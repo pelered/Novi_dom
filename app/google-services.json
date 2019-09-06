@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "563988642191",
+    "firebase_url": "https://zivotinje-dom.firebaseio.com",
+    "project_id": "zivotinje-dom",
+    "storage_bucket": "zivotinje-dom.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563988642191:android:93cc90bf2e1e49e2",
+        "android_client_info": {
+          "package_name": "com.example.zivotinje"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "563988642191-ste47lp1496ph9rd4v1t8pjmts41bfor.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zivotinje",
+            "certificate_hash": "addb90bc19e5100bcd2e97a56ba2665e6e997cf6"
+          }
+        },
+        {
+          "client_id": "563988642191-rim4sorh3mn3b6qqb47bau3bla4h0jr0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC26VEPrCChWqNKoPXF88Eiz5a-Rkt6rcQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "563988642191-rim4sorh3mn3b6qqb47bau3bla4h0jr0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
