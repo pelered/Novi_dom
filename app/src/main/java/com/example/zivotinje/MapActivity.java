@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 import androidx.fragment.app.Fragment;
@@ -46,11 +48,18 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -67,7 +76,10 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
     DatabaseReference myRef ;
     private final float DEFAULT_ZOOM=18;
     Geocoder mGeocoder;
-
+    LatLng zagreb;
+    private List adrese;
+    List<Address> addresses;
+   // ArrayList<MarkerData> markersArray = new ArrayList<MarkerData>();
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,25 +89,24 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-
-
-
         mapView = mapFragment.getView();
+
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("Sklonista");
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        //mUploads = new HashMap();
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
         mMap.setMyLocationEnabled(true);
-        LatLng zagreb = new LatLng( 45.815399, 15.966568);
+        zagreb = new LatLng( 45.815399, 15.966568);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.addMarker(new MarkerOptions().position(zagreb).title("Marker in Zagreb"));
+
+
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(zagreb,6));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(zagreb));
 
@@ -126,11 +137,67 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
         });
 
 
+        postavi_markere();
 
 
 
 
     }
+    private void postavi_markere(){
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int i=0;
+                mGeocoder=new Geocoder(getActivity(), Locale.getDefault());
+                //Log.d("Podaciii", dataSnapshot.getValue().toString());
+                //Log.d("proba", dataSnapshot.getValue(key));
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                    //Log.d("podatakpopodatak",postSnapshot.child("adresa").getValue().toString());
+
+                    ///Log.d("adresica",adrese.toString());
+                    try {
+                        addresses=mGeocoder.getFromLocationName(adrese.toString(),1);
+                        Log.d("adresica",addresses.toString());
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title(postSnapshot.child("naziv").getValue().toString()));
+
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    //Log.d("Podatakadrese", String.valueOf(ds.getValue()));
+                    //Upload upload = postSnapshot.getValue(Upload.class);
+                    //upload.getMapa();
+                    //Log.d("proba1",postSnapshot.getChildren().toString());
+                    //Adresa adresa=postSnapshot.getValue(Adresa.class);
+                    //adresa.setMapa(postSnapshot.getKey(),postSnapshot);
+
+                   // Log.d("proba2",adresa.getMapa().toString());
+                   // mUploads.put(upload);
+                    //Log.d("podatakpopodatak",postSnapshot.getChildren());
+                   /* for (DataSnapshot ps : postSnapshot.getChildren()){
+                        Log.d("podatakpopodatak",ps.child("adresa").getValue().toString());
+                    }*/
+                }
+                i++;
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+/*
+        for (int i=0; i<addresses.size();i++){
+
+
+            mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title("Marker in Zagreb"));
+        }*/
+        //mMap.addMarker(new MarkerOptions().position(zagreb).title("Marker in Zagreb"));
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 51) {
@@ -175,26 +242,5 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
                 });
     }
 
-    private void getPlaceInfo(String naziv) throws IOException {
-        List<Address> addresses = mGeocoder.getFromLocationName(naziv,1);
-        if (addresses.get(0).getPostalCode() != null) {
-            String ZIP = addresses.get(0).getPostalCode();
-            Log.d("ZIP CODE",ZIP);
-        }
 
-        if (addresses.get(0).getLocality() != null) {
-            String city = addresses.get(0).getLocality();
-            Log.d("CITY",city);
-        }
-
-        if (addresses.get(0).getAdminArea() != null) {
-            String state = addresses.get(0).getAdminArea();
-            Log.d("STATE",state);
-        }
-
-        if (addresses.get(0).getCountryName() != null) {
-            String country = addresses.get(0).getCountryName();
-            Log.d("COUNTRY",country);
-        }
-    }
 }
