@@ -3,24 +3,31 @@ package com.example.zivotinje;
 import android.content.ClipData;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.daimajia.slider.library.Animations.DescriptionAnimation;
-import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.BaseSliderView;
-import com.daimajia.slider.library.SliderTypes.TextSliderView;
-import com.daimajia.slider.library.Tricks.ViewPagerEx;
+
+import com.sangcomz.fishbun.FishBun;
+import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter;
+import com.sangcomz.fishbun.define.Define;
+import com.smarteist.autoimageslider.IndicatorAnimations;
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
+import com.smarteist.autoimageslider.SliderAnimations;
+import com.smarteist.autoimageslider.SliderView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,137 +35,111 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class PrikazZiv extends Fragment implements ViewPagerEx.OnPageChangeListener,BaseSliderView.OnSliderClickListener {
-    int PICK_IMAGE_MULTIPLE = 5;
-    String imageEncoded;
-    List<String> imagesEncodedList;
+public class PrikazZiv extends Fragment implements View.OnClickListener {
+    ArrayList<Parcelable> path;
+    private Button odaberi;
 
-    SliderLayout sliderLayout;
-    HashMap<String,String> Hash_file_maps ;
+    SliderView sliderView;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_prikaz_ziv, container, false);
     }
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        sliderView = view.findViewById(R.id.imageSlider);
+        /*
+        final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+        adapter.setCount(3);
+        adapter.slike(path);
+
+        sliderView.setSliderAdapter(adapter);
+
+        sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
+        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+        sliderView.setIndicatorSelectedColor(Color.WHITE);
+        sliderView.setIndicatorUnselectedColor(Color.GRAY);
+        sliderView.setScrollTimeInSec(15);
+        //sliderView.startAutoCycle();
 
 
-        Hash_file_maps = new HashMap<String, String>();
-
-        sliderLayout = (SliderLayout)view.findViewById(R.id.slider);
-
-        Hash_file_maps.put("Android CupCake", "http://androidblog.esy.es/images/cupcake-1.png");
-        Hash_file_maps.put("Android Donut", "http://androidblog.esy.es/images/donut-2.png");
-        Hash_file_maps.put("Android Eclair", "http://androidblog.esy.es/images/eclair-3.png");
-        Hash_file_maps.put("Android Froyo", "http://androidblog.esy.es/images/froyo-4.png");
-        Hash_file_maps.put("Android GingerBread", "http://androidblog.esy.es/images/gingerbread-5.png");
-
-        for(String name : Hash_file_maps.keySet()){
-
-            TextSliderView textSliderView = new TextSliderView(getActivity());
-            textSliderView
-                    .description(name)
-                    .image(Hash_file_maps.get(name))
-                    .setScaleType(BaseSliderView.ScaleType.Fit)
-                    .setOnSliderClickListener(this);
-            textSliderView.bundle(new Bundle());
-            textSliderView.getBundle()
-                    .putString("extra",name);
-            sliderLayout.addSlider(textSliderView);
-        }
-        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Accordion);
-        sliderLayout.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-        sliderLayout.setCustomAnimation(new DescriptionAnimation());
-        sliderLayout.setDuration(3000);
-        sliderLayout.addOnPageChangeListener(this);
-
-
-    }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            // When an Image is picked
-            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
-                    && null != data) {
-                // Get the Image from data
-
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                imagesEncodedList = new ArrayList<String>();
-                if(data.getData()!=null){
-
-                    Uri mImageUri=data.getData();
-
-                    // Get the cursor
-                    Cursor cursor = getActivity().getContentResolver().query(mImageUri,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageEncoded  = cursor.getString(columnIndex);
-                    cursor.close();
-
-                } else {
-                    if (data.getClipData() != null) {
-                        ClipData mClipData = data.getClipData();
-                        ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
-                        for (int i = 0; i < mClipData.getItemCount(); i++) {
-
-                            ClipData.Item item = mClipData.getItemAt(i);
-                            Uri uri = item.getUri();
-                            mArrayUri.add(uri);
-                            // Get the cursor
-
-                            Cursor cursor = getActivity().getContentResolver().query(uri, filePathColumn, null, null, null);
-                            // Move to first row
-                            cursor.moveToFirst();
-
-                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                            imageEncoded  = cursor.getString(columnIndex);
-                            imagesEncodedList.add(imageEncoded);
-                            cursor.close();
-
-                        }
-                        Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
-                    }
-                }
-            } else {
-                Toast.makeText(getActivity(), "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
+        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+            @Override
+            public void onIndicatorClicked(int position) {
+                sliderView.setCurrentPagePosition(position);
             }
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
+        });
+
+         */
+        odaberi=view.findViewById(R.id.odaberi);
+        odaberi.setOnClickListener(this);
+
+
+
+
+
+
+    }
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent imageData) {
+        super.onActivityResult(requestCode, resultCode, imageData);
+        switch (requestCode) {
+            case Define.ALBUM_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // path = imageData.getStringArrayListExtra(Define.INTENT_PATH);
+                    // you can get an image path(ArrayList<String>) on <0.6.2
+
+                    path = imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
+                    //path=imageData.getStringArrayListExtra(Define.INTENT_PATH);
+                    // you can get an image path(ArrayList<Uri>) on 0.6.2 and later
+                    //Log.d("Proba",path.toString());
+                    final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+                    adapter.setCount(path.size());
+                    adapter.slike(path);
+                    adapter.broj(path.size());
+                    sliderView.setSliderAdapter(adapter);
+                    sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+                    sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
+                    sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+                    sliderView.setIndicatorSelectedColor(Color.WHITE);
+                    sliderView.setIndicatorUnselectedColor(Color.GRAY);
+                    sliderView.setScrollTimeInSec(15);
+                    //sliderView.startAutoCycle();
+
+                    sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+                        @Override
+                        public void onIndicatorClicked(int position) {
+                            sliderView.setCurrentPagePosition(position);
+                        }
+                    });
+                    break;
+                }
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-    @Override
-    public void onStop() {
-
-        sliderLayout.stopAutoCycle();
-
-        super.onStop();
     }
 
-    @Override
-    public void onSliderClick(BaseSliderView slider) {
-        Toast.makeText(getActivity(),slider.getBundle().get("extra") + "",Toast.LENGTH_SHORT).show();
-    }
+
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    public void onClick(View view) {
 
-    }
 
-    @Override
-    public void onPageSelected(int position) {
-        Log.d("Slider Demo", "Page Changed: " + position);
-
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
+        FishBun.with(PrikazZiv.this).setImageAdapter(new GlideAdapter())
+                .setMaxCount(5)
+                .setMinCount(1)
+                .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), false)
+                .setActionBarTitleColor(Color.parseColor("#ffffff"))
+                .setAlbumSpanCount(2, 3)
+                .setButtonInAlbumActivity(false)
+                .setCamera(true)
+                .exceptGif(true)
+                .setReachLimitAutomaticClose(true)
+                .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_back_white))
+                .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                .setAllViewTitle("All")
+                .setMenuAllDoneText("All Done")
+                .textOnNothingSelected("Odaberi jednu do najviše 5")
+                .startAlbum();
     }
 }
