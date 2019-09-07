@@ -10,6 +10,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -45,9 +46,7 @@ import java.util.List;
 public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     String TAG = "placeautocomplete";
 
-    Geocoder mGeocoder;
     Button gumb;
-    Double lan,lon;
     AutocompleteSupportFragment autocompleteFragment;
     TextView skriven,naziv;
     AppCompatCheckBox checkbox;
@@ -130,28 +129,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
 
     }
-    private void getPlaceInfo(String naziv) throws IOException {
-        List<Address> addresses = mGeocoder.getFromLocationName(naziv,1);
-        if (addresses.get(0).getPostalCode() != null) {
-            String ZIP = addresses.get(0).getPostalCode();
-            Log.d("ZIP CODE",ZIP);
-        }
 
-        if (addresses.get(0).getLocality() != null) {
-            String city = addresses.get(0).getLocality();
-            Log.d("CITY",city);
-        }
-
-        if (addresses.get(0).getAdminArea() != null) {
-            String state = addresses.get(0).getAdminArea();
-            Log.d("STATE",state);
-        }
-
-        if (addresses.get(0).getCountryName() != null) {
-            String country = addresses.get(0).getCountryName();
-            Log.d("COUNTRY",country);
-        }
-    }
 
     @Override
     public void onClick(View view) {

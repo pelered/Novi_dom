@@ -3,6 +3,7 @@ package com.example.zivotinje;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.app.ProgressDialog;
@@ -11,9 +12,11 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,14 +26,20 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,9 +47,17 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.sangcomz.fishbun.FishBun;
+import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter;
+import com.sangcomz.fishbun.define.Define;
+import com.smarteist.autoimageslider.IndicatorAnimations;
+import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
+import com.smarteist.autoimageslider.SliderAnimations;
+import com.smarteist.autoimageslider.SliderView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +84,8 @@ public class Animal  extends Fragment {
     private DatabaseReference mDatabaseRef;
 
     private StorageTask mUploadTask;
+    AutocompleteSupportFragment autocompleteFragment;
+
 
     private ArrayList<Uri> ImageList = new ArrayList<Uri>();
     private int uploads = 0;
@@ -75,6 +94,10 @@ public class Animal  extends Fragment {
     int index = 0;
 
     ArrayList<Uri> mArrayUri;
+
+    ArrayList<Parcelable> path;
+
+    SliderView sliderView;
 
     String imageEncoded;
     List<String> imagesEncodedList;
@@ -87,12 +110,12 @@ public class Animal  extends Fragment {
         mButtonUpload =view.findViewById(R.id.button_upload);
         mTextViewShowUploads = view.findViewById(R.id.text_view_show_uploads);
         mEditTextFileName = view.findViewById(R.id.edit_text_file_name);
-        mImageView = view.findViewById(R.id.image_view);
         mProgressBar = view.findViewById(R.id.progress_bar);
         prefs = getActivity().getSharedPreferences("shared_pref_name", MODE_PRIVATE);
 
         mStorageRef = FirebaseStorage.getInstance().getReference("Sklonista");
         database=FirebaseDatabase.getInstance();
+        sliderView = view.findViewById(R.id.imageSlider);
 
         mDatabaseRef = database.getReference("Sklonista");
         Log.d("referenca",mDatabaseRef.toString());
@@ -121,6 +144,32 @@ public class Animal  extends Fragment {
         mTextViewShowUploads.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+            }
+        });
+        // Initialize Places.
+        Places.initialize(getContext(), "AIzaSyAyVddfVCAcVub30s1xsJLiaRCMx70EbtA");
+        // Initialize the AutocompleteSupportFragment.
+        autocompleteFragment = (AutocompleteSupportFragment)getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG,Place.Field.ID, Place.Field.NAME));
+        //autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE)
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setHint("Adresa");
+        //mice search icon
+        ImageView searchIcon = (ImageView)((LinearLayout)autocompleteFragment.getView()).getChildAt(0);
+        searchIcon.setVisibility(View.GONE);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                autocompleteFragment.setText(place.getLatLng().toString());
+
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
 
             }
         });
@@ -194,6 +243,24 @@ public class Animal  extends Fragment {
     }
 
     private void openFileChooser() {
+        FishBun.with(Animal.this).setImageAdapter(new GlideAdapter())
+                .setMaxCount(5)
+                .setMinCount(1)
+                .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), false)
+                .setActionBarTitleColor(Color.parseColor("#ffffff"))
+                .setAlbumSpanCount(2, 3)
+                .setButtonInAlbumActivity(false)
+                .setCamera(true)
+                .exceptGif(true)
+                .setReachLimitAutomaticClose(true)
+                .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_back_white))
+                .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                .setAllViewTitle("All")
+                .setMenuAllDoneText("All Done")
+                .textOnNothingSelected("Odaberi jednu do najviše 5")
+                .startAlbum();
+        /*
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -201,11 +268,45 @@ public class Animal  extends Fragment {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_REQUEST);
         //startActivityForResult(intent, PICK_IMAGE_REQUEST);
+
+         */
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent imageData) {
+        super.onActivityResult(requestCode, resultCode, imageData);
+        switch (requestCode) {
+            case Define.ALBUM_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // path = imageData.getStringArrayListExtra(Define.INTENT_PATH);
+                    // you can get an image path(ArrayList<String>) on <0.6.2
+                    ImageList=imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
+                    path = imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
+                    //path=imageData.getStringArrayListExtra(Define.INTENT_PATH);
+                    // you can get an image path(ArrayList<Uri>) on 0.6.2 and later
+                    //Log.d("Proba",path.toString());
+                    final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+                    adapter.setCount(path.size());
+                    adapter.slike(path);
+                    adapter.broj(path.size());
+                    sliderView.setSliderAdapter(adapter);
+                    sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+                    sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
+                    sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+                    sliderView.setIndicatorSelectedColor(Color.WHITE);
+                    sliderView.setIndicatorUnselectedColor(Color.GRAY);
+                    sliderView.setScrollTimeInSec(15);
+                    //sliderView.startAutoCycle();
+
+                    sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+                        @Override
+                        public void onIndicatorClicked(int position) {
+                            sliderView.setCurrentPagePosition(position);
+                        }
+                    });
+                    break;
+                }
+        }
 /*
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
@@ -214,7 +315,7 @@ public class Animal  extends Fragment {
             Picasso.get().load(mImageUri).into(mImageView);
         }
 
- */
+
 
         try {
             if (requestCode == PICK_IMAGE_REQUEST) {
@@ -239,6 +340,8 @@ public class Animal  extends Fragment {
         }catch (Exception e){
             e.getStackTrace();
         }
+
+        */
 
 
     }

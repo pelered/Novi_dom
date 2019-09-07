@@ -1,7 +1,10 @@
 package com.example.zivotinje;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +49,9 @@ import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
+import java.util.List;
+
 import static android.app.Activity.RESULT_OK;
 
 
@@ -60,6 +66,8 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
     FirebaseDatabase database;
     DatabaseReference myRef ;
     private final float DEFAULT_ZOOM=18;
+    Geocoder mGeocoder;
+
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -165,5 +173,28 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
                             Toast.makeText(getActivity(), "unable to get last location", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void getPlaceInfo(String naziv) throws IOException {
+        List<Address> addresses = mGeocoder.getFromLocationName(naziv,1);
+        if (addresses.get(0).getPostalCode() != null) {
+            String ZIP = addresses.get(0).getPostalCode();
+            Log.d("ZIP CODE",ZIP);
+        }
+
+        if (addresses.get(0).getLocality() != null) {
+            String city = addresses.get(0).getLocality();
+            Log.d("CITY",city);
+        }
+
+        if (addresses.get(0).getAdminArea() != null) {
+            String state = addresses.get(0).getAdminArea();
+            Log.d("STATE",state);
+        }
+
+        if (addresses.get(0).getCountryName() != null) {
+            String country = addresses.get(0).getCountryName();
+            Log.d("COUNTRY",country);
+        }
     }
 }

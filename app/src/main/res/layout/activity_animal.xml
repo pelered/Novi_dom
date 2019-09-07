@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Animal">
 
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <Button
         android:id="@+id/button_choose_image"
-        android:layout_width="wrap_content"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
-        android:text="Choose file" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="115dp"
+        android:layout_marginLeft="115dp"
+        android:layout_marginTop="107dp"
+        android:layout_marginEnd="126dp"
+        android:layout_marginRight="126dp"
+        android:background="@android:color/transparent"
+        android:text="Odaberi slike" />
 
     <EditText
         android:id="@+id/edit_text_file_name"
@@ -24,44 +37,150 @@
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@+id/button_choose_image" />
 
-    <ImageView
-        android:id="@+id/image_view"
+    <com.smarteist.autoimageslider.SliderView
+        android:id="@+id/imageSlider"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/progress_bar"
-        android:layout_below="@id/edit_text_file_name"
-        android:layout_marginTop="16dp" />
+        android:layout_height="293dp"
+        android:layout_alignEnd="@+id/edit_text_file_name"
+        android:layout_alignRight="@+id/edit_text_file_name"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        app:sliderAnimationDuration="600"
+        app:sliderAutoCycleDirection="back_and_forth"
+        app:sliderAutoCycleEnabled="true"
+        app:sliderCircularHandlerEnabled="true"
+        app:sliderIndicatorAnimationDuration="600"
+        app:sliderIndicatorGravity="center_horizontal|bottom"
+        app:sliderIndicatorMargin="15dp"
+        app:sliderIndicatorOrientation="horizontal"
+        app:sliderIndicatorPadding="3dp"
+        app:sliderIndicatorRadius="2dp"
+        app:sliderIndicatorSelectedColor="#5A5A5A"
+        app:sliderIndicatorUnselectedColor="#FFF"
+        app:sliderScrollTimeInSec="1"
+        app:sliderStartAutoCycle="true" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_upload"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="16dp"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="710dp"
+        android:layout_marginEnd="-2dp"
+        android:layout_marginRight="-2dp" />
 
     <Button
         android:id="@+id/button_upload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_width="144dp"
+        android:layout_height="38dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="264dp"
+        android:layout_marginLeft="264dp"
+        android:layout_marginTop="300dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginRight="3dp"
         android:text="Upload" />
 
     <TextView
         android:id="@+id/text_view_show_uploads"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/button_upload"
+        android:layout_width="131dp"
+        android:layout_height="32dp"
         android:layout_alignTop="@+id/button_upload"
-        android:layout_marginStart="25dp"
+        android:layout_alignBottom="@+id/button_upload"
+        android:layout_marginStart="-137dp"
+        android:layout_marginLeft="-137dp"
+        android:layout_marginTop="-44dp"
+        android:layout_marginBottom="61dp"
         android:layout_toEndOf="@+id/button_upload"
+        android:layout_toRightOf="@+id/button_upload"
+        android:background="@android:color/transparent"
         android:gravity="center"
-        android:text="Show Uploads"
-        android:textSize="16sp"
-        android:layout_marginLeft="25dp"
-        android:layout_toRightOf="@+id/button_upload" />
+        android:text="Obrisi slike"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/naziv_sk"
+        android:layout_width="338dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="38dp"
+        android:layout_marginLeft="38dp"
+        android:layout_marginTop="350dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginRight="35dp"
+        android:background="@null"
+        android:hint="Naziv sklonista" />
+
+
+    <EditText
+        android:id="@+id/opis"
+        android:layout_width="wrap_content"
+        android:layout_height="115dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="39dp"
+        android:layout_marginLeft="39dp"
+        android:layout_marginTop="422dp"
+        android:layout_marginEnd="33dp"
+        android:layout_marginRight="33dp"
+        android:background="@null"
+        android:gravity="top|left"
+        android:hint="Opis"
+        android:inputType="textMultiLine" />
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView2"
+        android:layout_width="337dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="38dp"
+        android:layout_marginLeft="38dp"
+        android:layout_marginTop="383dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginRight="35dp"
+        android:background="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <fragment
+            android:id="@+id/autocomplete_fragment"
+
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+
+            />
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
+
+</ScrollView>
