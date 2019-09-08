@@ -24,6 +24,7 @@ public class SliderAdapterExample extends
     private int mCount;
     ArrayList<Parcelable> path;
     private int pos2;
+    ArrayList<String> path2;
 
     public SliderAdapterExample(FragmentActivity context) {
         this.context = context;
@@ -55,16 +56,30 @@ public class SliderAdapterExample extends
             }
         });
         ArrayList<Parcelable> link;
-        link=path;
+        ArrayList<String> link2;
+        if(path==null){
+             link2=path2;
+            for (int i = 0; i < pos2; i++) {
+                Glide.with(viewHolder.itemView)
+                        .load(link2.get(position))
+                        .fitCenter()
+                        .into(viewHolder.imageViewBackground);
 
+            }
+        }else{
+            link=path;
+            for (int i = 0; i < pos2; i++) {
+                Glide.with(viewHolder.itemView)
+                        .load(link.get(position))
+                        .fitCenter()
+                        .into(viewHolder.imageViewBackground);
 
-        for (int i = 0; i < pos2; i++) {
-            Glide.with(viewHolder.itemView)
-                    .load(link.get(position))
-                    .fitCenter()
-                    .into(viewHolder.imageViewBackground);
+            }
 
         }
+
+
+
 
 /*
 
@@ -126,6 +141,10 @@ public class SliderAdapterExample extends
     public int getCount() {
         //slider view count could be dynamic size
         return mCount;
+    }
+
+    public void slike2(ArrayList<String> slike2) {
+        this.path2=slike2;
     }
 
     class SliderAdapterVH extends SliderViewAdapter.ViewHolder {

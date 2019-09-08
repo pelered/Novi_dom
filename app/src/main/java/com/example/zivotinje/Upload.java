@@ -1,21 +1,22 @@
 package com.example.zivotinje;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.google.firebase.database.Exclude;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class Upload {
     private String mName;
     private String mImageUrl;
     private String mId;
+    private String adresa;
+    private String opis;
     public Map<String, Boolean> stars = new HashMap<>();
     private int count=0;
+    private ArrayList<String> slike=new ArrayList<String>();
+    private Map<String,String> slike_skinute=new HashMap<>();
+    public Map<String,String> slike_map =new HashMap<>();
 
     public Upload() {
         //empty constructor needed
@@ -30,8 +31,44 @@ public class Upload {
         mImageUrl = imageUrl;
         mId=id;
     }
-    public Upload(String imageUrl){
-        mImageUrl=imageUrl;
+    public Upload(Map<String,String> slike_skinute){
+        this.slike_skinute=slike_skinute;
+    }
+
+    public void setSlike_skinute(Map<String,String> slike_skinute) {
+        this.slike_skinute = slike_skinute;
+    }
+    public Map<String,String> getSlike_skinute(){
+        return  slike_skinute;
+    }
+
+    public Upload(String name, String id, String adresa, String opis, ArrayList<String> slike)
+{       this.slike=slike;
+        this.mName=name;
+        mId=id;
+        this.adresa=adresa;
+        this.opis=opis;
+    }
+    public Upload(String name, String id, String adresa, String opis, HashMap<String,String> slike_map)
+    {
+        this.slike_map=slike_map;
+        this.slike=slike;
+        this.mName=name;
+        mId=id;
+        this.adresa=adresa;
+        this.opis=opis;
+    }
+
+    public void setAdresa(String adresa) {
+        this.adresa = adresa;
+    }
+
+    public void setmId(String mId) {
+        this.mId = mId;
+    }
+
+    public void setOpis(String opis) {
+        this.opis = opis;
     }
 
     public String getName() {
@@ -59,11 +96,13 @@ public String getId(){return mId;}
     }
     @Exclude
     public Map<String, Object> toMap() {
-        count =count+1;
         HashMap<String, Object> result = new HashMap<>();
-        result.put("imageUrl"+count, mImageUrl);
+        result.put("naziv",mName);
+        result.put("id",mId);
+        result.put("adresa",adresa);
+        result.put("opis",opis);
+        result.put("url",slike_map);
 
-        result.put("stars", stars);
 
         return result;
     }

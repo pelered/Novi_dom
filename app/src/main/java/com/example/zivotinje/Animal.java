@@ -34,14 +34,20 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -55,6 +61,10 @@ import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawControlle
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,12 +81,10 @@ public class Animal  extends Fragment {
     private Button mButtonChooseImage;
     private Button mButtonUpload;
     private TextView mTextViewShowUploads;
-    private EditText mEditTextFileName;
-    private ImageView mImageView;
     private ProgressBar mProgressBar;
 
-    private Uri mImageUri;
     SharedPreferences prefs;
+    String adresa;
 
 
     private StorageReference mStorageRef;
@@ -84,6 +92,8 @@ public class Animal  extends Fragment {
     private DatabaseReference mDatabaseRef;
 
     private StorageTask mUploadTask;
+    private StorageTask uploadTask;
+
     AutocompleteSupportFragment autocompleteFragment;
 
 
@@ -91,16 +101,23 @@ public class Animal  extends Fragment {
     private int uploads = 0;
     private DatabaseReference databaseReference;
     private ProgressDialog progressDialog;
-    int index = 0;
+    private EditText naziv,opis;
 
-    ArrayList<Uri> mArrayUri;
 
     ArrayList<Parcelable> path;
 
     SliderView sliderView;
+    private ArrayList<String> slike=new ArrayList<String>();
+    private ArrayList<String> slike2=new ArrayList<String>();
 
-    String imageEncoded;
-    List<String> imagesEncodedList;
+    private HashMap<String,String> slike_map=new HashMap<String,String>();
+    private Map<String,String> slike_skinute=new HashMap<String,String>();
+    int i=0;
+
+
+
+
+    String id;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_animal,container,false);
@@ -109,16 +126,17 @@ public class Animal  extends Fragment {
         mButtonChooseImage = view.findViewById(R.id.button_choose_image);
         mButtonUpload =view.findViewById(R.id.button_upload);
         mTextViewShowUploads = view.findViewById(R.id.text_view_show_uploads);
-        mEditTextFileName = view.findViewById(R.id.edit_text_file_name);
         mProgressBar = view.findViewById(R.id.progress_bar);
         prefs = getActivity().getSharedPreferences("shared_pref_name", MODE_PRIVATE);
-
+        id=prefs.getString("uid","");
         mStorageRef = FirebaseStorage.getInstance().getReference("Sklonista");
         database=FirebaseDatabase.getInstance();
         sliderView = view.findViewById(R.id.imageSlider);
 
         mDatabaseRef = database.getReference("Sklonista");
-        Log.d("referenca",mDatabaseRef.toString());
+        //Log.d("referenca",mDatabaseRef.toString());
+        naziv=view.findViewById(R.id.naziv_sk);
+        opis=view.findViewById(R.id.opis);
 
 
         //mDatabaseRef = FirebaseDatabase.getInstance().getReference("uploads");
@@ -153,7 +171,7 @@ public class Animal  extends Fragment {
         autocompleteFragment = (AutocompleteSupportFragment)getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG,Place.Field.ID, Place.Field.NAME));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG,Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS));
         //autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE)
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setHint("Adresa");
@@ -165,6 +183,8 @@ public class Animal  extends Fragment {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 autocompleteFragment.setText(place.getLatLng().toString());
+                adresa=place.getAddress();
+                Log.d("pod adresa",adresa);
 
             }
 
@@ -173,8 +193,99 @@ public class Animal  extends Fragment {
 
             }
         });
+        if(autocompleteFragment!=null){
+
+            ucitajPodatke();
+
+        }
+
 
     }
+
+    private void ucitajPodatke(){
+        mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Log.d("pod",postSnapshot.child("naziv").toString());
+                    if(postSnapshot.getKey().equals(id)){
+                        String broj= String.valueOf(postSnapshot.child("url").getChildrenCount());
+                        int br=Integer.parseInt(broj);
+
+                        for(int j=0; j<br;j++){
+                            slike2.add(postSnapshot.child("url").child(j+"_key").getValue().toString());
+                            Log.d("pod slika url", postSnapshot.child("url").child(j+"_key").getValue().toString());
+
+                        }
+                        /*
+                        Upload up=postSnapshot.child("url").getValue(Upload.class);
+                        String myString=postSnapshot.child("url").getValue().toString();
+                        HashMap<String, Integer> map = convertToHashMap(myString);
+                        Log.d("test", map.toString());
+                        slike_skinute= up.getSlike_skinute();
+                        Log.d("poddd",slike_skinute.toString());
+                        Log.d("pod jos",postSnapshot.toString());*/
+
+                        naziv.setText(postSnapshot.child("naziv").getValue().toString());
+                        if(postSnapshot.child("adresa").getValue()!=null){
+                            if(autocompleteFragment!=null){
+                                autocompleteFragment.setText(postSnapshot.child("adresa").getValue().toString());
+
+                            }
+                            adresa=postSnapshot.child("adresa").getValue().toString();
+
+
+                        }
+                        if(postSnapshot.child("naziv").toString()==null){
+
+                        }else{
+                            opis.setText("Opis");
+                        }
+
+                    }
+                }
+
+            }
+
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("pod slike2",slike2.toString());
+                inicijalizirajSlider(slike2);
+            }
+        }, 10000);
+
+    }
+    public void inicijalizirajSlider( ArrayList<String> slike2){
+        final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+        adapter.setCount(slike2.size());
+        adapter.slike2(slike2);
+        adapter.broj(slike2.size());
+        sliderView.setSliderAdapter(adapter);
+        sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
+        sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
+        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+        sliderView.setIndicatorSelectedColor(Color.WHITE);
+        sliderView.setIndicatorUnselectedColor(Color.GRAY);
+        sliderView.setScrollTimeInSec(15);
+        //sliderView.startAutoCycle();
+
+        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+            @Override
+            public void onIndicatorClicked(int position) {
+                sliderView.setCurrentPagePosition(position);
+            }
+        });
+    }
+
     private String getFileExtension(Uri uri) {
         ContentResolver cR = getActivity().getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
@@ -182,17 +293,71 @@ public class Animal  extends Fragment {
     }
 
     private void uploadFile() {
+
         if (!ImageList.isEmpty()) {
 
-
             for (uploads=0; uploads < ImageList.size(); uploads++) {
-                Uri Image  = ImageList.get(uploads);
-                StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                final Uri Image  = ImageList.get(uploads);
+
+
+                final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                         + "." + getFileExtension(Image));
-                mUploadTask = fileReference.putFile(Image)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                 Log.d("reference",fileReference.toString());
+                Log.d("naziv slike",System.currentTimeMillis()
+                        + "." + getFileExtension(Image));
+
+                uploadTask = fileReference.putFile(Image);
+                mUploadTask = fileReference.putFile(Image);
+
+
+                // Register observers to listen for when the download is done or if it fails
+                mUploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("podaci",taskSnapshot.getMetadata().toString());
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                        mUploadTask = fileReference.putFile(Image);
+
+                        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                            @Override
+                            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                if (!task.isSuccessful()) {
+                                    throw task.getException();
+                                }
+
+                                // Continue with the task to get the download URL
+                                return fileReference.getDownloadUrl();
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    Uri downloadUri = task.getResult();
+                                    Log.d("url trazeni",downloadUri.toString());
+                                    slike_map.put(i+"_key",downloadUri.toString());
+                                    i++;
+                                    Log.d("mapa key",slike_map.toString());
+                                    Toast.makeText(getActivity(), "Upload successful", Toast.LENGTH_LONG).show();
+                                    slike.add(downloadUri.toString());
+                                } else {
+                                    // Handle failures
+                                    // ...
+                                }
+                            }
+                        });
+                    }
+                });
+/*
+                muploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
                                 Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
                                     @Override
@@ -200,8 +365,17 @@ public class Animal  extends Fragment {
                                         mProgressBar.setProgress(0);
                                     }
                                 }, 0);
-                                Toast.makeText(getActivity(), "Upload successful", Toast.LENGTH_LONG).show();
-                                dodajSliku(taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+
+
+
+
+
+                                slike_map.put(i+"_key",taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+                                i++;
+                                Log.d("mapa key",slike_map.toString());
+                                        Toast.makeText(getActivity(), "Upload successful", Toast.LENGTH_LONG).show();
+                                slike.add(taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -217,34 +391,48 @@ public class Animal  extends Fragment {
                                 mProgressBar.setProgress((int) progress);
                             }
                         });
+*/
             }
+
+
+
 
 
         } else {
             Toast.makeText(getActivity(), "No file selected", Toast.LENGTH_SHORT).show();
         }
 
-////
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("pod slike",slike.toString());
+                dodajSliku();
+            }
+        }, 10000);
 
     }
-    private void dodajSliku(String url){
+    private void dodajSliku(){
         //String id=prefs.getString("uid","");
-        Upload upload = new Upload(url);
+        Upload upload2 = new Upload(naziv.getText().toString(),id,adresa,opis.getText().toString(),slike_map);
+
+        Upload upload = new Upload(naziv.getText().toString(),id,adresa,opis.getText().toString(),slike);
         Map<String, Object> postValues =upload.toMap();
-        //Log.d("mapa",postValues.toString());
-        Map<String, Object> childUpdates = new HashMap<>();
-        String uploadId = mDatabaseRef.child(prefs.getString("uid","")).push().getKey();
-        childUpdates.put(uploadId,postValues);
+        Map<String, Object> postValues2=upload2.toMap();
+        Log.d("mapa slike",slike_map.toString());
+        Log.d("mapa",postValues2.toString());
+        //Map<String, Object> childUpdates = new HashMap<>();
+        //String uploadId = mDatabaseRef.child(prefs.getString("uid","")).push().getKey();
+        //childUpdates.put(uploadId,postValues);
 
         Log.d("ID uploda",prefs.getString("uid",""));
-        mDatabaseRef.child(prefs.getString("uid","")).push().setValue(postValues);
+        mDatabaseRef.child(prefs.getString("uid","")).updateChildren(postValues2);
+        slike.clear();
         ImageList.clear();
     }
 
     private void openFileChooser() {
         FishBun.with(Animal.this).setImageAdapter(new GlideAdapter())
-                .setMaxCount(5)
+                .setMaxCount(8)
                 .setMinCount(1)
                 .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), false)
                 .setActionBarTitleColor(Color.parseColor("#ffffff"))
@@ -258,7 +446,7 @@ public class Animal  extends Fragment {
                 .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
                 .setAllViewTitle("All")
                 .setMenuAllDoneText("All Done")
-                .textOnNothingSelected("Odaberi jednu do najviše 5")
+                .textOnNothingSelected("Odaberi jednu do najviše 8")
                 .startAlbum();
         /*
         Intent intent = new Intent();

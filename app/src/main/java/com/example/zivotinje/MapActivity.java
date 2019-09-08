@@ -94,6 +94,8 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
 
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Sklonista");
+        mGeocoder=new Geocoder(getActivity(), Locale.getDefault());
+
     }
 
     @Override
@@ -148,24 +150,28 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int i=0;
-                mGeocoder=new Geocoder(getActivity(), Locale.getDefault());
                 //Log.d("Podaciii", dataSnapshot.getValue().toString());
                 //Log.d("proba", dataSnapshot.getValue(key));
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                    //Log.d("podatakpopodatak",postSnapshot.child("adresa").getValue().toString());
+                    String in=postSnapshot.getKey();
+                    //Log.d("pod",in);
+                    //Log.d("podatakpopodatak",postSnapshot.getKey());
 
                     ///Log.d("adresica",adrese.toString());
                     try {
-                        addresses=mGeocoder.getFromLocationName(adrese.toString(),1);
-                        Log.d("adresica",addresses.toString());
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title(postSnapshot.child("naziv").getValue().toString()));
+                        if(mGeocoder!=null){
+                            if(postSnapshot.child("adresa").getValue()!=null) {
+                                addresses = mGeocoder.getFromLocationName(postSnapshot.child("adresa").getValue().toString(), 1);
+                                //Log.d("adresica",addresses.toString());
+                                mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title(postSnapshot.child("naziv").getValue().toString()));
+                            }
+                        }
 
 
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                     //Log.d("Podatakadrese", String.valueOf(ds.getValue()));
                     //Upload upload = postSnapshot.getValue(Upload.class);
                     //upload.getMapa();
