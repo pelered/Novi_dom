@@ -31,7 +31,7 @@
     <com.smarteist.autoimageslider.SliderView
         android:id="@+id/imageSlider"
         android:layout_width="match_parent"
-        android:layout_height="247dp"
+        android:layout_height="297dp"
 
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
@@ -107,36 +107,38 @@
 
     <EditText
         android:id="@+id/naziv_sk"
-        android:layout_width="338dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="38dp"
-        android:layout_marginLeft="38dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
         android:layout_marginTop="350dp"
-        android:layout_marginEnd="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
         android:background="@null"
+        android:gravity="center"
         android:hint="Naziv sklonista" />
 
 
     <EditText
+
         android:id="@+id/opis"
-        android:layout_width="wrap_content"
-        android:layout_height="115dp"
+        android:layout_width="match_parent"
+        android:layout_height="141dp"
         android:layout_below="@+id/cardView2"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="35dp"
-        android:layout_marginLeft="35dp"
-        android:layout_marginTop="37dp"
-        android:layout_marginEnd="37dp"
-        android:layout_marginRight="37dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="51dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
         android:background="@null"
         android:gravity="top|left"
         android:hint="Opis"
@@ -144,18 +146,18 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginStart="38dp"
-        android:layout_marginLeft="38dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
         android:layout_marginTop="383dp"
-        android:layout_marginEnd="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
         android:background="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -165,12 +167,31 @@
             android:id="@+id/autocomplete_fragment"
 
             android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-            android:layout_width="333dp"
-            android:layout_height="31dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@null"
 
             />
     </androidx.cardview.widget.CardView>
+
+    <EditText
+        android:gravity="center"
+        android:id="@+id/email_skl"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_below="@+id/cardView2"
+        android:layout_alignParentStart="true"
+
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="0dp"
+        android:background="@null"
+        android:hint="Email" />
 
 </RelativeLayout>
 

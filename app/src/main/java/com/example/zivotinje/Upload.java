@@ -12,6 +12,7 @@ public class Upload {
     private String mId;
     private String adresa;
     private String opis;
+    String email;
     public Map<String, Boolean> stars = new HashMap<>();
     private int count=0;
     private ArrayList<String> slike=new ArrayList<String>();
@@ -58,6 +59,28 @@ public class Upload {
         this.adresa=adresa;
         this.opis=opis;
     }
+    public Upload(String name, String id, String adresa,String email, String opis, HashMap<String,String> slike_map)
+    {
+        this.email=email;
+        this.slike_map=slike_map;
+        this.slike=slike;
+        this.mName=name;
+        mId=id;
+        this.adresa=adresa;
+        this.opis=opis;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setmName(String mName) {
+        this.mName = mName;
+    }
+
+    public void setSlike_map(Map<String, String> slike_map) {
+        this.slike_map = slike_map;
+    }
 
     public void setAdresa(String adresa) {
         this.adresa = adresa;
@@ -100,6 +123,7 @@ public String getId(){return mId;}
         result.put("naziv",mName);
         result.put("id",mId);
         result.put("adresa",adresa);
+        result.put("email",email);
         result.put("opis",opis);
         result.put("url",slike_map);
 

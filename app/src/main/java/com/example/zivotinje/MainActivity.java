@@ -134,18 +134,18 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, new MapActivity());
-            ft.addToBackStack("tag_back");
+            ft.addToBackStack("tag_back2");
             ft.commit();        }
         else if (id == R.id.nav_gallery) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, new Animal());
-            ft.addToBackStack("tag_back");
+            ft.addToBackStack("tag_back3");
             ft.commit();
 
         } else if (id == R.id.nav_slideshow) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new PrikazZiv());
-            ft.addToBackStack("tag_back");
+            ft.replace(R.id.fragment_container, new PrikazSkl());
+            ft.addToBackStack("tag_back4");
             ft.commit();
 
         } else if (id == R.id.nav_tools) {

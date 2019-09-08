@@ -43,6 +43,7 @@ public class SliderAdapterExample extends
     public void slike(ArrayList<Parcelable> path){
         this.path=path;
     }
+
     public void broj(int pos2){
         this.pos2=pos2;
     }

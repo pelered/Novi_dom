@@ -4,6 +4,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -48,6 +50,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.api.LogDescriptor;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -55,16 +58,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import static android.app.Activity.RESULT_OK;
 
 
-public class MapActivity extends Fragment implements OnMapReadyCallback {
+public class MapActivity extends Fragment implements Serializable, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     @Nullable
     private GoogleMap mMap;
 
@@ -77,8 +80,17 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
     private final float DEFAULT_ZOOM=18;
     Geocoder mGeocoder;
     LatLng zagreb;
+    Double lan,lon;
     private List adrese;
     List<Address> addresses;
+    String id;
+    String ide;
+
+    Marker[] markerr;
+    private static final long serialVersionUID = -2163051469151804394L;
+    private int idd;
+    private String created;
+    HashMap<String,String> popis=new HashMap<>();
    // ArrayList<MarkerData> markersArray = new ArrayList<MarkerData>();
 
 
@@ -95,13 +107,50 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Sklonista");
         mGeocoder=new Geocoder(getActivity(), Locale.getDefault());
+        markerr = new Marker[20];
 
     }
 
-    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Integer j=0;
+        for(Map.Entry<String, String> entry : popis.entrySet())
+        {
+            Log.d("mape brojac",j.toString());
+            j++;
+            Log.d("mapee id",marker.getId());
+            Log.d("mapee kljuc",entry.getKey());
+            if (marker.getId().equals(entry.getKey())){
+                Log.d("Imamo",entry.getValue());
+                ide=entry.getValue();
+                break;
+
+            }else if(ide==null) {
+                ide = "1";
+                Log.d("Imamo2",ide);
+
+            }
+        }
+        //Log.d("marker",id);
+        PrikazSkl fragment=new PrikazSkl();
+        Bundle args = new Bundle();
+        args.putString("marker", ide);
+        fragment.setArguments(args);
+        //getFragmentManager().beginTransaction().replace(R.id.fragment_container, new PrikazSkl())
+        //Fragment fragment = new PrikazSkl();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack("tag_back1");
+        ft.commit();
+        //you can get assests of the clicked marker
+        return  true;
+    }
+
     public void onMapReady(GoogleMap googleMap) {
         //mUploads = new HashMap();
         mMap = googleMap;
+
+
+        mMap.setOnMarkerClickListener(this);
 
         // Add a marker in Sydney and move the camera
         mMap.setMyLocationEnabled(true);
@@ -145,33 +194,25 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
 
 
     }
+
     private void postavi_markere(){
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int i=0;
-                //Log.d("Podaciii", dataSnapshot.getValue().toString());
+                final int i=0;
+                Log.d("Podaciii", dataSnapshot.getValue().toString());
                 //Log.d("proba", dataSnapshot.getValue(key));
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                    String in=postSnapshot.getKey();
-                    //Log.d("pod",in);
-                    //Log.d("podatakpopodatak",postSnapshot.getKey());
+                for (final DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            odgodi_geoc(postSnapshot,i);
 
-                    ///Log.d("adresica",adrese.toString());
-                    try {
-                        if(mGeocoder!=null){
-                            if(postSnapshot.child("adresa").getValue()!=null) {
-                                addresses = mGeocoder.getFromLocationName(postSnapshot.child("adresa").getValue().toString(), 1);
-                                //Log.d("adresica",addresses.toString());
-                                mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title(postSnapshot.child("naziv").getValue().toString()));
-                            }
                         }
+                    }, 0);
 
 
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     //Log.d("Podatakadrese", String.valueOf(ds.getValue()));
                     //Upload upload = postSnapshot.getValue(Upload.class);
                     //upload.getMapa();
@@ -186,7 +227,7 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
                         Log.d("podatakpopodatak",ps.child("adresa").getValue().toString());
                     }*/
                 }
-                i++;
+
 
             }
 
@@ -202,6 +243,39 @@ public class MapActivity extends Fragment implements OnMapReadyCallback {
             mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title("Marker in Zagreb"));
         }*/
         //mMap.addMarker(new MarkerOptions().position(zagreb).title("Marker in Zagreb"));
+    }
+    public void odgodi_geoc(DataSnapshot postSnapshot,Integer i){
+        String in=postSnapshot.getKey();
+        Log.d("mapeee",in);
+        //Log.d("podatakpopodatak",postSnapshot.getKey());
+
+        ///Log.d("adresica",adrese.toString());
+        try {
+            if(mGeocoder!=null){
+                if(postSnapshot.child("adresa").getValue()!=null) {
+                    id=postSnapshot.child("id").getValue().toString();
+                    addresses = mGeocoder.getFromLocationName(postSnapshot.child("adresa").getValue().toString(), 1);
+                    //Log.d("adresica",addresses.toString());
+                    lan=addresses.get(i).getLatitude();
+                    lon=addresses.get(i).getLongitude();
+                    markerr[i] =mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title(postSnapshot.child("naziv").getValue().toString()));
+                    Log.d("mape",markerr[i].toString());
+                    markerr[i].showInfoWindow();
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude())).title(postSnapshot.child("naziv").getValue().toString())).showInfoWindow();
+                    popis.put(markerr[i].getId(),id);
+                    Log.d("marker",mMap.toString());
+                    Log.d("mapee",popis.toString());
+                    i++;
+
+
+                }
+            }
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
