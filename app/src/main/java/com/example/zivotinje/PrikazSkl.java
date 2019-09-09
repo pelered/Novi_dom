@@ -104,8 +104,12 @@ public class PrikazSkl extends Fragment implements Serializable {
                 sendEmail();
             }
         });
+        if (getArguments()==null){
+            value=prefs.getString("uid","");
+        }else{
+            value= getArguments().getString("marker");
 
-        value= getArguments().getString("marker");
+        }
         Log.d("frag",value);
 
         /*
@@ -118,8 +122,7 @@ public class PrikazSkl extends Fragment implements Serializable {
         */
 
         ///ovo treba izmjeniti privremeno
-        uid=prefs.getString("uid","");
-        email1.setText(prefs.getString("email",""));
+
 
 Log.d("ovdje sam","jesssam");
             ucitaj_podatke();
@@ -180,6 +183,7 @@ Log.d("ovdje sam","jesssam");
                         naziv=postSnapshot.child("naziv").getValue().toString();
                         //treba promijeniti da se email sprema
                         //email1=prefs.getString("email","");
+                        email=postSnapshot.child("email").getValue().toString();
 
                         //opis.setText(postSnapshot.child("opis").getValue().toString());
                         adresa=postSnapshot.child("adresa").getValue().toString();
@@ -192,6 +196,8 @@ Log.d("ovdje sam","jesssam");
                             opis1.setText("Opis");
 
                         }else{
+                            naziv1.setText(naziv);
+                            email1.setText(email);
                             opis1.setText(postSnapshot.child("opis").getValue().toString());
                         }
                         opis=postSnapshot.child("opis").getValue().toString();
@@ -215,7 +221,6 @@ Log.d("ovdje sam","jesssam");
             public void run() {
                 Log.d("pod slike2",slike2.toString());
                 if(!slike2.isEmpty()){
-                    naziv1.setText(naziv);
                     inicijalizirajSlider(slike2);
                 }
 

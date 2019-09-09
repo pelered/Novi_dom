@@ -149,6 +149,10 @@ public class MainActivity extends AppCompatActivity
             ft.commit();
 
         } else if (id == R.id.nav_tools) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, new EditSkl());
+            ft.addToBackStack("tag_back4");
+            ft.commit();
 
         } else if (id == R.id.nav_share) {
 

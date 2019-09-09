@@ -1,9 +1,303 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditSkl">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/button_choose_image"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="115dp"
+            android:layout_marginLeft="115dp"
+            android:layout_marginTop="107dp"
+            android:layout_marginEnd="126dp"
+            android:layout_marginRight="126dp"
+            android:background="@android:color/transparent"
+            android:text="Odaberi slike" />
+
+
+        <com.smarteist.autoimageslider.SliderView
+            android:id="@+id/imageSlider"
+            android:layout_width="match_parent"
+            android:layout_height="297dp"
+
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            app:sliderAnimationDuration="600"
+            app:sliderAutoCycleDirection="back_and_forth"
+            app:sliderAutoCycleEnabled="true"
+            app:sliderCircularHandlerEnabled="true"
+            app:sliderIndicatorAnimationDuration="600"
+            app:sliderIndicatorGravity="center_horizontal|bottom"
+            app:sliderIndicatorMargin="15dp"
+            app:sliderIndicatorOrientation="horizontal"
+            app:sliderIndicatorPadding="3dp"
+            app:sliderIndicatorRadius="2dp"
+            app:sliderIndicatorSelectedColor="#5A5A5A"
+            app:sliderIndicatorUnselectedColor="#FFF"
+            app:sliderScrollTimeInSec="1"
+            app:sliderStartAutoCycle="true" >
+
+        </com.smarteist.autoimageslider.SliderView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="710dp"
+            android:layout_marginEnd="-2dp"
+            android:layout_marginRight="-2dp" />
+
+        <Button
+            android:id="@+id/button_upload"
+            android:layout_width="144dp"
+            android:layout_height="38dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="264dp"
+            android:layout_marginLeft="264dp"
+            android:layout_marginTop="300dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:text="Upload" />
+
+        <TextView
+            android:id="@+id/text_view_show_uploads"
+            android:layout_width="131dp"
+            android:layout_height="32dp"
+            android:layout_alignTop="@+id/button_upload"
+            android:layout_alignBottom="@+id/button_upload"
+            android:layout_marginStart="-137dp"
+            android:layout_marginLeft="-137dp"
+            android:layout_marginTop="-44dp"
+            android:layout_marginBottom="61dp"
+            android:layout_toEndOf="@+id/button_upload"
+            android:layout_toRightOf="@+id/button_upload"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:text="Obrisi slike"
+            android:textSize="16sp" />
+
+
+        <EditText
+            android:id="@+id/naziv_ziv"
+            android:layout_width="wrap_content"
+            android:layout_height="37dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="107dp"
+            android:layout_marginLeft="107dp"
+            android:layout_marginTop="344dp"
+            android:layout_marginEnd="102dp"
+            android:layout_marginRight="102dp"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="Ime" />
+
+        <EditText
+
+            android:id="@+id/opis_ziv"
+            android:layout_width="match_parent"
+            android:layout_height="141dp"
+            android:layout_below="@+id/cardView2"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="197dp"
+            android:layout_marginEnd="-2dp"
+            android:layout_marginRight="-2dp"
+            android:background="@null"
+            android:gravity="top|left"
+            android:hint="Opis"
+            android:inputType="textMultiLine" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="-34dp"
+            android:layout_marginLeft="-34dp"
+            android:layout_marginTop="386dp"
+            android:layout_marginEnd="34dp"
+            android:layout_marginRight="34dp"
+            android:background="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/pasmina"
+            android:layout_width="204dp"
+            android:layout_height="36dp"
+            android:layout_below="@+id/cardView2"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="76dp"
+            android:layout_marginEnd="203dp"
+            android:layout_marginRight="203dp"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="Pasmina" />
+
+        <RadioGroup
+            android:id="@+id/vrsta"
+            android:layout_width="302dp"
+            android:layout_height="59dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="61dp"
+            android:layout_marginLeft="61dp"
+            android:layout_marginTop="395dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginRight="48dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/pas"
+                android:layout_width="166dp"
+                android:layout_height="match_parent"
+                android:text="Pas"
+                android:checked="true"
+                />
+
+            <RadioButton
+                android:id="@+id/macka"
+                android:layout_width="168dp"
+                android:layout_height="match_parent"
+                android:text="Macka" />
+
+        </RadioGroup>
+
+        <Spinner
+            android:id="@+id/pasmine"
+            android:layout_width="204dp"
+            android:layout_height="35dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="207dp"
+            android:layout_marginLeft="207dp"
+            android:layout_marginTop="460dp"
+            android:layout_marginBottom="20dp" />
+
+        <EditText
+            android:id="@+id/godine"
+            android:layout_width="151dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="504dp"
+            android:layout_marginEnd="260dp"
+            android:layout_marginRight="260dp"
+            android:ems="10"
+            android:hint="Godine"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/tezina"
+            android:layout_width="134dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="174dp"
+            android:layout_marginLeft="174dp"
+            android:layout_marginTop="504dp"
+            android:layout_marginEnd="103dp"
+            android:layout_marginRight="103dp"
+            android:ems="10"
+            android:hint="Težina"
+            android:inputType="numberDecimal" />
+
+        <TextView
+            android:id="@+id/kg"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="321dp"
+            android:layout_marginLeft="321dp"
+            android:layout_marginTop="518dp"
+            android:layout_marginEnd="-23dp"
+            android:layout_marginRight="-23dp"
+            android:text="kg" />
+
+        <EditText
+            android:id="@+id/oznaka"
+            android:layout_width="258dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="299dp"
+            android:layout_marginEnd="153dp"
+            android:layout_marginRight="153dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Oznaka u skloništu" />
+
+    </RelativeLayout>
+
+</ScrollView>

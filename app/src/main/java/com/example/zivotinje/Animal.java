@@ -2,22 +2,18 @@ package com.example.zivotinje;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.app.ProgressDialog;
-import android.content.ClipData;
+
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.SupportMapFragment;
+
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -60,16 +55,10 @@ import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
-import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
@@ -82,39 +71,39 @@ public class Animal  extends Fragment {
     private TextView mTextViewShowUploads;
     private ProgressBar mProgressBar;
 
-    SharedPreferences prefs;
-    String adresa;
+    private SharedPreferences prefs;
+    private String adresa;
 
 
     private StorageReference mStorageRef;
-    FirebaseDatabase database;
+    private FirebaseDatabase database;
     private DatabaseReference mDatabaseRef;
 
     private StorageTask mUploadTask;
-    private StorageTask uploadTask;
+    //private StorageTask uploadTask;
 
-    AutocompleteSupportFragment autocompleteFragment;
+    private AutocompleteSupportFragment autocompleteFragment;
 
 
     private ArrayList<Uri> ImageList = new ArrayList<Uri>();
     private int uploads = 0;
-    private DatabaseReference databaseReference;
+    //private DatabaseReference databaseReference;
     private EditText naziv,opis,email;
 
 
-    ArrayList<Parcelable> path;
-    ArrayList<Parcelable> path2=new ArrayList<>();
+    private ArrayList<Parcelable> path;
+    //ArrayList<Parcelable> path2=new ArrayList<>();
 
 
-    SliderView sliderView;
+    private SliderView sliderView;
     private ArrayList<String> slike=new ArrayList<String>();
     private ArrayList<String> slike2=new ArrayList<String>();
     private ArrayList<String> slike_ucitavanje=new ArrayList<String>();
 
 
     private HashMap<String,String> slike_map=new HashMap<String,String>();
-    private Map<String,String> slike_skinute=new HashMap<String,String>();
-    int i=0;
+    //private Map<String,String> slike_skinute=new HashMap<String,String>();
+    private int i=0;
 
 
 
@@ -325,7 +314,7 @@ public class Animal  extends Fragment {
                  Log.d("reference",fileReference.toString());
                 Log.d("naziv slike",System.currentTimeMillis()+ "." + getFileExtension(Image));
 
-                uploadTask = fileReference.putFile(Image);
+                //uploadTask = fileReference.putFile(Image);
                 mUploadTask = fileReference.putFile(Image);
 
                 // Register observers to listen for when the download is done or if it fails
