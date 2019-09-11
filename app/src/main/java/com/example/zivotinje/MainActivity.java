@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_slideshow) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new PrikazSkl());
+            ft.replace(R.id.fragment_container,new Ispis());
             ft.addToBackStack("tag_back4");
             ft.commit();
 
