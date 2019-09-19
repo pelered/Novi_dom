@@ -29,6 +29,7 @@ import java.util.List;
 public class Ispis extends Fragment {
     private RecyclerView mRecyclerView;
     private IspisAdapter mAdapter;
+    private ProgressBar mProgressCircle;
 
 
     private DatabaseReference mDatabaseRef;
@@ -40,6 +41,7 @@ public class Ispis extends Fragment {
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mProgressCircle=view.findViewById(R.id.progress_circle);
 
         mUploads = new ArrayList<>();
 
@@ -64,12 +66,14 @@ public class Ispis extends Fragment {
                 mAdapter = new IspisAdapter(getActivity(), mUploads);
 
                 mRecyclerView.setAdapter(mAdapter);
+                mProgressCircle.setVisibility(View.INVISIBLE);
 
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                mProgressCircle.setVisibility(View.INVISIBLE);
             }
         });
 

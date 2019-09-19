@@ -12,17 +12,17 @@ public class Upload {
     private String mId;
     private String adresa;
     private String opis;
-    String email;
+    private String email;
     public Map<String, Boolean> stars = new HashMap<>();
     private int count=0;
-    private ArrayList<String> slike=new ArrayList<String>();
+    private ArrayList<String> slike=new ArrayList<>();
     private Map<String,String> slike_skinute=new HashMap<>();
     public Map<String,String> slike_map =new HashMap<>();
 
     public Upload() {
         //empty constructor needed
     }
-
+/*
     public Upload(String name,String id,String imageUrl){
         if (name.trim().equals("")) {
             name = "No Name";
@@ -59,11 +59,12 @@ public class Upload {
         this.adresa=adresa;
         this.opis=opis;
     }
+
+ */
     public Upload(String name, String id, String adresa,String email, String opis, HashMap<String,String> slike_map)
     {
         this.email=email;
         this.slike_map=slike_map;
-        this.slike=slike;
         this.mName=name;
         mId=id;
         this.adresa=adresa;

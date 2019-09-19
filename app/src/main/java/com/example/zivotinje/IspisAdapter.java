@@ -43,6 +43,7 @@ public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHol
 
     @Override
     public int getItemCount() {
+
         return mUploads.size();
     }
 
