@@ -1,5 +1,6 @@
 package com.example.zivotinje;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -10,12 +11,12 @@ import android.widget.TextView;
 
 public class CustomAdapter extends BaseAdapter implements SpinnerAdapter {
 
-    String[] company;
-    Context context;
-    String[] colors = {"#13edea","#e20ecd","#15ea0d"};
-    String[] colorsback = {"#FF000000","#FFF5F1EC","#ea950d"};
+    private String[] company;
+    private Context context;
+//    private String[] colors = {"#13edea","#e20ecd","#15ea0d"};
+//    private String[] colorsback = {"#FF000000","#FFF5F1EC","#ea950d"};
 
-    public CustomAdapter(Context context, String[] company) {
+    CustomAdapter(Context context, String[] company) {
         this.company = company;
         this.context = context;
     }
@@ -37,8 +38,8 @@ public class CustomAdapter extends BaseAdapter implements SpinnerAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view =  View.inflate(context, R.layout.company_main, null);
-        TextView textView = (TextView) view.findViewById(R.id.main);
+        @SuppressLint("ViewHolder") View view =  View.inflate(context, R.layout.company_main, null);
+        TextView textView =view.findViewById(R.id.main);
         textView.setText(company[position]);
         return textView;
     }
@@ -46,9 +47,8 @@ public class CustomAdapter extends BaseAdapter implements SpinnerAdapter {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
 
-        View view;
-        view =  View.inflate(context, R.layout.company_dropdown, null);
-        final TextView textView = (TextView) view.findViewById(R.id.dropdown);
+        View view = View.inflate(context, R.layout.company_dropdown, null);
+        final TextView textView =view.findViewById(R.id.dropdown);
         textView.setText(company[position]);
 
         textView.setTextColor(Color.parseColor("#FF000000"));

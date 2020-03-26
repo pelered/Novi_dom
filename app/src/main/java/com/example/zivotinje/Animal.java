@@ -1,16 +1,15 @@
 package com.example.zivotinje;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-
-
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -26,9 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.api.Status;
-
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -55,20 +52,17 @@ import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class Animal  extends Fragment {
 
-    private Button mButtonChooseImage;
-    private Button mButtonUpload;
-    private TextView mTextViewShowUploads;
     private ProgressBar mProgressBar;
 
     private SharedPreferences prefs;
@@ -76,7 +70,6 @@ public class Animal  extends Fragment {
 
 
     private StorageReference mStorageRef;
-    private FirebaseDatabase database;
     private DatabaseReference mDatabaseRef;
 
     private StorageTask mUploadTask;
@@ -85,23 +78,22 @@ public class Animal  extends Fragment {
     private AutocompleteSupportFragment autocompleteFragment;
 
 
-    private ArrayList<Uri> ImageList = new ArrayList<Uri>();
-    private int uploads = 0;
+    private ArrayList<Uri> ImageList = new ArrayList<>();
     //private DatabaseReference databaseReference;
-    private EditText naziv,opis,email;
+    private EditText naziv;
+    private EditText opis;
 
 
-    private ArrayList<Parcelable> path;
     //ArrayList<Parcelable> path2=new ArrayList<>();
 
 
     private SliderView sliderView;
-    private ArrayList<String> slike=new ArrayList<String>();
-    private ArrayList<String> slike2=new ArrayList<String>();
-    private ArrayList<String> slike_ucitavanje=new ArrayList<String>();
+    private ArrayList<String> slike= new ArrayList<>();
+    private ArrayList<String> slike2= new ArrayList<>();
+    private ArrayList<String> slike_ucitavanje= new ArrayList<>();
 
 
-    private HashMap<String,String> slike_map=new HashMap<String,String>();
+    private HashMap<String,String> slike_map= new HashMap<>();
     //private Map<String,String> slike_skinute=new HashMap<String,String>();
     private int i=0;
 
@@ -113,22 +105,23 @@ public class Animal  extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_animal,container,false);
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mButtonChooseImage = view.findViewById(R.id.button_choose_image);
-        mButtonUpload =view.findViewById(R.id.button_upload);
-        mTextViewShowUploads = view.findViewById(R.id.text_view_show_uploads);
+        Button mButtonChooseImage = view.findViewById(R.id.button_choose_image);
+        Button mButtonUpload = view.findViewById(R.id.button_upload);
+        TextView mTextViewShowUploads = view.findViewById(R.id.text_view_show_uploads);
         mProgressBar = view.findViewById(R.id.progress_bar);
-        prefs = getActivity().getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+        prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("shared_pref_name", MODE_PRIVATE);
         id=prefs.getString("uid","");
         mStorageRef = FirebaseStorage.getInstance().getReference("Sklonista");
-        database=FirebaseDatabase.getInstance();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
         sliderView = view.findViewById(R.id.imageSlider);
 
         mDatabaseRef = database.getReference("Sklonista");
         //Log.d("referenca",mDatabaseRef.toString());
         naziv=view.findViewById(R.id.naziv_sk);
         opis=view.findViewById(R.id.opis);
-        email=view.findViewById(R.id.email_skl);
+        EditText email = view.findViewById(R.id.email_skl);
         Log.d("Email",prefs.getString("email",""));
         //if(!prefs.getString("email","").isEmpty()){
             email.setText(prefs.getString("email",""));
@@ -200,7 +193,7 @@ public class Animal  extends Fragment {
 
     }
 
-//pokrene se priucitavanju fragmenta
+//pokrene se pri ucitavanju fragmenta
     private void ucitajPodatke(){
         mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -293,7 +286,7 @@ public class Animal  extends Fragment {
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-//uplodamo slike i dohvacamorl njihov
+//uplodamo slike i dohvacamo rl njihov
     private void uploadFile() {
 
         if (!ImageList.isEmpty()) {
@@ -306,7 +299,8 @@ public class Animal  extends Fragment {
                 }
                 i=j;
             }
-            for (uploads=0; uploads < ImageList.size(); uploads++) {
+            int uploads = 0;
+            for (uploads =0; uploads < ImageList.size(); uploads++) {
                 final Uri Image  = ImageList.get(uploads);
                 final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                         + "." + getFileExtension(Image));
@@ -387,7 +381,7 @@ public class Animal  extends Fragment {
         }, 10000);
 
     }
-    //slika se dodajeu bazu podataka tj njezin url
+    //slika se dodaje u bazu podataka tj njezin url
     private void dodajSliku(){
         //String id=prefs.getString("uid","");
         Upload upload2 = new Upload(naziv.getText().toString(),id,adresa,prefs.getString("email",""),opis.getText().toString(),slike_map);
@@ -446,11 +440,11 @@ public class Animal  extends Fragment {
                     // path = imageData.getStringArrayListExtra(Define.INTENT_PATH);
                     // you can get an image path(ArrayList<String>) on <0.6.2
                     ImageList=imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
-                    path = imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
+                    ArrayList<Parcelable> path = imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
 
                     //path=imageData.getStringArrayListExtra(Define.INTENT_PATH);
                     // you can get an image path(ArrayList<Uri>) on 0.6.2 and later
-                    Log.d("Proba",path.toString());
+                    Log.d("Proba", path.toString());
                     if(!slike_ucitavanje.isEmpty()) {
                         for (int i = 0; i < path.size(); i++) {
                             slike_ucitavanje.add(path.get(i).toString());
@@ -466,7 +460,7 @@ public class Animal  extends Fragment {
                         adapter.setCount(path.size());
                         adapter.slike(path);
                         adapter.broj(path.size());
-                        Log.d("usao sam",path.toString());
+                        Log.d("usao sam", path.toString());
 
                     }else{
                         adapter.setCount(slike_ucitavanje.size());
