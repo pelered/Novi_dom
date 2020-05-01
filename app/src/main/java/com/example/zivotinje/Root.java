@@ -20,6 +20,14 @@ public class Root
 
     private String opis;
 
+    public Root(String uid, String mnaziv, String madresa) {
+        id=uid;
+        naziv=mnaziv;
+        adresa=madresa;
+
+    }
+    public Root(){}
+
     public String getAdresa ()
     {
         return adresa;

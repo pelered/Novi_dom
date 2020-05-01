@@ -60,7 +60,7 @@ import java.util.Objects;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
-public class Animal  extends Fragment {
+public class EditSkl extends Fragment {
 
     private ProgressBar mProgressBar;
 
@@ -89,7 +89,7 @@ public class Animal  extends Fragment {
     private TextView mTextViewShowUploads;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_animal,container,false);
+        return inflater.inflate(R.layout.activity_edit_skl,container,false);
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -337,7 +337,7 @@ public class Animal  extends Fragment {
             public void run() {
                 update_podatke();
             }
-        }, 3000);
+        }, 0);
     }
     //slika(kao i ostatak podataka) se dodaje u bazu podataka tj njezin url
     private void update_podatke(){
@@ -368,7 +368,7 @@ public class Animal  extends Fragment {
     }
 //za otvaranje galerije na klik gumba
     private void openFileChooser() {
-        FishBun.with(Animal.this).setImageAdapter(new GlideAdapter())
+        FishBun.with(EditSkl.this).setImageAdapter(new GlideAdapter())
                 .setMaxCount(8)
                 .setMinCount(1)
                 .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), false)

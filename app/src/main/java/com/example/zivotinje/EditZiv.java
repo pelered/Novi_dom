@@ -52,22 +52,19 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class EditZiv extends Fragment {
-    private String[] company = {};
-    EditText ime,pasmina,godine,tezina,opis,oznaka;
-    RadioGroup vrsta;
+    private EditText ime,pasmina,godine,tezina,opis,oznaka;
+    private RadioGroup vrsta;
     private RadioButton radioButton;
     private SliderView sliderView;
-    Button upload,odaberi_sliku;
+    private Button upload,odaberi_sliku;
     private StorageReference mStorageRef;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseRef;
-    private StorageTask mUploadTask;
+    private StorageTask<com.google.firebase.storage.UploadTask.TaskSnapshot> mUploadTask;
     private StorageTask UploadTask;
     private SharedPreferences prefs;
     int selectedId;
     private View ve;
-
-
 
     private ArrayList<Uri> path;
     private ArrayList<String> slike=new ArrayList<String>();
@@ -86,10 +83,7 @@ public class EditZiv extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_edit_ziv, container, false);
-        spCompany = v.findViewById(R.id.pasmine);
-        CustomAdapter adapter = new CustomAdapter(this.getActivity(), company);
 
-        spCompany.setAdapter(adapter);
 
         return v;
     }
@@ -247,9 +241,6 @@ public class EditZiv extends Fragment {
         Map<String, Object> postValues2=upload2.toMap();
         Log.d("mapa slike",slike_map.toString());
         Log.d("mapa",postValues2.toString());
-        //Map<String, Object> childUpdates = new HashMap<>();
-        //String uploadId = mDatabaseRef.child(prefs.getString("uid","")).push().getKey();
-        //childUpdates.put(uploadId,postValues);
 
         Log.d("ID uploda",prefs.getString("uid",""));
         mDatabaseRef.child(oznaka.getText().toString()).updateChildren(postValues2);
@@ -284,16 +275,7 @@ public class EditZiv extends Fragment {
                 .setMenuAllDoneText("All Done")
                 .textOnNothingSelected("Odaberi jednu do najviše 8")
                 .startAlbum();
-        /*
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
 
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_REQUEST);
-        //startActivityForResult(intent, PICK_IMAGE_REQUEST);
-
-         */
     }
     //pokrene se kad dode neki rezultat npr od galerije
     @Override
@@ -302,40 +284,29 @@ public class EditZiv extends Fragment {
         switch (requestCode) {
             case Define.ALBUM_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-                    // path = imageData.getStringArrayListExtra(Define.INTENT_PATH);
-                    // you can get an image path(ArrayList<String>) on <0.6.2
                     ImageList=imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
-                    path = imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
-
-                    //path=imageData.getStringArrayListExtra(Define.INTENT_PATH);
-                    // you can get an image path(ArrayList<Uri>) on 0.6.2 and later
-                    Log.d("Proba",path.toString());
-                    //ako postoje slike dohvacene iz baze dodaj ih
+                    //Log.d("proba2",ImageList.toString());
+                    //ako trenutno dohvacena lista slika nije prazna, slike se dodaju na kraj liste i tako prikazuju
                     if(!slike_ucitavanje.isEmpty()) {
-                        for (int i = 0; i < path.size(); i++) {
-                            slike_ucitavanje.add(path.get(i).toString());
-
-                            //Log.d("put2",path.get(i).toString());
-
+                        for (int i = 0; i < ImageList.size(); i++) {
+                            slike_ucitavanje.add(ImageList.get(i).toString());
                         }
-                        Log.d("put",slike_ucitavanje.toString());
+                        //Log.d("put",slike_ucitavanje.toString());
 
                     }
                     final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
-                    //provjeravamo koji Array korisiti
-                    //da li smo dobile slike iz baze ili samo iz galerije
+                    //ako skloniste nema slika prikazat ce samo odabrane trenutno,prije uploda
                     if(slike_ucitavanje.isEmpty()){
-                        adapter.setCount(path.size());
-                        adapter.slike(path);
-                        adapter.broj(path.size());
-                        Log.d("usao sam",path.toString());
+                        adapter.setCount(ImageList.size());
+                        adapter.slike(ImageList);
+                        adapter.broj(ImageList.size());
 
                     }else{
                         adapter.setCount(slike_ucitavanje.size());
                         adapter.slike2(slike_ucitavanje);
                         adapter.broj(slike_ucitavanje.size());
                     }
-
+                    //postavljanje slidera
                     sliderView.setSliderAdapter(adapter);
                     sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
                     sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
@@ -343,8 +314,8 @@ public class EditZiv extends Fragment {
                     sliderView.setIndicatorSelectedColor(Color.WHITE);
                     sliderView.setIndicatorUnselectedColor(Color.GRAY);
                     sliderView.setScrollTimeInSec(15);
-                    sliderView.startAutoCycle();
 
+                    //indikator na kojoj smo slici rednim broj u slideru
                     sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
                         @Override
                         public void onIndicatorClicked(int position) {
@@ -354,10 +325,5 @@ public class EditZiv extends Fragment {
                     break;
                 }
         }
-
-
-
     }
-
-
 }

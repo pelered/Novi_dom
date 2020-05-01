@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity
             ft.commit();        }
         else if (id == R.id.nav_gallery) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new Animal());
+            ft.replace(R.id.fragment_container, new EditSkl());
             ft.addToBackStack("tag_back3");
             ft.commit();
 

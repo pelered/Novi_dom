@@ -244,7 +244,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
 
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("TAG", "handleFacebookAccessToken:" + token);
-
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -290,6 +289,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                             myRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                       @Override
                                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                          //dodala mozda maknem kasnije
                                           Root skl=dataSnapshot.getValue(Root.class);
                                           //UploadSkl skl=dataSnapshot.getValue(UploadSkl.class);
                                           Log.d("evoooo",dataSnapshot.toString());

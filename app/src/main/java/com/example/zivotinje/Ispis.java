@@ -2,27 +2,21 @@ package com.example.zivotinje;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sangcomz.fishbun.adapter.image.ImageAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +25,6 @@ public class Ispis extends Fragment {
     private IspisAdapter mAdapter;
     private ProgressBar mProgressCircle;
 
-
-    private DatabaseReference mDatabaseRef;
 
     private List<Root> mUploads;
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,7 +38,7 @@ public class Ispis extends Fragment {
 
         mUploads = new ArrayList<>();
 
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("Sklonista");
+        DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference("Sklonista");
        // Log.d("Usao",mDatabaseRef.toString());
 
         mDatabaseRef.addValueEventListener(new ValueEventListener() {
@@ -57,6 +49,7 @@ public class Ispis extends Fragment {
                    // Log.d("Usao sam2",postSnapshot.toString());
 
                     Root upload = postSnapshot.getValue(Root.class);
+                    assert upload != null;
                     Log.d("Lose",upload.toString());
 
                     //Log.d("Lose", String.valueOf(upload.getUrl().values()));
