@@ -6,11 +6,9 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
-import android.net.Uri;
+
 import android.os.Bundle;
-import android.text.InputFilter;
+
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -44,21 +42,16 @@ import java.util.List;
 
 
 public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-    String TAG = "placeautocomplete";
+    private String TAG = "placeautocomplete";
 
-    Button gumb;
-    AutocompleteSupportFragment autocompleteFragment;
-    TextView skriven,naziv;
-    AppCompatCheckBox checkbox;
-    EditText email,lozinka,potvrda;
-
+    private Button gumb;
+    private AutocompleteSupportFragment autocompleteFragment;
+    private TextView skriven,naziv;
+    private AppCompatCheckBox checkbox;
+    private EditText email,lozinka,potvrda;
     private FirebaseAuth mAuth;
-
-
-    FirebaseDatabase database;
-    DatabaseReference myRef ;
-
-
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,39 +100,19 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
-
-
                 autocompleteFragment.setText(place.getLatLng().toString());
                 skriven.setText(place.getName());
-
-                Log.i(TAG, "Place: " + place.getLatLng() + ", " + place.getName());
+                //Log.i(TAG, "Place: " + place.getLatLng() + ", " + place.getName());
             }
-
             @Override
             public void onError(Status status) {
                 // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
-
-
-
-
-
-
-
     }
-
-
     @Override
     public void onClick(View view) {
-         //String nazi=autocompleteFragment.getText();
-        /*
-        try {
-            getPlaceInfo(naziv);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
         if(provjeri()){
             Log.d("Naziv",skriven.getText().toString());
             try{
@@ -167,19 +140,14 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                                     finish();
 
                                 }
-
                                 // ...
                             }
                         });
             }catch (Exception e){
 
             }
-
-
         }
-
     }
-
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {
@@ -200,18 +168,15 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             return true;
         }
     }
-
     private void updateUI(FirebaseUser user) {
         String username;
         if(user.getDisplayName()==null ){
             username=naziv.getText().toString();
         }else{
             username=user.getDisplayName();
-
         }
         String email=user.getEmail();
         String uid=user.getUid();
-
         SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("email",email);
@@ -219,17 +184,12 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         editor.putString("uid",uid);
         editor.putBoolean("hasLogin",true);
         editor.apply();
-
         //image with glide
-
         Intent intent=new Intent(this,ProfileActivity.class);
         intent.putExtra("username",username);
         intent.putExtra("email",email);
         intent.putExtra("uid",uid);
-        //intent.putExtra("url",String.valueOf(url));
         startActivity(intent);
         finish();
-
-
     }
 }

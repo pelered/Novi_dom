@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,70 +65,55 @@ public class Animal  extends Fragment {
     private ProgressBar mProgressBar;
 
     private SharedPreferences prefs;
-    private String adresa;
-
-
     private StorageReference mStorageRef;
     private DatabaseReference mDatabaseRef;
-
-    private StorageTask mUploadTask;
-    //private StorageTask uploadTask;
-
+    private FirebaseDatabase database;
+    private StorageTask<UploadTask.TaskSnapshot> mUploadTask;
     private AutocompleteSupportFragment autocompleteFragment;
-
-
+    //spremljeni veze na slike odabrane s mobitela
     private ArrayList<Uri> ImageList = new ArrayList<>();
-    //private DatabaseReference databaseReference;
+    private String adresa;
     private EditText naziv;
     private EditText opis;
-
-
-    //ArrayList<Parcelable> path2=new ArrayList<>();
-
-
+    private EditText email;
+    private String id;
     private SliderView sliderView;
-    private ArrayList<String> slike= new ArrayList<>();
-    private ArrayList<String> slike2= new ArrayList<>();
+    //koristi se za prikaz slika poslije dodavanja s mobitela, no prvo se spremi u listu slike iz baze ako ih ima
     private ArrayList<String> slike_ucitavanje= new ArrayList<>();
-
-
+    //potreban da se ne uplodaju iste slike,pa ako se nije dodala slika s mobitela ovo će biti prazno i nijedna slika se neće uplodati
     private HashMap<String,String> slike_map= new HashMap<>();
-    //private Map<String,String> slike_skinute=new HashMap<String,String>();
     private int i=0;
-
-
-
-
-    String id;
+    private Root dohvaceno;
+    private Button mButtonChooseImage;
+    private Button mButtonUpload;
+    private TextView mTextViewShowUploads;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_animal,container,false);
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Button mButtonChooseImage = view.findViewById(R.id.button_choose_image);
-        Button mButtonUpload = view.findViewById(R.id.button_upload);
-        TextView mTextViewShowUploads = view.findViewById(R.id.text_view_show_uploads);
+        mButtonChooseImage = view.findViewById(R.id.button_choose_image);
+        mButtonUpload = view.findViewById(R.id.button_upload);
+        mTextViewShowUploads = view.findViewById(R.id.text_view_show_uploads);
         mProgressBar = view.findViewById(R.id.progress_bar);
-        prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("shared_pref_name", MODE_PRIVATE);
-        id=prefs.getString("uid","");
-        mStorageRef = FirebaseStorage.getInstance().getReference("Sklonista");
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        sliderView = view.findViewById(R.id.imageSlider);
-
-        mDatabaseRef = database.getReference("Sklonista");
-        //Log.d("referenca",mDatabaseRef.toString());
         naziv=view.findViewById(R.id.naziv_sk);
         opis=view.findViewById(R.id.opis);
-        EditText email = view.findViewById(R.id.email_skl);
-        Log.d("Email",prefs.getString("email",""));
-        //if(!prefs.getString("email","").isEmpty()){
-            email.setText(prefs.getString("email",""));
+        email = view.findViewById(R.id.email_skl);
 
+        prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+        //dohvati id sklonista iz sharedpref
+        id=prefs.getString("uid","");
 
+        //baza podataka
+        mStorageRef = FirebaseStorage.getInstance().getReference("Sklonista");
+        database = FirebaseDatabase.getInstance();
+        mDatabaseRef = database.getReference("Sklonista");
 
-        //mDatabaseRef = FirebaseDatabase.getInstance().getReference("uploads");
+        sliderView = view.findViewById(R.id.imageSlider);
+        email.setText(prefs.getString("email",""));
 
+        //gumb za uplodanje podataka
         mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,12 +126,12 @@ public class Animal  extends Fragment {
                 if (mUploadTask != null && mUploadTask.isInProgress()) {
                     Toast.makeText(getActivity(), "Upload in progress", Toast.LENGTH_SHORT).show();
                 } else {
-                    uploadFile();
+                    upload();
                 }
 
             }
         });
-
+        //obrisi sliku
         mTextViewShowUploads.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,11 +139,11 @@ public class Animal  extends Fragment {
             }
         });
         ////za adresu dohvatiti
+
         // Initialize Places.
         Places.initialize(getContext(), "AIzaSyAyVddfVCAcVub30s1xsJLiaRCMx70EbtA");
         // Initialize the AutocompleteSupportFragment.
         autocompleteFragment = (AutocompleteSupportFragment)getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG,Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS));
         //autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE)
@@ -169,101 +153,85 @@ public class Animal  extends Fragment {
         ImageView searchIcon = (ImageView)((LinearLayout)autocompleteFragment.getView()).getChildAt(0);
         searchIcon.setVisibility(View.GONE);
 
+        //ako odabaremo adresu,spremi ju
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 autocompleteFragment.setText(place.getLatLng().toString());
                 adresa=place.getAddress();
                 Log.d("pod adresa",adresa);
-
             }
-
             @Override
             public void onError(@NonNull Status status) {
-
+                Toast.makeText(getActivity(),"Neuspjeli odabir adrese ", Toast.LENGTH_SHORT).show();
             }
         });
-        ///za adresu uhvatiti
+        ///ako fragment je ucitan
         if(autocompleteFragment!=null){
-
             ucitajPodatke();
-
         }
-
-
     }
-
-//pokrene se pri ucitavanju fragmenta
+//pokrene se pri ucitavanju fragmenta za dohvacanje podataka
     private void ucitajPodatke(){
         mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Log.d("pod",postSnapshot.child("naziv").toString());
+                    //Log.d("pod",postSnapshot.toString());
                     if(postSnapshot.getKey().equals(id)){
-                        String broj= String.valueOf(postSnapshot.child("url").getChildrenCount());
-                        int br=Integer.parseInt(broj);
-
-                        for(int j=0; j<br;j++){
-                            slike2.add(postSnapshot.child("url").child(j+"_key").getValue().toString());
-                            slike_ucitavanje.add(postSnapshot.child("url").child(j+"_key").getValue().toString());
-                            Log.d("put0",slike_ucitavanje.toString());
-                            Log.d("pod slika url2",slike2.toString());
-
-                            Log.d("pod slika url", postSnapshot.child("url").child(j+"_key").getValue().toString());
-
-                        }
-                        /*
-                        Upload up=postSnapshot.child("url").getValue(Upload.class);
-                        String myString=postSnapshot.child("url").getValue().toString();
-                        HashMap<String, Integer> map = convertToHashMap(myString);
-*/
-
-                        naziv.setText(postSnapshot.child("naziv").getValue().toString());
-                        if(postSnapshot.child("adresa").getValue()!=null){
-                            if(autocompleteFragment!=null){
-                                autocompleteFragment.setText(postSnapshot.child("adresa").getValue().toString());
-                            }
-                            adresa=postSnapshot.child("adresa").getValue().toString();
-                        }
-                        if(postSnapshot.child("opis").getValue()==null){
-                            opis.setText("Opis");
-
+                        //Log.d("neuspjeh", String.valueOf(postSnapshot.hasChild("url")));
+                        //ako se jos nisu url,opis postavili
+                        if(postSnapshot.hasChild("url") & postSnapshot.hasChild("opis")){
+                            dohvaceno=postSnapshot.getValue(Root.class);
+                        }else if(postSnapshot.hasChild("url")) {
+                            dohvaceno=postSnapshot.getValue(Root.class);
                         }else{
-                            opis.setText(postSnapshot.child("opis").getValue().toString());
+                            dohvaceno=postSnapshot.getValue(Root.class);
                         }
-
+                        if(postSnapshot.hasChild("url")){
+                            for(Map.Entry<String, String> entry :dohvaceno.getUrl().entrySet())
+                            {
+                                slike_ucitavanje.add(entry.getValue());
+                            }
+                        }
+                        naziv.setText(dohvaceno.getNaziv());
+                        if(dohvaceno.getAdresa()!=null){
+                            if(autocompleteFragment!=null){
+                                autocompleteFragment.setText(dohvaceno.getAdresa());
+                            }
+                            adresa=dohvaceno.getAdresa();
+                        }
+                        if(!postSnapshot.hasChild("opis")){
+                            opis.setText(R.string.Opis);
+                        }else{
+                            opis.setText(dohvaceno.getOpis());
+                        }
                     }
                 }
-
             }
-
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                Toast.makeText(getActivity(), "Skidanje nije uspjelo", Toast.LENGTH_SHORT).show();
             }
         });
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d("pod slike2",slike2.toString());
-                if(!slike2.isEmpty()){
-                    inicijalizirajSlider(slike2);
+                //Log.d("pod slike2",slike2.toString());
+                if(!slike_ucitavanje.isEmpty()){
+                    inicijalizirajSlider(slike_ucitavanje);
                 }
-
             }
         }, 1000);
-
     }
     //inicijalizacija slidera nakon sto se slike skinu,ako ih ima
-    public void inicijalizirajSlider( ArrayList<String> slike2){
+    private void inicijalizirajSlider( ArrayList<String> slike_slider){
         final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
-        adapter.setCount(slike2.size());
-        adapter.slike2(slike2);
-        adapter.broj(slike2.size());
+        adapter.setCount(slike_slider.size());
+        adapter.slike2(slike_slider);
+        adapter.broj(slike_slider.size());
         sliderView.setSliderAdapter(adapter);
         sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
         sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
@@ -271,8 +239,6 @@ public class Animal  extends Fragment {
         sliderView.setIndicatorSelectedColor(Color.WHITE);
         sliderView.setIndicatorUnselectedColor(Color.GRAY);
         sliderView.setScrollTimeInSec(15);
-        //sliderView.startAutoCycle();
-
         sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
             @Override
             public void onIndicatorClicked(int position) {
@@ -280,37 +246,28 @@ public class Animal  extends Fragment {
             }
         });
     }
-
     private String getFileExtension(Uri uri) {
         ContentResolver cR = getActivity().getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-//uplodamo slike i dohvacamo rl njihov
-    private void uploadFile() {
-
+    //uplodamo slike i dohvacamo url njihov,jedino ako smo odabrali neku sliku s mobitela
+    private void upload() {
+        //ulazi u if ako smo odabrali neki file/slike
         if (!ImageList.isEmpty()) {
-            if(!slike2.isEmpty()){
+            if(!slike_ucitavanje.isEmpty()){
                 int j;
-                for(j=0;j<slike2.size();j++){
-                    slike_map.put(j+"_key",slike2.get(j));
-                    Log.d("slike_map"+j,slike_map.toString());
-
+                for(j=0; j< slike_ucitavanje.size(); j++){
+                    slike_map.put(j+"_key", slike_ucitavanje.get(j));
+                    //Log.d("slike_map"+j,slike_map.toString());
                 }
                 i=j;
             }
-            int uploads = 0;
-            for (uploads =0; uploads < ImageList.size(); uploads++) {
+            for (int uploads =0; uploads < ImageList.size(); uploads++) {
                 final Uri Image  = ImageList.get(uploads);
-                final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-                        + "." + getFileExtension(Image));
-
-                 Log.d("reference",fileReference.toString());
-                Log.d("naziv slike",System.currentTimeMillis()+ "." + getFileExtension(Image));
-
-                //uploadTask = fileReference.putFile(Image);
+                //sprema u storage sliku s nazivom prema milisekundama
+                final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()+ "." + getFileExtension(Image));
                 mUploadTask = fileReference.putFile(Image);
-
                 // Register observers to listen for when the download is done or if it fails
                 mUploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -327,17 +284,14 @@ public class Animal  extends Fragment {
                                 mProgressBar.setProgress(0);
                             }
                         }, 0);
-                        Log.d("podaci",taskSnapshot.getMetadata().toString());
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                         // ...
-                        //mUploadTask = fileReference.putFile(Image);
-                        Task<Uri> urlTask = mUploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                         mUploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                             @Override
                             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                                 if (!task.isSuccessful()) {
                                     throw task.getException();
                                 }
-
                                 // Continue with the task to get the download URL
                                 return fileReference.getDownloadUrl();
                             }
@@ -346,15 +300,11 @@ public class Animal  extends Fragment {
                             public void onComplete(@NonNull Task<Uri> task) {
                                 if (task.isSuccessful()) {
                                     Uri downloadUri = task.getResult();
-                                    Log.d("url trazeni",downloadUri.toString());
                                     slike_map.put(i+"_key",downloadUri.toString());
                                     i++;
-                                    Log.d("mapa key",slike_map.toString());
-                                    Toast.makeText(getActivity(), "Upload uspio", Toast.LENGTH_LONG).show();
-                                    slike.add(downloadUri.toString());
+                                    Toast.makeText(getActivity(), "Upload slike"+i+" uspio,ostalo je: "+(ImageList.size()-i), Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(getActivity(), "Upload nije uspio", Toast.LENGTH_LONG).show();
-
+                                    Toast.makeText(getActivity(), "Upload slike nije uspio", Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
@@ -365,38 +315,55 @@ public class Animal  extends Fragment {
                         double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                         mProgressBar.setProgress((int) progress);
                     }
-                });;
+                });
 
             }
         } else {
-            Toast.makeText(getActivity(), "No file selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Slika nije bila odabrana.Ostali izmjeneni podaci će uplodati", Toast.LENGTH_LONG).show();
+            //potrebno spremit u slike map, makar nema nista zbog naredbe za update. inace dijete url potpuno nestalo
+            if(!slike_ucitavanje.isEmpty()){
+                int j;
+                for(j=0; j< slike_ucitavanje.size(); j++){
+                    slike_map.put(j+"_key", slike_ucitavanje.get(j));
+                    Log.d("slike_map"+j,slike_map.toString());
+                }
+                i=j;
+            }
         }
-
+        //problem za mozda rjesit->trebao bi ici na upload ostali podataka tek kad sve slike rjesi,ovo je privremeno
+        Log.d("Evome: ", String.valueOf(1));
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d("pod slike",slike.toString());
-                dodajSliku();
+                update_podatke();
             }
-        }, 10000);
-
+        }, 3000);
     }
-    //slika se dodaje u bazu podataka tj njezin url
-    private void dodajSliku(){
-        //String id=prefs.getString("uid","");
-        Upload upload2 = new Upload(naziv.getText().toString(),id,adresa,prefs.getString("email",""),opis.getText().toString(),slike_map);
-        //Upload upload = new Upload(naziv.getText().toString(),id,adresa,opis.getText().toString(),slike);
-        //Map<String, Object> postValues =upload.toMap();
-        Map<String, Object> postValues2=upload2.toMap();
-        Log.d("mapa slike",slike_map.toString());
-        Log.d("mapa",postValues2.toString());
-        //Map<String, Object> childUpdates = new HashMap<>();
-        //String uploadId = mDatabaseRef.child(prefs.getString("uid","")).push().getKey();
-        //childUpdates.put(uploadId,postValues);
-
-        Log.d("ID uploda",prefs.getString("uid",""));
-        mDatabaseRef.child(prefs.getString("uid","")).updateChildren(postValues2);
-        slike.clear();
+    //slika(kao i ostatak podataka) se dodaje u bazu podataka tj njezin url
+    private void update_podatke(){
+        //jos izmjeniti adresu
+        //sprema u objekt podatke koje zelimo uplodati
+        dohvaceno.setAdresa(adresa);
+        dohvaceno.setEmail(email.getText().toString());
+        dohvaceno.setNaziv(naziv.getText().toString());
+        dohvaceno.setOpis(opis.getText().toString());
+        dohvaceno.setUrl(slike_map);
+        //Upload upload2 = new Upload(naziv.getText().toString(),id,adresa,email.getText().toString(),opis.getText().toString(),slike_map);
+        //preko objekta se dohvacaju podaci spremljeni za upload i spremaju mapu
+        //Map<String, Object> postValues2=upload2.toMap();
+        Map<String, Object> postValues2=dohvaceno.toMap();
+        //dohvaca se prema id i updata podaci
+        mDatabaseRef.child(id).updateChildren(postValues2).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(getActivity(),"Upload nije uspio "+ exception.toString(), Toast.LENGTH_LONG).show();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getActivity(),"Upload svih podataka je uspio ", Toast.LENGTH_LONG).show();
+            }
+        });
         ImageList.clear();
     }
 //za otvaranje galerije na klik gumba
@@ -418,16 +385,7 @@ public class Animal  extends Fragment {
                 .setMenuAllDoneText("All Done")
                 .textOnNothingSelected("Odaberi jednu do najviše 8")
                 .startAlbum();
-        /*
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
 
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_REQUEST);
-        //startActivityForResult(intent, PICK_IMAGE_REQUEST);
-
-         */
     }
 //pokrene se kad dode neki rezultat npr od galerije
     @Override
@@ -436,38 +394,29 @@ public class Animal  extends Fragment {
         switch (requestCode) {
             case Define.ALBUM_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-
-                    // path = imageData.getStringArrayListExtra(Define.INTENT_PATH);
-                    // you can get an image path(ArrayList<String>) on <0.6.2
                     ImageList=imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
-                    ArrayList<Parcelable> path = imageData.getParcelableArrayListExtra(Define.INTENT_PATH);
-
-                    //path=imageData.getStringArrayListExtra(Define.INTENT_PATH);
-                    // you can get an image path(ArrayList<Uri>) on 0.6.2 and later
-                    Log.d("Proba", path.toString());
+                    //Log.d("proba2",ImageList.toString());
+                    //ako trenutno dohvacena lista slika nije prazna, slike se dodaju na kraj liste i tako prikazuju
                     if(!slike_ucitavanje.isEmpty()) {
-                        for (int i = 0; i < path.size(); i++) {
-                            slike_ucitavanje.add(path.get(i).toString());
-
-                            //Log.d("put2",path.get(i).toString());
-
+                        for (int i = 0; i < ImageList.size(); i++) {
+                            slike_ucitavanje.add(ImageList.get(i).toString());
                         }
-                        Log.d("put",slike_ucitavanje.toString());
+                        //Log.d("put",slike_ucitavanje.toString());
 
                     }
                     final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+                    //ako skloniste nema slika prikazat ce samo odabrane trenutno,prije uploda
                     if(slike_ucitavanje.isEmpty()){
-                        adapter.setCount(path.size());
-                        adapter.slike(path);
-                        adapter.broj(path.size());
-                        Log.d("usao sam", path.toString());
+                        adapter.setCount(ImageList.size());
+                        adapter.slike(ImageList);
+                        adapter.broj(ImageList.size());
 
                     }else{
                         adapter.setCount(slike_ucitavanje.size());
                         adapter.slike2(slike_ucitavanje);
                         adapter.broj(slike_ucitavanje.size());
                     }
-
+                    //postavljanje slidera
                     sliderView.setSliderAdapter(adapter);
                     sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
                     sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
@@ -475,8 +424,8 @@ public class Animal  extends Fragment {
                     sliderView.setIndicatorSelectedColor(Color.WHITE);
                     sliderView.setIndicatorUnselectedColor(Color.GRAY);
                     sliderView.setScrollTimeInSec(15);
-                    //sliderView.startAutoCycle();
 
+                    //indikator na kojoj smo slici rednim broj u slideru
                     sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
                         @Override
                         public void onIndicatorClicked(int position) {
@@ -486,11 +435,6 @@ public class Animal  extends Fragment {
                     break;
                 }
         }
-
-
-
     }
-
-
 }
 

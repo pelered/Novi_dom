@@ -2,16 +2,8 @@ package com.example.zivotinje;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
-import android.net.Uri;
 import android.os.Bundle;
 
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.view.GravityCompat;
@@ -20,7 +12,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabLayout;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -29,16 +20,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.Menu;
-import android.widget.Button;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
     private TextView log,ime,email;
-    SharedPreferences prefs;
+    private SharedPreferences prefs;
 
 
     @Override
@@ -47,17 +34,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        /*
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
-         */
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -80,17 +57,14 @@ public class MainActivity extends AppCompatActivity
 
         prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
         if(prefs.contains("hasLogin")) {
-            Log.d("test","ima podatke za prikazat");
+            //Log.d("test","ima podatke za prikazat");
             email.setText(prefs.getString("email", ""));
             ime.setText(prefs.getString("username", ""));
             log.setText("Log out");
-            Log.d("UID",prefs.getString("uid",""));
+            //Log.d("UID",prefs.getString("uid",""));
         }else{
             log.setText("Log in");
         }
-
-
-
     }
 
     @Override
@@ -150,7 +124,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_tools) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new EditSkl());
+            ft.replace(R.id.fragment_container, new EditZiv());
             ft.addToBackStack("tag_back4");
             ft.commit();
 
@@ -159,7 +133,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -168,21 +141,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if(log.getText().toString().equals("Log in")) {
-
             Intent intent=new Intent(this,Login.class);
             startActivity(intent);
             if(prefs.contains("hasLogin")) {
                 log.setText("Log out");
-
             }else{
                 log.setText("Log in");
-
             }
-
         }else if(log.getText().toString().equals("Log out")){
             Intent intent=new Intent(this,Login.class);
             startActivity(intent);
-
             log.setText("Log in");
 
 

@@ -13,55 +13,13 @@ public class Upload {
     private String adresa;
     private String opis;
     private String email;
-    public Map<String, Boolean> stars = new HashMap<>();
     private int count=0;
-    private ArrayList<String> slike=new ArrayList<>();
-    private Map<String,String> slike_skinute=new HashMap<>();
-    public Map<String,String> slike_map =new HashMap<>();
+    private Map<String,String> slike_map;
 
     public Upload() {
         //empty constructor needed
     }
-/*
-    public Upload(String name,String id,String imageUrl){
-        if (name.trim().equals("")) {
-            name = "No Name";
-        }
-
-        mName = name;
-        mImageUrl = imageUrl;
-        mId=id;
-    }
-    public Upload(Map<String,String> slike_skinute){
-        this.slike_skinute=slike_skinute;
-    }
-
-    public void setSlike_skinute(Map<String,String> slike_skinute) {
-        this.slike_skinute = slike_skinute;
-    }
-    public Map<String,String> getSlike_skinute(){
-        return  slike_skinute;
-    }
-
-    public Upload(String name, String id, String adresa, String opis, ArrayList<String> slike)
-{       this.slike=slike;
-        this.mName=name;
-        mId=id;
-        this.adresa=adresa;
-        this.opis=opis;
-    }
-    public Upload(String name, String id, String adresa, String opis, HashMap<String,String> slike_map)
-    {
-        this.slike_map=slike_map;
-        this.slike=slike;
-        this.mName=name;
-        mId=id;
-        this.adresa=adresa;
-        this.opis=opis;
-    }
-
- */
-    public Upload(String name, String id, String adresa,String email, String opis, HashMap<String,String> slike_map)
+    Upload(String name, String id, String adresa, String email, String opis, HashMap<String, String> slike_map)
     {
         this.email=email;
         this.slike_map=slike_map;
@@ -69,6 +27,21 @@ public class Upload {
         mId=id;
         this.adresa=adresa;
         this.opis=opis;
+    }
+    public Upload(String name, String id, String adresa,String email, String opis)
+    {
+        this.email=email;
+        this.mName=name;
+        mId=id;
+        this.adresa=adresa;
+        this.opis=opis;
+    }
+    public Upload(String name, String id, String adresa,String email )
+    {
+        this.email=email;
+        this.mName=name;
+        mId=id;
+        this.adresa=adresa;
     }
 
     public void setEmail(String email) {
@@ -102,11 +75,12 @@ public class Upload {
     public void setName(String name) {
         mName = name;
     }
-public String getId(){return mId;}
+
+    public String getId(){return mId;}
+
     public void setId(String id) {
         mId = id;
     }
-
 
     public String getImageUrl() {
         return mImageUrl;
@@ -115,9 +89,12 @@ public String getId(){return mId;}
     public void setImageUrl(String imageUrl) {
         mImageUrl = imageUrl;
     }
+
     public void count(){
         count =count+1;
     }
+
+    //za upload na bazu podataka
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -127,8 +104,6 @@ public String getId(){return mId;}
         result.put("email",email);
         result.put("opis",opis);
         result.put("url",slike_map);
-
-
         return result;
     }
 

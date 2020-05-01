@@ -58,12 +58,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     private CallbackManager callbackManager;
     private  Button log_skl;
     private TextView reg_skl;
-    AppCompatCheckBox checkbox;
+    private AppCompatCheckBox checkbox;
     private EditText email,lozinka;
 
-    FirebaseDatabase database;
-    DatabaseReference myRef ;
-    String naziv;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef ;
+    private String naziv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,22 +88,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
         //zasebno
         email=findViewById(R.id.email_log);
         lozinka=findViewById(R.id.lozinka_log);
+
         log_skl=findViewById(R.id.log_skl);
         log_skl.setOnClickListener(this);
+
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Sklonista");
 
         checkbox =findViewById(R.id.checkbox);
-
         checkbox.setOnCheckedChangeListener(this);
         //
 
         //facebook
 
         callbackManager = CallbackManager.Factory.create();
-
         loginButton = findViewById(R.id.login_button);
-        //loginButton.setReadPermissions("email", "public_profile");
         loginButton.setPermissions("email", "public_profile");
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -111,17 +110,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
             public void onSuccess(LoginResult loginResult) {
                 Log.d("Tag", "facebook:onSuccess:" + loginResult);
                 handleFacebookAccessToken(loginResult.getAccessToken());
-
             }
-
             @Override
             public void onCancel() {
-
+                Log.d("Tag", "facebook:onCancel");
             }
 
             @Override
             public void onError(FacebookException error) {
-
+                Log.d("Tag", "facebook:onError", error);
             }
         });
 
@@ -131,6 +128,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     }
     //google
     private void signIn() {
+        Log.d("Probam :", String.valueOf(4));
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -146,53 +144,33 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+                //firebaseAuthWithGoogle(account.getIdToken());
                 firebaseAuthWithGoogle(account);
+                //PROBLEM: otkriti zasto se ne pokaze toast
+                Toast.makeText(getBaseContext(),"Uspjesan log in",Toast.LENGTH_SHORT);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w("tag", "Google sign in failed", e);
-                // ...
+                Toast.makeText(this,"Nespjesan log in error: "+e,Toast.LENGTH_SHORT);
             }
         }else{
             // Pass the activity result back to the Facebook SDK
             callbackManager.onActivityResult(requestCode, resultCode, data);
-
         }
     }
     @Override
     public void onStart() {
         super.onStart();
+        Log.d("Probam :", String.valueOf(1));
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
             updateUI(currentUser);
-
         }
-       /* final FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser!=null){
-            myRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                 @Override
-                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                     UploadSkl skl=dataSnapshot.getValue(UploadSkl.class);
-                     naziv=skl.getNaziv();
-                     updateUI(currentUser);
-                     Log.d("naziv",naziv);
-
-                 }
-
-                 @Override
-                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                 }
-             }
-            );
-            //updateUI(currentUser);
-
-        }*/
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d("Tag", "firebaseAuthWithGoogle:" + acct.getId());
-
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -209,14 +187,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                            // Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             updateUI(null);
                         }
-
-                        // ...
                     }
                 });
     }
 
     private void updateUI(FirebaseUser user) {
-
+        Log.d("Probam :", String.valueOf(3));
     String username;
     if(user.getDisplayName()==null){
         username=naziv;
@@ -227,13 +203,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     Uri url=user.getPhotoUrl();
     String uid=user.getUid();
 
-        SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("email",email);
-        editor.putString("username", username);
-        editor.putString("uid",uid);
-        editor.putBoolean("hasLogin",true);
-        editor.apply();
+    SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putString("email",email);
+    editor.putString("username", username);
+    editor.putString("uid",uid);
+    editor.putBoolean("hasLogin",true);
+    editor.apply();
 
         //image with glide
 
@@ -245,15 +221,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     startActivity(intent);
     finish();
 
-
     }
-
-
     @Override
     public void onClick(View view) {
         if(view.equals(googlebtn)){
             signIn();
-
         }else if(view.equals(reg_skl)){
             Intent intent=new Intent(Login.this,RegistrationActivity.class);
             startActivity(intent);
@@ -265,8 +237,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                 Toast.makeText(Login.this, "email ili lozinka prazni.",
                         Toast.LENGTH_SHORT).show();
             }
-
-            //finish();
         }
     }
 
@@ -320,33 +290,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                             myRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                       @Override
                                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                          UploadSkl skl=dataSnapshot.getValue(UploadSkl.class);
+                                          Root skl=dataSnapshot.getValue(Root.class);
+                                          //UploadSkl skl=dataSnapshot.getValue(UploadSkl.class);
                                           Log.d("evoooo",dataSnapshot.toString());
                                           naziv=skl.getNaziv();
                                           updateUI(user);
-                                          Log.d("naziv",naziv);
-
+                                          //Log.d("naziv",naziv);
                                       }
-
                                       @Override
                                       public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                          Toast.makeText(getApplicationContext(),"Otkazan log in error: "+databaseError,Toast.LENGTH_SHORT);
                                       }
                                   }
                             );
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("log s emailom i pas", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(Login.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(Login.this, "Authentication failed. error: "+task.getException(), Toast.LENGTH_SHORT).show();
                             Intent intent =new Intent(Login.this,Login.class);
                             startActivity(intent);
                             finish();
-
-                            //updateUI(null);
                         }
-
-                        // ...
                     }
                 });
     }

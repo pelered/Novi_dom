@@ -27,7 +27,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     String username,email,photo;
     Uri url;
-
     TextView u,e;
     Button logout,vrati;
     ImageView i;
@@ -39,15 +38,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-
         email=getIntent().getStringExtra("email");
         username=getIntent().getStringExtra("username");
         if(getIntent().getStringExtra("url")!=null){
             photo=getIntent().getStringExtra("url");
             url=Uri.parse(photo);
         }
-
-
         u=findViewById(R.id.username);
         e=findViewById(R.id.email);
         logout=(Button) findViewById(R.id.logout);
@@ -62,20 +58,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         if(getIntent().getStringExtra("url")!=null){
             Picasso.get().load(url).into(i);
-
         }
-
        //potrebno da se moze odlogirat i s google,da mozes kasnije i druge accounte birati
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
     }
-
     @Override
     public void onClick(View view) {
         if(view.equals(logout)){
@@ -90,22 +81,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         }
                     });
             LoginManager.getInstance().logOut();
-            SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
 
+            SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
-            Log.d("dal izbrise","usao sam");
+            //Log.d("dal izbrise","usao sam");
             editor.commit();
         }else if(view.equals(vrati)){
             Intent intent=new Intent(ProfileActivity.this,MainActivity.class);
             startActivity(intent);
             finish();
         }
-
-        //Makni z+izbaze mobitela
-
     }
-
 
     public void onStart() {
         super.onStart();

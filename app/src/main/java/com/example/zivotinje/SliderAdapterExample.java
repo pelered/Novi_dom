@@ -2,6 +2,7 @@ package com.example.zivotinje;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,7 @@ public class SliderAdapterExample extends
 
     private Context context;
     private int mCount;
-    ArrayList<Parcelable> path;
+    ArrayList<Uri> path;
     private int pos2;
     ArrayList<String> path2;
 
@@ -30,6 +31,7 @@ public class SliderAdapterExample extends
         this.context = context;
     }
 
+    //velicina polja slika
     public void setCount(int count) {
         this.mCount = count;
     }
@@ -39,11 +41,12 @@ public class SliderAdapterExample extends
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_slider_adapter_example, null);
         return new SliderAdapterVH(inflate);
     }
-
-    public void slike(ArrayList<Parcelable> path){
+    //ovo je slike uzete s mobitela
+    public void slike(ArrayList<Uri> path){
         this.path=path;
     }
 
+    //velicina polja slika
     public void broj(int pos2){
         this.pos2=pos2;
     }
@@ -56,7 +59,7 @@ public class SliderAdapterExample extends
                 Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show();
             }
         });
-        ArrayList<Parcelable> link;
+        ArrayList<Uri> link;
         ArrayList<String> link2;
         if(path==null){
              link2=path2;

@@ -2,7 +2,6 @@ package com.example.zivotinje;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -13,13 +12,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -53,10 +50,8 @@ import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.zivotinje.R.id.button;
-import static com.example.zivotinje.R.id.imageSlider;
 
-public class EditSkl extends Fragment {
+public class EditZiv extends Fragment {
     private String[] company = {};
     EditText ime,pasmina,godine,tezina,opis,oznaka;
     RadioGroup vrsta;
@@ -74,7 +69,7 @@ public class EditSkl extends Fragment {
 
 
 
-    private ArrayList<Parcelable> path;
+    private ArrayList<Uri> path;
     private ArrayList<String> slike=new ArrayList<String>();
     private ArrayList<String> slike2=new ArrayList<String>();
     private ArrayList<String> slike_ucitavanje=new ArrayList<String>();
@@ -90,7 +85,7 @@ public class EditSkl extends Fragment {
     public static Spinner spCompany;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_edit_skl, container, false);
+        View v = inflater.inflate(R.layout.activity_edit_ziv, container, false);
         spCompany = v.findViewById(R.id.pasmine);
         CustomAdapter adapter = new CustomAdapter(this.getActivity(), company);
 
@@ -272,7 +267,7 @@ public class EditSkl extends Fragment {
 
     //za otvaranje galerije na klik gumba
     private void openFileChooser() {
-        FishBun.with(EditSkl.this).setImageAdapter(new GlideAdapter())
+        FishBun.with(EditZiv.this).setImageAdapter(new GlideAdapter())
                 .setMaxCount(8)
                 .setMinCount(1)
                 .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), false)
