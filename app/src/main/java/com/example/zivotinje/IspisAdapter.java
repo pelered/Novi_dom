@@ -34,11 +34,13 @@ public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHol
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         Root uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getNaziv());
+        if(uploadCurrent.getUrl()!=null){
+            Glide.with(mContext)
+                    .load(uploadCurrent.getUrl().get("0_key"))
+                    .centerCrop()
+                    .into(holder.imageView);
+        }
 
-        Glide.with(mContext)
-                .load(uploadCurrent.getUrl().get("0_key"))
-                .centerCrop()
-                .into(holder.imageView);
     }
 
     @Override

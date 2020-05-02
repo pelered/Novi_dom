@@ -82,6 +82,7 @@ public class EditSkl extends Fragment {
     private ArrayList<String> slike_ucitavanje= new ArrayList<>();
     //potreban da se ne uplodaju iste slike,pa ako se nije dodala slika s mobitela ovo će biti prazno i nijedna slika se neće uplodati
     private HashMap<String,String> slike_map= new HashMap<>();
+    //TODO prouciti kako i radi tocno
     private int i=0;
     private Root dohvaceno;
     private Button mButtonChooseImage;
@@ -100,6 +101,8 @@ public class EditSkl extends Fragment {
         naziv=view.findViewById(R.id.naziv_sk);
         opis=view.findViewById(R.id.opis);
         email = view.findViewById(R.id.email_skl);
+
+        mProgressBar.setVisibility(View.INVISIBLE);
 
         prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("shared_pref_name", MODE_PRIVATE);
         //dohvati id sklonista iz sharedpref
@@ -159,7 +162,7 @@ public class EditSkl extends Fragment {
             public void onPlaceSelected(@NonNull Place place) {
                 autocompleteFragment.setText(place.getLatLng().toString());
                 adresa=place.getAddress();
-                Log.d("pod adresa",adresa);
+                //Log.d("pod adresa",adresa);
             }
             @Override
             public void onError(@NonNull Status status) {
@@ -264,11 +267,13 @@ public class EditSkl extends Fragment {
                 i=j;
             }
             for (int uploads =0; uploads < ImageList.size(); uploads++) {
+                mProgressBar.setVisibility(View.VISIBLE);
                 final Uri Image  = ImageList.get(uploads);
                 //sprema u storage sliku s nazivom prema milisekundama
                 final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()+ "." + getFileExtension(Image));
                 mUploadTask = fileReference.putFile(Image);
                 // Register observers to listen for when the download is done or if it fails
+                final int finalUploads = uploads;
                 mUploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
@@ -302,7 +307,7 @@ public class EditSkl extends Fragment {
                                     Uri downloadUri = task.getResult();
                                     slike_map.put(i+"_key",downloadUri.toString());
                                     i++;
-                                    Toast.makeText(getActivity(), "Upload slike"+i+" uspio,ostalo je: "+(ImageList.size()-i), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), "Upload slike"+i+" uspio", Toast.LENGTH_LONG).show();
                                 } else {
                                     Toast.makeText(getActivity(), "Upload slike nije uspio", Toast.LENGTH_LONG).show();
                                 }
@@ -312,32 +317,33 @@ public class EditSkl extends Fragment {
                 }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("Ispis: ", String.valueOf(finalUploads));
+                        Log.d("Ispis: ", String.valueOf(ImageList.size()));
+                        if(finalUploads==ImageList.size()){
+                            update_podatke();
+                        }
+                        //TODO napraviti da prikazuje tocno kolko je ostalo
                         double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                         mProgressBar.setProgress((int) progress);
                     }
                 });
-
             }
         } else {
-            Toast.makeText(getActivity(), "Slika nije bila odabrana.Ostali izmjeneni podaci će uplodati", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Slika nije bila odabrana.Ostali izmjeneni podaci će se uplodati", Toast.LENGTH_LONG).show();
             //potrebno spremit u slike map, makar nema nista zbog naredbe za update. inace dijete url potpuno nestalo
             if(!slike_ucitavanje.isEmpty()){
                 int j;
                 for(j=0; j< slike_ucitavanje.size(); j++){
                     slike_map.put(j+"_key", slike_ucitavanje.get(j));
-                    Log.d("slike_map"+j,slike_map.toString());
+                    //Log.d("slike_map"+j,slike_map.toString());
                 }
                 i=j;
             }
+            update_podatke();
         }
         //problem za mozda rjesit->trebao bi ici na upload ostali podataka tek kad sve slike rjesi,ovo je privremeno
-        Log.d("Evome: ", String.valueOf(1));
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                update_podatke();
-            }
-        }, 0);
+        //Log.d("Evome: ", String.valueOf(1));
+
     }
     //slika(kao i ostatak podataka) se dodaje u bazu podataka tj njezin url
     private void update_podatke(){
@@ -362,6 +368,7 @@ public class EditSkl extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getActivity(),"Upload svih podataka je uspio ", Toast.LENGTH_LONG).show();
+                //mProgressBar.setVisibility(View.INVISIBLE);
             }
         });
         ImageList.clear();

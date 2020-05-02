@@ -168,18 +168,18 @@ public class EditZiv extends Fragment {
                         public void onFailure(@NonNull Exception exception) {
                             Toast.makeText(getActivity(), "Upload nije uspio " + exception.toString(), Toast.LENGTH_LONG).show();
                         }
-                    })
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    }) .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                            Log.d("podaci", taskSnapshot.getMetadata().toString());
                             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                             // ...
                             //mUploadTask = fileReference.putFile(Image);
                             Task<Uri> urlTask = mUploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                                 @Override
                                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                    Log.d("podaci1", task.toString());
+
                                     if (!task.isSuccessful()) {
                                         throw task.getException();
                                     }
@@ -206,8 +206,11 @@ public class EditZiv extends Fragment {
                                     }
                                 }
                             });
+
                         }
+
                     })
+
                         .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
