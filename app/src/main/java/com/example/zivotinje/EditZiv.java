@@ -65,29 +65,20 @@ public class EditZiv extends Fragment {
     private SharedPreferences prefs;
     int selectedId;
     private View ve;
-
     private ArrayList<Uri> path;
-    private ArrayList<String> slike=new ArrayList<String>();
-    private ArrayList<String> slike2=new ArrayList<String>();
-    private ArrayList<String> slike_ucitavanje=new ArrayList<String>();
-    private HashMap<String,String> slike_map=new HashMap<String,String>();
-    private ArrayList<Uri> ImageList = new ArrayList<Uri>();
-
+    private ArrayList<String> slike=new ArrayList<>();
+    private ArrayList<String> slike2=new ArrayList<>();
+    private ArrayList<String> slike_ucitavanje=new ArrayList<>();
+    private HashMap<String,String> slike_map=new HashMap<>();
+    private ArrayList<Uri> ImageList = new ArrayList<>();
     private int i=0;
     private int uploads = 0;
 
-
-
-
-    public static Spinner spCompany;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_edit_ziv, container, false);
-
-
         return v;
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -140,28 +131,25 @@ public class EditZiv extends Fragment {
     }
     //uplodamo slike i dohvacamorl njihov
     private void uploadFile() {
-
         if (!ImageList.isEmpty()) {
             if (!slike2.isEmpty()) {
                 int j;
                 for (j = 0; j < slike2.size(); j++) {
                     slike_map.put(j + "_key", slike2.get(j));
                     Log.d("slike_map" + j, slike_map.toString());
-
                 }
                 i = j;
             }
+            //Log.d("TU*","tu sam");
             for (uploads = 0; uploads < ImageList.size(); uploads++) {
+                //Log.d("TU**","tu sam");
                 final Uri Image = ImageList.get(uploads);
                 final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                         + "." + getFileExtension(Image));
-
                 Log.d("reference", fileReference.toString());
                 Log.d("naziv slike", System.currentTimeMillis() + "." + getFileExtension(Image));
-
                 //uploadTask = fileReference.putFile(Image);
                 mUploadTask = fileReference.putFile(Image);
-
                 // Register observers to listen for when the download is done or if it fails
                 mUploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -171,7 +159,6 @@ public class EditZiv extends Fragment {
                     }) .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
                             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                             // ...
                             //mUploadTask = fileReference.putFile(Image);
@@ -179,11 +166,9 @@ public class EditZiv extends Fragment {
                                 @Override
                                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                                     Log.d("podaci1", task.toString());
-
                                     if (!task.isSuccessful()) {
                                         throw task.getException();
                                     }
-
                                     // Continue with the task to get the download URL
                                     return fileReference.getDownloadUrl();
                                 }
@@ -192,26 +177,23 @@ public class EditZiv extends Fragment {
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     if (task.isSuccessful()) {
                                         Uri downloadUri = task.getResult();
-                                        Log.d("url trazeni", downloadUri.toString());
+                                        Log.d("trazeni", downloadUri.toString());
                                         //spremam u hash listu
                                         slike_map.put(i + "_key", downloadUri.toString());
                                         i++;
-                                        Log.d("mapa key", slike_map.toString());
+                                        Log.d("trazeni key", slike_map.toString());
                                         Toast.makeText(getActivity(), "Upload.Dohvacen url", Toast.LENGTH_LONG).show();
                                         //spremam samo url-ove
                                         slike.add(downloadUri.toString());
                                     } else {
                                         Toast.makeText(getActivity(), "Upload nije uspio", Toast.LENGTH_LONG).show();
-
                                     }
                                 }
                             });
 
                         }
 
-                    })
-
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
 
@@ -222,8 +204,6 @@ public class EditZiv extends Fragment {
             } else{
                 Toast.makeText(getActivity(), "No file selected", Toast.LENGTH_SHORT).show();
             }
-
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -231,34 +211,28 @@ public class EditZiv extends Fragment {
                 dodajSliku();
             }
         }, 10000);
-
     }
     //slika se dodajeu bazu podataka , kao i podaci o zivotinji
     private void dodajSliku(){
         selectedId = vrsta.getCheckedRadioButtonId();
         radioButton = (RadioButton) ve.findViewById(selectedId);
         Log.d("vrsta",radioButton.getText().toString());
-
         //String id=prefs.getString("uid","");
         ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(),radioButton.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),Float.parseFloat(tezina.getText().toString()),Float.parseFloat(godine.getText().toString()),prefs.getString("uid",""),slike_map);
         Map<String, Object> postValues2=upload2.toMap();
         Log.d("mapa slike",slike_map.toString());
         Log.d("mapa",postValues2.toString());
-
         Log.d("ID uploda",prefs.getString("uid",""));
         mDatabaseRef.child(oznaka.getText().toString()).updateChildren(postValues2);
         slike.clear();
         ImageList.clear();
     }
-
     //dohvacamo koja vrsta je slika
-
     private String getFileExtension(Uri uri) {
         ContentResolver cR = getActivity().getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-
     //za otvaranje galerije na klik gumba
     private void openFileChooser() {
         FishBun.with(EditZiv.this).setImageAdapter(new GlideAdapter())

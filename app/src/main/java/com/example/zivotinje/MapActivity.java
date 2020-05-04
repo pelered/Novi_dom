@@ -1,5 +1,7 @@
 package com.example.zivotinje;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -9,30 +11,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.libraries.places.api.net.PlacesClient;
-
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.IntentSender;
-
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.google.android.gms.common.api.ResolvableApiException;
-
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -45,23 +35,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.api.LogDescriptor;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.maps.android.collections.GroundOverlayManager;
-import com.google.maps.android.collections.MarkerManager;
-import com.google.maps.android.collections.PolygonManager;
-import com.google.maps.android.collections.PolylineManager;
 import com.google.maps.android.ui.IconGenerator;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -70,7 +51,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import static android.app.Activity.RESULT_OK;
-
 
 public class MapActivity extends Fragment implements Serializable, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     @Nullable
@@ -88,17 +68,14 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
     private List<Address> addresses;
     private String id;
     private String ide;
-
+    private String requiredPermission;
     private ArrayList<Marker> markerr;
     private static final long serialVersionUID = -2163051469151804394L;
     private HashMap<String,String> popis=new HashMap<>();
     private Root upload;
     private ArrayList<Root> lista_sklonista;
     int count=0;
-
     private IconGenerator iconFactory;
-    //private MarkerManager markerManager;
-
     boolean doubleBackToExitPressedOnce = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -110,29 +87,20 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
         mapFragment.getMapAsync(this);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         mapView = mapFragment.getView();
-
         //povezivanje s bazom
         database = FirebaseDatabase.getInstance();
         //refernca na bazu podataka
         myRef = database.getReference("Sklonista");
-
         mGeocoder=new Geocoder(getActivity(), Locale.getDefault());
         //za spremanje markera
         markerr = new ArrayList<>();
-        lista_sklonista=new ArrayList<Root>();
-
-
-        //isprobavanj1
+        lista_sklonista=new ArrayList<>();
         iconFactory = new IconGenerator(getContext());
 
-
     }
-//PROBLEM- brzi dupli klik prblizi, a sporiji dupli otvori skloniste bolje rjesenje?
+//TODO PROBLEM- brzi dupli klik prblizi, a sporiji dupli otvori skloniste bolje rjesenje?
     public boolean onMarkerClick(Marker marker) {
-
-
         if (doubleBackToExitPressedOnce) {
-
             for(Map.Entry<String, String> entry : popis.entrySet())
             {
                 if (marker.getId().equals(entry.getKey())){
@@ -141,7 +109,6 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                     break;
                 }else if(ide==null) {
                     ide = "1";
-
                 }
             }
             // sluzi da se id posalje na sljedeci fragment da zna koje skloniste prikazati
@@ -154,12 +121,10 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
             ft.addToBackStack("tag_back1");
             ft.commit();
             return  true;
-
         } else {
             this.doubleBackToExitPressedOnce = true;
-            Log.d("Delay", String.valueOf(doubleBackToExitPressedOnce));
+            //Log.d("Delay", String.valueOf(doubleBackToExitPressedOnce));
             marker.showInfoWindow();
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -168,28 +133,23 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
             }, 500);
         }
         return true;
-
     }
 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
-        mMap.setMyLocationEnabled(true);
+        requiredPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+        int checkVal = getContext().checkCallingOrSelfPermission(requiredPermission);
+        if (checkVal== PackageManager.PERMISSION_GRANTED){
+            mMap.setMyLocationEnabled(true);
+        }
+        //
         //postavi sredisnu lokaciju na zg
         zagreb = new LatLng( 45.815399, 15.966568);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(zagreb,6));
         postavi_markere();
-
         //mMap.getUiSettings().setZoomGesturesEnabled(false);
-
-        //isprovbavanje 2
-        //markerManager = new MarkerManager(mMap);
-        //GroundOverlayManager groundOverlayManager = new GroundOverlayManager(mMap);
-        //PolygonManager polygonManager = new PolygonManager(mMap);
-        //PolylineManager polylineManager = new PolylineManager(mMap);
-        //
-
         //postavka location gumba
         if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
             View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
@@ -198,7 +158,6 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
             layoutParams.setMargins(0, 0, 40, 180);
         }
-
         //check if gps is enabled or not and then request user to enable it
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000);
@@ -216,13 +175,6 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                 getDeviceLocation();
             }
         });
-
-
-
-
-
-
-
     }
 // dohvaca podatke iz baze da bi prikazao sklonista na mapi
     private void postavi_markere(){
@@ -235,10 +187,8 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                     Log.d("problem",postSnapshot.toString());
                    upload = postSnapshot.getValue(Root.class);
                    lista_sklonista.add(upload);
-
                     //Log.d("mape***",lista_sklonista.toString());
                     //Log.d("mape****", String.valueOf(lista_sklonista.size()));
-
                     //provjerit zkj postoji, mozda jer ne bi prikazalo nista radi brzine ucitavanja?
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -249,18 +199,14 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                     }, 0);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                //napravi toast da javi neuspjesnot
-
+                Toast.makeText(getActivity(),"Neuspjesno dohvacanje podataka",Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     //dohvaca podatke o sklonistu ako postoji ista pod adresa
     public void odgodi_geoc(ArrayList<Root> lista){
-
         try {
             if(mGeocoder!=null){
                 if(!lista.isEmpty()) {
@@ -269,27 +215,13 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                         addresses = mGeocoder.getFromLocationName(lista.get(i).getAdresa(), 1);
                         lan = addresses.get(0).getLatitude();
                         lon = addresses.get(0).getLongitude();
-                        Log.d("mape*", lista.toString());
-                        Log.d("mape***",markerr.toString());
+                        //Log.d("mape*", lista.toString());
+                        //Log.d("mape***",markerr.toString());
                         if(!markerr.isEmpty()){
                             //Log.d("mape**", String.valueOf(popis.containsValue((lista.get(i).getId()))));
                             if (!popis.containsValue((lista.get(i).getId()))){
                                 count++;
-                                //markerr.add( mMap.addMarker(new MarkerOptions().position(new LatLng(lan, lon))));
-                                //markerr.get(i).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-
-                               /* MarkerManager.Collection markerCollection = markerManager.newCollection();
-                                markerCollection.addMarker(new MarkerOptions()
-                                        .position(new LatLng( lan, lon))
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                                        .title(lista.get(i).getNaziv()));*/
-
-                                //markerr.get(i).setIcon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(lista.get(i).getNaziv())));
-
                                 markerr.add(mMap.addMarker(new MarkerOptions().position(new LatLng(lan, lon)).title(lista.get(i).getNaziv())));
-                                
-                                //markerr.get(i).showInfoWindow();
-                                //Log.d("Kolekcija",markerCollection.toString());
                                 popis.put(markerr.get(i).getId(), id);
                             }
                         }else{
@@ -298,19 +230,16 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                             //markerr.get(i).showInfoWindow();
                             popis.put(markerr.get(i).getId(), id);
                         }
-
                         //Log.d("mapee*", String.valueOf(count));
                         //Log.d("marker*",markerr.toString());
                        // Log.d("mape****", popis.toString());
                     }
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 51) {
@@ -319,7 +248,6 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
             }
         }
     }
-
     //dohvaca podaatke o lokacije ako je ukljucena
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
@@ -351,13 +279,10 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                                     }
                                 };
                                 mFusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-
                             }
                         } else
                             Toast.makeText(getActivity(), "Neuspješan pronalazak lokacije", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-
-
 }

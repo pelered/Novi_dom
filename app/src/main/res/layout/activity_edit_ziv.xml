@@ -10,24 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/button_choose_image"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="115dp"
-            android:layout_marginLeft="115dp"
-            android:layout_marginTop="107dp"
-            android:layout_marginEnd="126dp"
-            android:layout_marginRight="126dp"
-            android:background="@android:color/transparent"
-            android:text="Odaberi slike" />
 
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="297dp"
+            app:cardCornerRadius="2dp"
+            android:layout_margin="5dp">
         <com.smarteist.autoimageslider.SliderView
             android:id="@+id/imageSlider"
             android:layout_width="match_parent"
@@ -44,7 +33,6 @@
             app:sliderAnimationDuration="600"
             app:sliderAutoCycleDirection="back_and_forth"
             app:sliderAutoCycleEnabled="true"
-            app:sliderCircularHandlerEnabled="true"
             app:sliderIndicatorAnimationDuration="600"
             app:sliderIndicatorGravity="center_horizontal|bottom"
             app:sliderIndicatorMargin="15dp"
@@ -57,7 +45,28 @@
             app:sliderStartAutoCycle="true" >
 
         </com.smarteist.autoimageslider.SliderView>
-
+            <Button
+                android:id="@+id/button_choose_image"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="115dp"
+                android:layout_marginLeft="115dp"
+                android:layout_marginTop="107dp"
+                android:layout_marginEnd="126dp"
+                android:layout_marginRight="126dp"
+                android:background="@android:color/transparent"
+                android:text="@string/odaberi_slike" />
+            <TextView
+                android:id="@+id/text_view_show_uploads"
+                android:layout_width="118dp"
+                android:layout_height="52dp"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/obrisi_slik"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
+        </androidx.cardview.widget.CardView>
         <ProgressBar
             android:id="@+id/progress_bar"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
@@ -90,22 +99,7 @@
             android:layout_marginRight="3dp"
             android:text="Upload" />
 
-        <TextView
-            android:id="@+id/text_view_show_uploads"
-            android:layout_width="131dp"
-            android:layout_height="32dp"
-            android:layout_alignTop="@+id/button_upload"
-            android:layout_alignBottom="@+id/button_upload"
-            android:layout_marginStart="-137dp"
-            android:layout_marginLeft="-137dp"
-            android:layout_marginTop="-44dp"
-            android:layout_marginBottom="61dp"
-            android:layout_toEndOf="@+id/button_upload"
-            android:layout_toRightOf="@+id/button_upload"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:text="Obrisi slike"
-            android:textSize="16sp" />
+
 
 
         <EditText
@@ -145,25 +139,6 @@
             android:gravity="top|left"
             android:hint="Opis"
             android:inputType="textMultiLine" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="-34dp"
-            android:layout_marginLeft="-34dp"
-            android:layout_marginTop="386dp"
-            android:layout_marginEnd="34dp"
-            android:layout_marginRight="34dp"
-            android:background="@null"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/pasmina"

@@ -51,16 +51,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     private static final int RC_SIGN_IN = 1;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
-
     private SignInButton googlebtn;
-
     private LoginButton loginButton;
     private CallbackManager callbackManager;
-    private  Button log_skl;
+    private Button log_skl;
     private TextView reg_skl;
     private AppCompatCheckBox checkbox;
     private EditText email,lozinka;
-
     private FirebaseDatabase database;
     private DatabaseReference myRef ;
     private String naziv;
@@ -97,14 +94,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
 
         checkbox =findViewById(R.id.checkbox);
         checkbox.setOnCheckedChangeListener(this);
-        //
 
         //facebook
-
         callbackManager = CallbackManager.Factory.create();
         loginButton = findViewById(R.id.login_button);
         loginButton.setPermissions("email", "public_profile");
-
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -124,7 +118,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
 
         reg_skl=findViewById(R.id.reg_skl);
         reg_skl.setOnClickListener(this);
-
     }
     //google
     private void signIn() {
@@ -132,11 +125,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         //za google log in
         if (requestCode == RC_SIGN_IN) {
@@ -146,12 +137,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 //firebaseAuthWithGoogle(account.getIdToken());
                 firebaseAuthWithGoogle(account);
-                //PROBLEM: otkriti zasto se ne pokaze toast
-                Toast.makeText(getBaseContext(),"Uspjesan log in",Toast.LENGTH_SHORT);
+                //Toast.makeText(getBaseContext(),"Uspjesan log in",Toast.LENGTH_SHORT).show;
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w("tag", "Google sign in failed", e);
-                Toast.makeText(this,"Nespjesan log in error: "+e,Toast.LENGTH_SHORT);
+                Toast.makeText(this,"Nespjesan log in error: "+e,Toast.LENGTH_SHORT).show();
             }
         }else{
             // Pass the activity result back to the Facebook SDK
@@ -161,14 +151,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("Probam :", String.valueOf(1));
+        //Log.d("Probam :", String.valueOf(1));
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
             updateUI(currentUser);
         }
     }
-
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d("Tag", "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -184,15 +173,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("Tag", "signInWithCredential:failure", task.getException());
-                           // Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"Autentikacija neuspjela",Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
                     }
                 });
     }
-
     private void updateUI(FirebaseUser user) {
-        Log.d("Probam :", String.valueOf(3));
+        //Log.d("Probam :", String.valueOf(3));
     String username;
     if(user.getDisplayName()==null){
         username=naziv;
@@ -210,9 +198,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     editor.putString("uid",uid);
     editor.putBoolean("hasLogin",true);
     editor.apply();
-
         //image with glide
-
     Intent intent=new Intent(this,ProfileActivity.class);
     intent.putExtra("username",username);
     intent.putExtra("email",email);
@@ -220,7 +206,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     intent.putExtra("url",String.valueOf(url));
     startActivity(intent);
     finish();
-
     }
     @Override
     public void onClick(View view) {
@@ -239,9 +224,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
             }
         }
     }
-
     //facebook
-
+    //zbog virusa ne radi
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("TAG", "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -261,12 +245,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
-
-                        // ...
                     }
                 });
     }
-
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {

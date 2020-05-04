@@ -2,6 +2,8 @@ package com.example.zivotinje;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,9 +37,10 @@ public class PrikazSkl extends Fragment implements Serializable {
     private TextView naziv1,opis1,email1, adresa1;
     private SliderView sliderView1;
     private ArrayList<String> slike2=new ArrayList<>();
-    private ImageView salji;
+    private ImageView salji,edit;
     private String value;
     private Root odabrano_skl;
+    private Button ispis_ziv;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_prikaz_skl, container, false);
@@ -52,10 +56,24 @@ public class PrikazSkl extends Fragment implements Serializable {
         adresa1 =view.findViewById(R.id.adresa_skl);
         //Bundle bundle = this.getArguments();
         salji=view.findViewById(R.id.salji);
+        edit=view.findViewById(R.id.edit_mode);
+        ispis_ziv=view.findViewById(R.id.ispis_zv);
+        ispis_ziv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                odi_na_ispis_ziv();
+            }
+        });
         salji.setOnClickListener(new View.OnClickListener() {
             //@Override
             public void onClick(View v) {
                 sendEmail();
+            }
+        });
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                edit();
             }
         });
         if (getArguments()==null){
@@ -65,6 +83,28 @@ public class PrikazSkl extends Fragment implements Serializable {
         }
          ucitaj_podatke();
     }
+
+    private void odi_na_ispis_ziv() {
+        IspisZiv fragment2 =new IspisZiv();
+        FragmentManager fragmentManager = getFragmentManager();
+        Bundle args = new Bundle();
+        args.putString("id_skl", odabrano_skl.getId());
+        fragment2.setArguments(args);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment2);
+        fragmentTransaction.addToBackStack("tag_ispis_ziv");
+        fragmentTransaction.commit();
+    }
+
+    private void edit() {
+        EditSkl fragment2 = new EditSkl();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment2);
+        fragmentTransaction.addToBackStack("tag_prikaz_skl");
+        fragmentTransaction.commit();
+    }
+
     @SuppressLint("IntentReset")
     private void sendEmail() {
         Log.i("Send email", "");
