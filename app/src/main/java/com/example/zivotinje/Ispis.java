@@ -24,6 +24,7 @@ public class Ispis extends Fragment {
     private IspisAdapter mAdapter;
     private ProgressBar mProgressCircle;
     private List<Root> mUploads;
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_ispis,container,false);
     }

@@ -1,11 +1,12 @@
 package com.example.zivotinje;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class ZivUpload {
-    private String name;
+    private String naziv;
     private String oznaka;
     private String vrsta;
     private String opis;
@@ -13,19 +14,17 @@ public class ZivUpload {
     private String id_skl;
     private Float tezina;
     private Float godine;
-    public Map<String,String> slike_map =new HashMap<>();
+    public Map<String,String> url =new HashMap<>();
 
 
-    private ArrayList<String> slike=new ArrayList<String>();
-    private Map<String,String> slike_skinute=new HashMap<>();
     public ZivUpload(){
 
     }
-    public ZivUpload(String name, String oznaka, String vrsta,String pasmina, String opis, Float tezina,Float godine,String id_skl, HashMap<String,String> slike_map)
+    public ZivUpload(String naziv, String oznaka, String vrsta, String pasmina, String opis, Float tezina, Float godine, String id_skl, HashMap<String,String> url)
     {
-        this.slike_map=slike_map;
+        this.url = url;
         this.id_skl=id_skl;
-        this.name=name;
+        this.naziv = naziv;
         this.oznaka=oznaka;
         this.vrsta=vrsta;
         this.opis=opis;
@@ -33,9 +32,88 @@ public class ZivUpload {
         this.tezina=tezina;
         this.godine=godine;
     }
+
+    public Float getGodine() {
+        return godine;
+    }
+
+    public Float getTezina() {
+        return tezina;
+    }
+
+    public Map<String, String> getUrl() {
+        return url;
+    }
+
+    public String getId_skl() {
+        return id_skl;
+    }
+
+    public String getNaziv() {
+        return naziv;
+    }
+
+    public String getOpis() {
+        return opis;
+    }
+
+    public String getOznaka() {
+        return oznaka;
+    }
+
+    public String getPasmina() {
+        return pasmina;
+    }
+
+    public String getVrsta() {
+        return vrsta;
+    }
+
+    public void setGodine(Float godine) {
+        this.godine = godine;
+    }
+
+    public void setId_skl(String id_skl) {
+        this.id_skl = id_skl;
+    }
+
+    public void setNaziv(String naziv) {
+        this.naziv = naziv;
+    }
+
+    public void setOpis(String opis) {
+        this.opis = opis;
+    }
+
+    public void setOznaka(String oznaka) {
+        this.oznaka = oznaka;
+    }
+
+    public void setPasmina(String pasmina) {
+        this.pasmina = pasmina;
+    }
+
+    public void setUrl(Map<String, String> url) {
+        this.url = url;
+    }
+
+    public void setTezina(Float tezina) {
+        this.tezina = tezina;
+    }
+
+    public void setVrsta(String vrsta) {
+        this.vrsta = vrsta;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("naziv",name);
+        result.put("naziv", naziv);
         result.put("id_skl",id_skl);
         result.put("oznaka",oznaka);
         result.put("vrsta",vrsta);
@@ -43,7 +121,7 @@ public class ZivUpload {
         result.put("pasmina",pasmina);
         result.put("tezina",tezina);
         result.put("godine",godine);
-        result.put("url",slike_map);
+        result.put("url", url);
 
         return result;
     }
