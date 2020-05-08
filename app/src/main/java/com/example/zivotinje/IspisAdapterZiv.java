@@ -1,6 +1,7 @@
 package com.example.zivotinje;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -38,15 +41,14 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
             @Override
             public void onClick(View v) {
                 Toast.makeText(mContext, "This is item in position " + position, Toast.LENGTH_SHORT).show();
-                /*PrikazSkl fragment=new PrikazSkl();
+                EditZiv fragment=new EditZiv();
                 Bundle args = new Bundle();
-                args.putString("marker", uploadCurrent.getOznaka());
+                args.putString("oznaka", uploadCurrent.getOznaka());
                 fragment.setArguments(args);
-                //FragmentTransaction ft=
                 FragmentTransaction ft =((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, fragment);
-                ft.addToBackStack("tag_back1_adapter");
-                ft.commit();*/
+                ft.addToBackStack("tag_ispis");
+                ft.commit();
             }
         });
         Log.d("Pisem",uploadCurrent.getUrl().toString());

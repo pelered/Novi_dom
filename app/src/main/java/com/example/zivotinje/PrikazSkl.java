@@ -7,9 +7,11 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,8 @@ import com.smarteist.autoimageslider.SliderView;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
+import android.content.SharedPreferences;
+
 public class PrikazSkl extends Fragment implements Serializable {
     private static final long serialVersionUID = -2163051469151804394L;
     private FirebaseDatabase database;
@@ -40,7 +44,7 @@ public class PrikazSkl extends Fragment implements Serializable {
     private ImageView salji,edit;
     private String value;
     private Root odabrano_skl;
-    private Button ispis_ziv;
+    private Button ispis_ziv,dodaj;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_prikaz_skl, container, false);
@@ -54,14 +58,31 @@ public class PrikazSkl extends Fragment implements Serializable {
         opis1=view.findViewById(R.id.opis_skl);
         email1=view.findViewById(R.id.email_sk);
         adresa1 =view.findViewById(R.id.adresa_skl);
+        dodaj=view.findViewById(R.id.dodaj);
         //Bundle bundle = this.getArguments();
         salji=view.findViewById(R.id.salji);
         edit=view.findViewById(R.id.edit_mode);
         ispis_ziv=view.findViewById(R.id.ispis_zv);
+        SharedPreferences prefs =getContext().getSharedPreferences("shared_pref_name", getContext().MODE_PRIVATE);
+        if(!TextUtils.isEmpty(prefs.getString("uid",""))){
+            if(getArguments().getString("marker").equals(prefs.getString("uid",""))) {
+                Log.d("IDD", prefs.getString("uid", ""));
+                edit.setVisibility(View.VISIBLE);
+                dodaj.setVisibility(View.VISIBLE);
+            }
+        }
+        dodaj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dodaj_ziv();
+            }
+        });
         ispis_ziv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                odi_na_ispis_ziv();
+                if(odabrano_skl.getId()!=null) {
+                    odi_na_ispis_ziv();
+                }
             }
         });
         salji.setOnClickListener(new View.OnClickListener() {
@@ -84,16 +105,32 @@ public class PrikazSkl extends Fragment implements Serializable {
          ucitaj_podatke();
     }
 
-    private void odi_na_ispis_ziv() {
-        IspisZiv fragment2 =new IspisZiv();
+    private void dodaj_ziv() {
+        EditZiv fragment2 =new EditZiv();
         FragmentManager fragmentManager = getFragmentManager();
         Bundle args = new Bundle();
-        args.putString("id_skl", odabrano_skl.getId());
+        //Todo mozda promijeniti da id gleda iz sharedpref
+        args.putString("id_skl_prikaz", odabrano_skl.getId());
         fragment2.setArguments(args);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment2);
         fragmentTransaction.addToBackStack("tag_ispis_ziv");
         fragmentTransaction.commit();
+    }
+
+    private void odi_na_ispis_ziv() {
+        if(odabrano_skl.getId()!=null){
+            IspisZiv fragment2 =new IspisZiv();
+            FragmentManager fragmentManager = getFragmentManager();
+            Bundle args = new Bundle();
+            args.putString("id_skl", odabrano_skl.getId());
+            fragment2.setArguments(args);
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, fragment2);
+            fragmentTransaction.addToBackStack("tag_ispis_ziv");
+            fragmentTransaction.commit();
+        }
+
     }
 
     private void edit() {

@@ -66,13 +66,13 @@ public class IspisZiv extends Fragment {
                 mAdapter=new IspisAdapterZiv(getActivity(),mUploads);
                 mAdapter = new IspisAdapterZiv(getActivity(), mUploads);
                 mRecyclerView.setAdapter(mAdapter);
-                mProgressCircle.setVisibility(View.INVISIBLE);
+                //mProgressCircle.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), "Neuspjela autorizacija " , Toast.LENGTH_SHORT).show();
-                mProgressCircle.setVisibility(View.INVISIBLE);
+                //mProgressCircle.setVisibility(View.INVISIBLE);
             }
         });
 

@@ -1,6 +1,7 @@
 package com.example.zivotinje;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -19,6 +20,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.multidex.MultiDex;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.widget.RelativeLayout;
@@ -83,6 +86,7 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
     }
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        MultiDex.install(getContext());
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -202,6 +206,7 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(),"Neuspjesno dohvacanje podataka",Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -282,6 +287,7 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                             }
                         } else
                             Toast.makeText(getActivity(), "Neuspješan pronalazak lokacije", Toast.LENGTH_SHORT).show();
+
                     }
                 });
     }

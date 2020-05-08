@@ -1,6 +1,7 @@
 package com.example.zivotinje;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.multidex.MultiDex;
 
 import android.view.Menu;
 import android.widget.TextView;
@@ -36,10 +38,15 @@ public class MainActivity extends AppCompatActivity
     private TextView log,ime,email;
     private SharedPreferences prefs;
 
-
     @Override
+    protected void attachBaseContext(Context context) {
+        super.attachBaseContext(context);
+        MultiDex.install(this);
+    }
+        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MultiDex.install(this);
         Dexter.withContext(this)
                 .withPermissions(
                         Manifest.permission.CAMERA,

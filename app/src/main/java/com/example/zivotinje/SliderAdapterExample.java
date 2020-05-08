@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,11 @@ import android.widget.Toast;
 import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
+//import com.esafirm.imagepicker.model.Image;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SliderAdapterExample extends
         SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
@@ -25,6 +28,7 @@ public class SliderAdapterExample extends
     private int pos2;
     ArrayList<String> path2;
     ArrayList<Uri> path;
+    //List<Image> path3;
     public SliderAdapterExample(FragmentActivity context) {
         this.context = context;
     }
@@ -32,22 +36,29 @@ public class SliderAdapterExample extends
     //velicina polja slika
     public void setCount(int count) {
         this.mCount = count;
+        Log.d("Pozicija()*", String.valueOf(mCount));
+
+
     }
 
     @Override
     public SliderAdapterVH onCreateViewHolder(ViewGroup parent) {
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_slider_adapter_example, null);
         return new SliderAdapterVH(inflate);
-    }
+    }/*
     public void deleteItem(int position) {
         this.path2.remove(position);
         notifyDataSetChanged();
-    }
+    }*/
     //ovo je slike uzete s mobitela
     public void slike(ArrayList<Uri> path){
         this.path=path;
+        //Log.d("Pozicija()**", String.valueOf(path));
     }
-
+    public void slike2(ArrayList<String> slike2) {
+        this.path2=slike2;
+        Log.d("Pozicija()**", String.valueOf(path2));
+    }
     //velicina polja slika
     public void broj(int pos2){
         this.pos2=pos2;
@@ -61,9 +72,12 @@ public class SliderAdapterExample extends
         });
         ArrayList<Uri> link;
         ArrayList<String> link2;
+        Log.d("Pozicijabroj: ", String.valueOf(mCount));
+        Log.d("Pozicijabroj*", String.valueOf(path2.size()));
+        Log.d("Pozicijabroj**: ", String.valueOf(position));
         if(path==null){
              link2=path2;
-            for (int i = 0; i < pos2; i++) {
+            for (int i = 0; i < mCount; i++) {
                 Glide.with(viewHolder.itemView)
                         .load(link2.get(position))
                         //.centerInside()
@@ -73,7 +87,7 @@ public class SliderAdapterExample extends
                         .optionalCenterInside()
                         .into(viewHolder.imageViewBackground);
             }
-        }else{
+        }/*else if(path2==null){
             link=path;
             for (int i = 0; i < pos2; i++) {
                 Glide.with(viewHolder.itemView)
@@ -81,7 +95,7 @@ public class SliderAdapterExample extends
                         .fitCenter()
                         .into(viewHolder.imageViewBackground);
             }
-        }
+        }*/
     }
 
     @Override
@@ -89,17 +103,10 @@ public class SliderAdapterExample extends
         //slider view count could be dynamic size
         return mCount;
     }
-
-    public void slike2(ArrayList<String> slike2) {
-        this.path2=slike2;
-    }
-
     class SliderAdapterVH extends SliderViewAdapter.ViewHolder {
-
         View itemView;
         ImageView imageViewBackground;
         TextView textViewDescription;
-
         public SliderAdapterVH(View itemView) {
             super(itemView);
             imageViewBackground = itemView.findViewById(R.id.iv_auto_image_slider);

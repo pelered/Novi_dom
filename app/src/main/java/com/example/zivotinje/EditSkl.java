@@ -44,6 +44,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+
 import com.sangcomz.fishbun.FishBun;
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter;
 import com.sangcomz.fishbun.define.Define;
@@ -105,7 +106,7 @@ public class EditSkl extends Fragment {
         opis=view.findViewById(R.id.opis);
         email = view.findViewById(R.id.email_skl);
 
-        mProgressBar.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("shared_pref_name", MODE_PRIVATE);
         //dohvati id sklonista iz sharedpref
@@ -119,6 +120,7 @@ public class EditSkl extends Fragment {
         sliderView = view.findViewById(R.id.imageSlider);
         adapter= new SliderAdapterExample(getActivity());
         email.setText(prefs.getString("email",""));
+        mProgressBar.setVisibility(View.GONE);
 
         //gumb za uplodanje podataka
         mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
@@ -333,6 +335,7 @@ public class EditSkl extends Fragment {
                                     count++;
                                 } else {
                                     Toast.makeText(getActivity(), "Upload slike nije uspio", Toast.LENGTH_LONG).show();
+
                                 }
                             }
                         });
@@ -349,9 +352,7 @@ public class EditSkl extends Fragment {
                     }
 
                 });
-
             }
-
         } else {
             Toast.makeText(getActivity(), "Slika nije bila odabrana.Ostali izmjeneni podaci će se uplodati", Toast.LENGTH_LONG).show();
             //potrebno spremit u slike map, makar nema nista zbog naredbe za update. inace dijete url potpuno nestalo
@@ -407,7 +408,7 @@ public class EditSkl extends Fragment {
         FishBun.with(EditSkl.this).setImageAdapter(new GlideAdapter())
                 .setMaxCount(8)
                 .setMinCount(1)
-                .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), false)
+                .setActionBarColor(Color.parseColor("#795548"), Color.parseColor("#5D4037"), true)
                 .setActionBarTitleColor(Color.parseColor("#ffffff"))
                 .setAlbumSpanCount(2, 3)
                 .setButtonInAlbumActivity(false)
@@ -415,8 +416,8 @@ public class EditSkl extends Fragment {
                 .exceptGif(true)
                 .setReachLimitAutomaticClose(true)
                 .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_back_white))
-                .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
-                .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                //.setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                //.setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
                 .setAllViewTitle("All")
                 .setMenuAllDoneText("All Done")
                 .textOnNothingSelected("Odaberi jednu do najviše 8")
@@ -427,6 +428,7 @@ public class EditSkl extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent imageData) {
         super.onActivityResult(requestCode, resultCode, imageData);
+        Log.d("Slike*",imageData.toString());
         switch (requestCode) {
             case Define.ALBUM_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {

@@ -40,15 +40,18 @@ public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHol
             @Override
             public void onClick(View v) {
                 //Toast.makeText(mContext, "This is item in position " + position, Toast.LENGTH_SHORT).show();
-                PrikazSkl fragment=new PrikazSkl();
-                Bundle args = new Bundle();
-                args.putString("marker", uploadCurrent.getId());
-                fragment.setArguments(args);
-                //FragmentTransaction ft=
-                FragmentTransaction ft =((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, fragment);
-                ft.addToBackStack("tag_back1_adapter");
-                ft.commit();
+                if(uploadCurrent.getId()!=null){
+                    PrikazSkl fragment=new PrikazSkl();
+                    Bundle args = new Bundle();
+                    args.putString("marker", uploadCurrent.getId());
+                    fragment.setArguments(args);
+                    //FragmentTransaction ft=
+                    FragmentTransaction ft =((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_container, fragment);
+                    ft.addToBackStack("tag_back1_adapter");
+                    ft.commit();
+                }
+
             }
         });
         if(uploadCurrent.getUrl()!=null){

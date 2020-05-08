@@ -14,14 +14,18 @@ public class ZivUpload {
     private String id_skl;
     private Float tezina;
     private Float godine;
+    private String spol;
+    private String status;
     public Map<String,String> url =new HashMap<>();
 
 
     public ZivUpload(){
 
     }
-    public ZivUpload(String naziv, String oznaka, String vrsta, String pasmina, String opis, Float tezina, Float godine, String id_skl, HashMap<String,String> url)
+    public ZivUpload(String naziv, String oznaka, String vrsta, String pasmina, String opis, Float tezina, Float godine, String id_skl, HashMap<String,String> url,String spol,String status)
     {
+        this.spol=spol;
+        this.status=status;
         this.url = url;
         this.id_skl=id_skl;
         this.naziv = naziv;
@@ -31,6 +35,14 @@ public class ZivUpload {
         this.pasmina=pasmina;
         this.tezina=tezina;
         this.godine=godine;
+    }
+
+    public String getSpol() {
+        return spol;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public Float getGodine() {
@@ -105,6 +117,14 @@ public class ZivUpload {
         this.vrsta = vrsta;
     }
 
+    public void setSpol(String spol) {
+        this.spol = spol;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -121,8 +141,9 @@ public class ZivUpload {
         result.put("pasmina",pasmina);
         result.put("tezina",tezina);
         result.put("godine",godine);
+        result.put("status",status);
+        result.put("spol",spol);
         result.put("url", url);
-
         return result;
     }
 }
