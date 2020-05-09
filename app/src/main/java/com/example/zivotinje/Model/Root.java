@@ -1,4 +1,4 @@
-package com.example.zivotinje;
+package com.example.zivotinje.Model;
 
 import com.google.firebase.database.Exclude;
 

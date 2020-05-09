@@ -20,6 +20,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.zivotinje.Adapter.SliderAdapterExample;
+import com.example.zivotinje.Model.Root;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +35,6 @@ import com.smarteist.autoimageslider.SliderView;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
-import android.content.SharedPreferences;
 
 public class PrikazSkl extends Fragment implements Serializable {
     private static final long serialVersionUID = -2163051469151804394L;

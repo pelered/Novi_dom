@@ -1,4 +1,4 @@
-package com.example.zivotinje;
+package com.example.zivotinje.Model;
 public class PasminaItem {
     private String pasminaName;
 

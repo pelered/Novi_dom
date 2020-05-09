@@ -1,9 +1,7 @@
-package com.example.zivotinje;
+package com.example.zivotinje.Adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +14,10 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 //import com.esafirm.imagepicker.model.Image;
+import com.example.zivotinje.R;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SliderAdapterExample extends
         SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {

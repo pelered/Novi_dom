@@ -1,14 +1,12 @@
-package com.example.zivotinje;
+package com.example.zivotinje.Adapter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -16,51 +14,57 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.example.zivotinje.PrikazSkl;
+import com.example.zivotinje.R;
+import com.example.zivotinje.Model.Root;
 
 import java.util.List;
 
-public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageViewHolder>{
+public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHolder> {
     private Context mContext;
-    private List<ZivUpload> mUploads;
-    public IspisAdapterZiv(Context context, List<ZivUpload> uploads) {
+    private List<Root> mUploads;
+    public IspisAdapter(Context context, List<Root> uploads) {
         mContext = context;
         mUploads = uploads;
     }
 
     @NonNull
-    public IspisAdapterZiv.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    @Override
+    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(mContext).inflate(R.layout.card_view_skl, parent, false);
-        return new IspisAdapterZiv.ImageViewHolder(v);
+        return new ImageViewHolder(v);
     }
 
-    public void onBindViewHolder(@NonNull final IspisAdapterZiv.ImageViewHolder holder, final int position) {
-        final ZivUpload uploadCurrent = mUploads.get(position);
+    @Override
+    public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
+        final Root uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getNaziv());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "This is item in position " + position, Toast.LENGTH_SHORT).show();
-                EditZiv fragment=new EditZiv();
-                Bundle args = new Bundle();
-                args.putString("oznaka", uploadCurrent.getOznaka());
-                fragment.setArguments(args);
-                FragmentTransaction ft =((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, fragment);
-                ft.addToBackStack("tag_ispis");
-                ft.commit();
+                //Toast.makeText(mContext, "This is item in position " + position, Toast.LENGTH_SHORT).show();
+                if(uploadCurrent.getId()!=null){
+                    PrikazSkl fragment=new PrikazSkl();
+                    Bundle args = new Bundle();
+                    args.putString("marker", uploadCurrent.getId());
+                    fragment.setArguments(args);
+                    //FragmentTransaction ft=
+                    FragmentTransaction ft =((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_container, fragment);
+                    ft.addToBackStack("tag_back1_adapter");
+                    ft.commit();
+                }
+
             }
         });
-        Log.d("Pisem",uploadCurrent.getUrl().toString());
         if(uploadCurrent.getUrl()!=null){
             Glide.with(mContext)
                     .load(uploadCurrent.getUrl().get("0_key"))
-                    //.centerCrop()
-                    .optionalFitCenter()
+                    .centerCrop()
                     .into(holder.imageView);
-
         }
     }
+    @Override
     public int getItemCount() {
         return mUploads.size();
     }

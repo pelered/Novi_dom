@@ -1,7 +1,6 @@
 package com.example.zivotinje;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.zivotinje.Model.Root;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.maps.GoogleMap;
@@ -217,7 +218,11 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
                 if(!lista.isEmpty()) {
                     for (int i=0; i<lista.size();i++) {
                         id = lista.get(i).getId();
-                        addresses = mGeocoder.getFromLocationName(lista.get(i).getAdresa(), 1);
+                        try {
+                            addresses = mGeocoder.getFromLocationName(lista.get(i).getAdresa(), 1);
+                        }catch (Error error){
+                            Toast.makeText(getContext(),"Upisete adresu u google maps i kopirajte dobivenu adresu ovdje: "+error,Toast.LENGTH_LONG).show();
+                                                    }
                         lan = addresses.get(0).getLatitude();
                         lon = addresses.get(0).getLongitude();
                         //Log.d("mape*", lista.toString());
@@ -243,6 +248,7 @@ public class MapActivity extends Fragment implements Serializable, OnMapReadyCal
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("ErrorError",e.toString());
         }
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

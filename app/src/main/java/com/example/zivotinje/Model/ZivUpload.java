@@ -1,4 +1,4 @@
-package com.example.zivotinje;
+package com.example.zivotinje.Model;
 
 import androidx.annotation.NonNull;
 

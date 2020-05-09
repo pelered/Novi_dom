@@ -22,7 +22,7 @@
         <activity android:name=".Ispis" />
         <activity android:name=".EditZiv" />
         <activity android:name=".PrikazSkl" />
-        <activity android:name=".SliderAdapterExample" />
+        <activity android:name=".Adapter.SliderAdapterExample" />
         <activity android:name=".EditSkl" />
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".ProfileActivity" />
