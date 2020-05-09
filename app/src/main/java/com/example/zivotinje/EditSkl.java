@@ -8,6 +8,8 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,26 +19,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.zivotinje.Adapter.PlaceAutoSuggestAdapter;
 import com.example.zivotinje.Adapter.SliderAdapterExample;
 import com.example.zivotinje.Model.Root;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -56,8 +57,8 @@ import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawControlle
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -73,10 +74,10 @@ public class EditSkl extends Fragment {
     private DatabaseReference mDatabaseRef;
     private FirebaseDatabase database;
     private StorageTask<UploadTask.TaskSnapshot> mUploadTask;
-    private AutocompleteSupportFragment autocompleteFragment;
+    //private AutocompleteSupportFragment autocompleteFragment;
     //spremljeni veze na slike odabrane s mobitela
     private ArrayList<Uri> ImageList = new ArrayList<>();
-    private String adresa;
+    //private String adresa;
     private EditText naziv;
     private EditText opis;
     private EditText email;
@@ -95,6 +96,7 @@ public class EditSkl extends Fragment {
     private Button mButtonUpload;
     private TextView mTextViewShowUploads;
     private SliderAdapterExample adapter;
+    private AutoCompleteTextView autoCompleteTextView;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_edit_skl,container,false);
@@ -108,6 +110,8 @@ public class EditSkl extends Fragment {
         naziv=view.findViewById(R.id.naziv_sk);
         opis=view.findViewById(R.id.opis);
         email = view.findViewById(R.id.email_skl);
+        autoCompleteTextView=view.findViewById(R.id.autocomplete);
+        autoCompleteTextView.setAdapter(new PlaceAutoSuggestAdapter(getContext(),android.R.layout.simple_list_item_1));
 
         mProgressBar.setVisibility(View.VISIBLE);
 
@@ -124,7 +128,32 @@ public class EditSkl extends Fragment {
         adapter= new SliderAdapterExample(getActivity());
         email.setText(prefs.getString("email",""));
         mProgressBar.setVisibility(View.GONE);
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("Address : ",autoCompleteTextView.getText().toString());
+                LatLng latLng=getLatLngFromAddress(autoCompleteTextView.getText().toString());
+                if(latLng!=null) {
+                    Log.d("Lat Lng : ", " " + latLng.latitude + " " + latLng.longitude);
+                    Address address=getAddressFromLatLng(latLng);
+                    if(address!=null) {
+                        Log.d("Address : ", "" + address.toString());
+                        Log.d("Address Line : ",""+address.getAddressLine(0));
+                        Log.d("Phone : ",""+address.getPhone());
+                        Log.d("Pin Code : ",""+address.getPostalCode());
+                        Log.d("Feature : ",""+address.getFeatureName());
+                        Log.d("More : ",""+address.getLocality());
+                    }
+                    else {
+                        Log.d("Adddress","Address Not Found");
+                    }
+                }
+                else {
+                    Log.d("Lat Lng","Lat Lng Not Found");
+                }
 
+            }
+        });
         //gumb za uplodanje podataka
         mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +189,7 @@ public class EditSkl extends Fragment {
             }
         });
         ////za adresu dohvatiti
-
+/*
         // Initialize Places.
         Places.initialize(getContext(), "AIzaSyAyVddfVCAcVub30s1xsJLiaRCMx70EbtA");
         // Initialize the AutocompleteSupportFragment.
@@ -172,10 +201,10 @@ public class EditSkl extends Fragment {
         autocompleteFragment.setHint("Adresa");
         //mice search icon
         ImageView searchIcon = (ImageView)((LinearLayout)autocompleteFragment.getView()).getChildAt(0);
-        searchIcon.setVisibility(View.GONE);
+        searchIcon.setVisibility(View.GONE);*/
 
         //ako odabaremo adresu,spremi ju
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+       /* autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 autocompleteFragment.setText(place.getLatLng().toString());
@@ -186,11 +215,11 @@ public class EditSkl extends Fragment {
             public void onError(@NonNull Status status) {
                 Toast.makeText(getActivity(),"Neuspjeli odabir adrese ", Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
         ///ako fragment je ucitan
-        if(autocompleteFragment!=null){
+        //if(autocompleteFragment!=null){
             ucitajPodatke();
-        }
+        //}
     }
 
     private void obrisi_sliku() {
@@ -223,10 +252,11 @@ public class EditSkl extends Fragment {
                         }
                         naziv.setText(dohvaceno.getNaziv());
                         if(dohvaceno.getAdresa()!=null){
-                            if(autocompleteFragment!=null){
+                           /* if(autocompleteFragment!=null){
                                 autocompleteFragment.setText(dohvaceno.getAdresa());
-                            }
-                            adresa=dohvaceno.getAdresa();
+                            }*/
+                            //adresa=dohvaceno.getAdresa();
+                            autoCompleteTextView.setText(dohvaceno.getAdresa());
                         }
                         if(!postSnapshot.hasChild("opis")){
                             opis.setText(R.string.Opis);
@@ -378,7 +408,7 @@ public class EditSkl extends Fragment {
     private void update_podatke(){
         //jos izmjeniti adresu
         //sprema u objekt podatke koje zelimo uplodati
-        dohvaceno.setAdresa(adresa);
+        dohvaceno.setAdresa(autoCompleteTextView.getText().toString());
         dohvaceno.setEmail(email.getText().toString());
         dohvaceno.setNaziv(naziv.getText().toString());
         dohvaceno.setOpis(opis.getText().toString());
@@ -425,6 +455,49 @@ public class EditSkl extends Fragment {
                 .setMenuAllDoneText("All Done")
                 .textOnNothingSelected("Odaberi jednu do najviše 8")
                 .startAlbum();
+
+    }
+    //dohvaca alat i lanf od adrese
+    private LatLng getLatLngFromAddress(String address){
+
+        Geocoder geocoder=new Geocoder(getContext());
+        List<Address> addressList;
+
+        try {
+            addressList = geocoder.getFromLocationName(address, 1);
+            if(addressList!=null){
+                Address singleaddress=addressList.get(0);
+                LatLng latLng=new LatLng(singleaddress.getLatitude(),singleaddress.getLongitude());
+                return latLng;
+            }
+            else{
+                return null;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+//dohvaca adresu od lat i lang
+    private Address getAddressFromLatLng(LatLng latLng){
+        Geocoder geocoder=new Geocoder(getContext());
+        List<Address> addresses;
+        try {
+            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 5);
+            if(addresses!=null){
+                Address address=addresses.get(0);
+                return address;
+            }
+            else{
+                return null;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
 
     }
 //pokrene se kad dode neki rezultat npr od galerije
