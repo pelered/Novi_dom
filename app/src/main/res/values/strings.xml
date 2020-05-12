@@ -29,7 +29,7 @@
     <string name="naziv_sklonista">Naziv sklonista</string>
     <string name="adresa">Adresa</string>
     <string name="naziv_skloni_ta">Naziv skloništa</string>
-    <string name="adresa">Adresa</string>
+    <!--<string name="adresa">Adresa</string>-->
     <string name="email_skloni_ta">Email skloništa</string>
     <string name="lozinka_min_6_znakova">Lozinka (min 6 znakova)</string>
     <string name="poka_i_lozinku">Pokaži lozinku</string>

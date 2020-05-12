@@ -28,10 +28,11 @@
 
         <AutoCompleteTextView
             android:id="@+id/autocomplete"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/adresa"
-            android:paddingBottom="10dp" />
+            android:paddingBottom="10dp"
+            android:gravity="center"/>
 
         <EditText
             android:id="@+id/email"

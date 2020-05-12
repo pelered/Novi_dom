@@ -76,6 +76,9 @@ dependencies {
     implementation 'com.android.support:multidex:2.0.1'
     //za dozvole
     implementation 'com.karumi:dexter:6.1.0'
+    //za okruglu slike
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
+    implementation 'com.google.android.material:material:1.0.0'
 
 }

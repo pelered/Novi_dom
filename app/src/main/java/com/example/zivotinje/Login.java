@@ -6,8 +6,10 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -23,6 +25,9 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -45,6 +50,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Login extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static final int RC_SIGN_IN = 1;
     private GoogleSignInClient mGoogleSignInClient;
@@ -59,6 +74,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     private FirebaseDatabase database;
     private DatabaseReference myRef ;
     private String naziv;
+    private String profilePicUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +116,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d("Tag", "facebook:onSuccess:" + loginResult);
+                Log.d("Tag", "facebook:onSuccess:" + loginResult.toString());
                 handleFacebookAccessToken(loginResult.getAccessToken());
             }
             @Override
@@ -119,9 +135,50 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     }
     //google
     private void signIn() {
-        Log.d("Probam :", String.valueOf(4));
+        //Log.d("Probam :", String.valueOf(4));
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+    private void storeImage(Bitmap image) {
+        File pictureFile = getOutputMediaFile();
+        if (pictureFile == null) {
+            Log.d("SpremiSliku",
+                    "Error creating media file, check storage permissions: ");// e.getMessage());
+            return;
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d("SpremiSliku", "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d("SpremiSliku", "Error accessing file: " + e.getMessage());
+        }
+    }
+    /** Create a File for saving an image or video */
+    private  File getOutputMediaFile(){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+                + "/Android/data/"
+                + getApplicationContext().getPackageName()
+                + "/Files");
+
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        File mediaFile;
+        String mImageName="MI_"+ timeStamp +".jpg";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+        return mediaFile;
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -185,23 +242,31 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     }else{
         username=user.getDisplayName();
     }
-    String email=user.getEmail();
-    Uri url=user.getPhotoUrl();
-    String uid=user.getUid();
+    String url = null;
 
+    if(profilePicUrl==null){
+        if(user.getPhotoUrl()!=null) {
+            url = user.getPhotoUrl().toString();
+        }
+    }else{
+        url=profilePicUrl;
+    }
+    String email=user.getEmail();
+    String uid=user.getUid();
     SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString("email",email);
     editor.putString("username", username);
     editor.putString("uid",uid);
     editor.putBoolean("hasLogin",true);
+    editor.putString("url",url);
     editor.apply();
         //image with glide
     Intent intent=new Intent(this,ProfileActivity.class);
     intent.putExtra("username",username);
     intent.putExtra("email",email);
     intent.putExtra("uid",uid);
-    intent.putExtra("url",String.valueOf(url));
+    intent.putExtra("url",url);
     startActivity(intent);
     finish();
     }
@@ -226,6 +291,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     //zbog virusa ne radi
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("TAG", "handleFacebookAccessToken:" + token);
+
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -234,8 +300,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("Tag", "signInWithCredential:success");
+                            Log.d("Tagfacebook" +
+                                    "1", token.getUserId().toString());;
+                            Log.d("Tagfacebook" +
+                                    "2", String.valueOf(task.getResult().getUser().getPhotoUrl()));
+                            Log.d("Tagfacebook" +
+                                    "3", task.getResult().getAdditionalUserInfo().getProfile().toString());;
                             FirebaseUser user = mAuth.getCurrentUser();
+                            try {
+                                profilePicUrl="https://graph.facebook.com/"+token.getUserId()+"/picture?type=large";
+                            }catch (Exception e)
+                            {
+                                Log.d("Facebook:error:catch",e.getMessage());
+                            }
+
                             updateUI(user);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("Tag", "signInWithCredential:failure", task.getException());
@@ -258,38 +338,35 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     }
     public void log(){
         mAuth.signInWithEmailAndPassword(email.getText().toString(), lozinka.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("log s emailom i pass", "signInWithEmail:success");
-                            final FirebaseUser user = mAuth.getCurrentUser();
-                            myRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                      @Override
-                                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                          //dodala mozda maknem kasnije
-                                          Root skl=dataSnapshot.getValue(Root.class);
-                                          //UploadSkl skl=dataSnapshot.getValue(UploadSkl.class);
-                                          Log.d("evoooo",dataSnapshot.toString());
-                                          naziv=skl.getNaziv();
-                                          updateUI(user);
-                                          //Log.d("naziv",naziv);
-                                      }
-                                      @Override
-                                      public void onCancelled(@NonNull DatabaseError databaseError) {
-                                          Toast.makeText(getApplicationContext(),"Otkazan log in error: "+databaseError,Toast.LENGTH_SHORT);
-                                      }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("log s emailom i pass", "signInWithEmail:success");
+                        final FirebaseUser user = mAuth.getCurrentUser();
+                        myRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                  @Override
+                                  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                      //dodala mozda maknem kasnije
+                                      Root skl=dataSnapshot.getValue(Root.class);
+                                      //UploadSkl skl=dataSnapshot.getValue(UploadSkl.class);
+                                      Log.d("evoooo",dataSnapshot.toString());
+                                      naziv=skl.getNaziv();
+                                      updateUI(user);
+                                      //Log.d("naziv",naziv);
                                   }
-                            );
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("log s emailom i pas", "signInWithEmail:failure", task.getException());
-                            //Toast.makeText(Login.this, "Authentication failed. error: "+task.getException(), Toast.LENGTH_SHORT).show();
-                            Intent intent =new Intent(Login.this,Login.class);
-                            startActivity(intent);
-                            finish();
-                        }
+                                  @Override
+                                  public void onCancelled(@NonNull DatabaseError databaseError) {
+                                      Toast.makeText(getApplicationContext(),"Otkazan log in error: "+databaseError,Toast.LENGTH_SHORT);
+                                  }
+                              }
+                        );
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("log s emailom i pas", "signInWithEmail:failure", task.getException());
+                        //Toast.makeText(Login.this, "Authentication failed. error: "+task.getException(), Toast.LENGTH_SHORT).show();
+                        Intent intent =new Intent(Login.this,Login.class);
+                        startActivity(intent);
+                        finish();
                     }
                 });
     }

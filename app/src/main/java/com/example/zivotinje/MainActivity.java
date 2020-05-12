@@ -20,6 +20,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.squareup.picasso.Picasso;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -29,14 +30,19 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.multidex.MultiDex;
 
 import android.view.Menu;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
     private TextView log,ime,email;
     private SharedPreferences prefs;
+    //private ImageView slika;
+    private CircleImageView slika;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -83,12 +89,16 @@ public class MainActivity extends AppCompatActivity
         log.setOnClickListener(this);
         email=(TextView)headerView.findViewById(R.id.email);
         ime=(TextView)headerView.findViewById(R.id.ime);
+        slika=headerView.findViewById(R.id.imageViewSlika);
 
         prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
         if(prefs.contains("hasLogin")) {
             //Log.d("test","ima podatke za prikazat");
             email.setText(prefs.getString("email", ""));
             ime.setText(prefs.getString("username", ""));
+            if(!prefs.getString("url", "").isEmpty()) {
+                Picasso.get().load(prefs.getString("url", "")).into(slika);
+            }
             log.setText("Log out");
             //Log.d("UID",prefs.getString("uid",""));
         }else{

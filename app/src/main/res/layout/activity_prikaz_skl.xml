@@ -13,7 +13,7 @@
 
         <ImageView
             android:id="@+id/edit_mode"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="47dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"

@@ -1,5 +1,7 @@
 package com.example.zivotinje.Model;
 
+import android.net.Uri;
+
 import com.google.firebase.database.Exclude;
 
 import java.util.ArrayList;
@@ -19,11 +21,19 @@ public class Root
     private Map<String,String> url;
 
     private String opis;
+    private ArrayList<Uri> url1;
 
     public Root(String uid, String mnaziv, String madresa) {
-        id=uid;
-        naziv=mnaziv;
-        adresa=madresa;
+        this.id=uid;
+        this.naziv=mnaziv;
+        this.adresa=madresa;
+
+    }
+    public Root(String uid, String mnaziv, String madresa,ArrayList<Uri> url1) {
+        this.id=uid;
+        this.naziv=mnaziv;
+        this.adresa=madresa;
+        this.url1=url1;
 
     }
     public Root(){}
@@ -84,6 +94,14 @@ public class Root
     public void setOpis (String opis)
     {
         this.opis = opis;
+    }
+
+    public ArrayList<Uri> getUrl1() {
+        return url1;
+    }
+
+    public void setUrl1(ArrayList<Uri> url1) {
+        this.url1 = url1;
     }
 
     @Override

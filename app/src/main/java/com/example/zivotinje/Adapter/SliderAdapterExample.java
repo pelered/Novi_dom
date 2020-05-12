@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 //import com.esafirm.imagepicker.model.Image;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.zivotinje.R;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
@@ -35,10 +36,7 @@ public class SliderAdapterExample extends
     public void setCount(int count) {
         this.mCount = count;
         Log.d("Pozicija()*", String.valueOf(mCount));
-
-
     }
-
     @Override
     public SliderAdapterVH onCreateViewHolder(ViewGroup parent) {
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_slider_adapter_example, null);
@@ -79,10 +77,13 @@ public class SliderAdapterExample extends
                 Glide.with(viewHolder.itemView)
                         .load(link2.get(position))
                         //.centerInside()
-                        //.fitCenter()
+                        .fitCenter()
                         //.optionalCenterCrop()
                         //.optionalFitCenter()
-                        .optionalCenterInside()
+                        //.optionalCenterInside()
+                        //.apply(new RequestOptions().override(400, 300))
+                        .centerInside()
+
                         .into(viewHolder.imageViewBackground);
             }
         }/*else if(path2==null){

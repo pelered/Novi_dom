@@ -122,7 +122,7 @@ public class EditZiv extends Fragment{
         mjesec=view.findViewById(R.id.mjeseci);
         mjesec.setFilters( new InputFilter[]{ new MinMaxFilter( "0" , "12" )}) ;
         godine.setFilters( new InputFilter[]{ new MinMaxFilter( "0" , "30" )}) ;
-        tezina.setFilters( new InputFilter[]{ new MinMaxFilter( "0" , "100" )}) ;
+        //tezina.setFilters( new InputFilter[]{ new MinMaxFilter( "0" , "100" )}) ;
         status=view.findViewById(R.id.status);
         sliderView =view.findViewById(R.id.imageSlider);
         upload=view.findViewById(R.id.button_upload);
@@ -206,7 +206,6 @@ public class EditZiv extends Fragment{
         slike_ucitavanje.remove(pozicija);
 
     }
-
     //pokrene se pri ucitavanju fragmenta za dohvacanje podataka
     private void ucitajPodatke(){
         mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -220,6 +219,8 @@ public class EditZiv extends Fragment{
                         if(postSnapshot.child("oznaka").getValue().equals(oznaka_ziv)) {
                             dohvaceno = postSnapshot.getValue(ZivUpload.class);
                             postavi_vrijednosti();
+                            Log.d("Tezina",dohvaceno.getTezina().toString());
+                            tezina.setText(dohvaceno.getTezina().toString());
                             if(postSnapshot.hasChild("url")){
                                 //spremamo hash mapu
                                 slike2=new HashMap<>(dohvaceno.getUrl());
@@ -262,7 +263,9 @@ public class EditZiv extends Fragment{
     private void postavi_vrijednosti() {
         ime.setText(dohvaceno.getNaziv());
         ime.setText(dohvaceno.getNaziv());
-        godine.setText(dohvaceno.getGodine().toString());
+        godine.setText(dohvaceno.getGodine().toString().split("\\.")[0]);
+        mjesec.setText(dohvaceno.getGodine().toString().split("\\.")[1]);
+
         tezina.setText(dohvaceno.getTezina().toString());
         opis.setText(dohvaceno.getOpis());
         oznaka.setText(dohvaceno.getOznaka());
@@ -395,7 +398,7 @@ public class EditZiv extends Fragment{
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d("pod slike",slike.toString());
+                //Log.d("pod slike",slike.toString());
                 dodajSliku();
             }
         }, 10000);
@@ -412,7 +415,7 @@ public class EditZiv extends Fragment{
             slike_ucitavanje.add(entry.getValue());
         }
         slike2=new HashMap<>(slike_map);
-        ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(), id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),Float.parseFloat(tezina.getText().toString()),Float.parseFloat(godine.getText().toString()),prefs.getString("uid",""),slike_map,id_spol.getText().toString(),id_status.getText().toString());
+        ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(), id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),Float.parseFloat(tezina.getText().toString()),Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),prefs.getString("uid",""),slike_map,id_spol.getText().toString(),id_status.getText().toString());
         Map<String, Object> postValues2=upload2.toMap();
         mDatabaseRef.child(oznaka.getText().toString()).updateChildren(postValues2).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
