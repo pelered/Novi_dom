@@ -1,6 +1,7 @@
 package com.example.zivotinje.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class AutoCompletePasminaAdapter extends ArrayAdapter<PasminaItem> {
         if(pasminaItem !=null){
             textViewName.setText(pasminaItem.getPasminaName());
         }
-        //Log.d("Pasmina_unos_zapisan",textViewName.getText().toString());
+        Log.d("Pasmina_unos_zapisan",textViewName.getText().toString());
         return convertView;
     }
 
@@ -66,10 +67,10 @@ public class AutoCompletePasminaAdapter extends ArrayAdapter<PasminaItem> {
                     }
                 }
             }
-            //Log.d("Pasmina sugg",suggestions.toString());
+            Log.d("Pasmina sugg",suggestions.toString());
             results.values = suggestions;
             results.count = suggestions.size();
-            //Log.d("Pasmina_result",results.toString());
+            Log.d("Pasmina_result",results.toString());
             return results;
         }
 

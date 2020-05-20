@@ -106,7 +106,6 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                                 assert user != null;
                                 updateUI(user);
                                 Root skl=new Root(user.getUid(),naziv.getText().toString(),autoCompleteTextView.getText().toString());
-                                //UploadSkl skl=new UploadSkl(user.getUid(),naziv.getText().toString(),skriven.getText().toString());
                                 myRef = database.getReference("Sklonista");
                                 myRef.child(user.getUid()).setValue(skl);
 

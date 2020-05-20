@@ -124,13 +124,16 @@ public class ZivUpload {
     public void setStatus(String status) {
         this.status = status;
     }
-
     @NonNull
-    @Override
+   @Override
+    public String toString(){
+        return "ClassPojo [naziv = "+naziv+", oznaka = "+oznaka+", vrsta = "+vrsta+", opis = "+opis+", url = "+url+", spol = "+spol+", pasmina = "+pasmina+", godine = "+godine+", tezina = "+tezina+", status = "+status+", id_skl = "+id_skl+"]";
+    }
+    /*@Override
     public String toString() {
         return super.toString();
     }
-
+*/
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("naziv", naziv);

@@ -21,8 +21,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         this.itemList = itemList;
     }
 
-    Context context;
-    List<Item> itemList;
+    private Context context;
+    private List<Item> itemList;
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,12 +36,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         Glide.with(context).load(itemList.get(position).getImage()).into(holder.cart_item_img);
         holder.cart_item_name.setText(itemList.get(position).getName());
         holder.cart_item_price.setText(itemList.get(position).getPrice());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
+        holder.itemView.setOnClickListener(v -> Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show());
     }
 
     @Override

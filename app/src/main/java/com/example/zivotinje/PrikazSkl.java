@@ -66,6 +66,11 @@ public class PrikazSkl extends Fragment implements Serializable {
         edit=view.findViewById(R.id.edit_mode);
         ispis_ziv=view.findViewById(R.id.ispis_zv);
         SharedPreferences prefs =getContext().getSharedPreferences("shared_pref_name", getContext().MODE_PRIVATE);
+        if (getArguments()==null){
+            Toast.makeText(getContext(),"Nisi smio ovo uspjet,javi mi kako",Toast.LENGTH_SHORT).show();
+        }else{
+            value= getArguments().getString("marker");
+        }
         if(!TextUtils.isEmpty(prefs.getString("uid",""))){
             if(getArguments().getString("marker").equals(prefs.getString("uid",""))) {
                 Log.d("IDD", prefs.getString("uid", ""));
@@ -99,11 +104,7 @@ public class PrikazSkl extends Fragment implements Serializable {
                 edit();
             }
         });
-        if (getArguments()==null){
-            Toast.makeText(getContext(),"Nisi smio ovo uspjet,javi mi kako",Toast.LENGTH_SHORT).show();
-        }else{
-            value= getArguments().getString("marker");
-        }
+
          ucitaj_podatke();
     }
 
@@ -212,17 +213,7 @@ public class PrikazSkl extends Fragment implements Serializable {
         sliderView1.setIndicatorSelectedColor(Color.WHITE);
         sliderView1.setIndicatorUnselectedColor(Color.GRAY);
         sliderView1.setScrollTimeInSec(15);
-        sliderView1.setOnIndicatorClickListener(new DrawController.ClickListener() {
-            @Override
-            public void onIndicatorClicked(int position) {
-                sliderView1.setCurrentPagePosition(position);
-            }
-        });
+        sliderView1.setOnIndicatorClickListener(position -> sliderView1.setCurrentPagePosition(position));
     }
-    /*
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent imageData) {
-        super.onActivityResult(requestCode, resultCode, imageData);
 
-    }*/
 }

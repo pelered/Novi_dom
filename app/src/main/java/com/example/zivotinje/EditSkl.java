@@ -74,7 +74,6 @@ public class EditSkl extends Fragment {
     private DatabaseReference mDatabaseRef;
     private FirebaseDatabase database;
     private StorageTask<UploadTask.TaskSnapshot> mUploadTask;
-    //private AutocompleteSupportFragment autocompleteFragment;
     //spremljeni veze na slike odabrane s mobitela
     private ArrayList<Uri> ImageList = new ArrayList<>();
     //private String adresa;
@@ -188,38 +187,8 @@ public class EditSkl extends Fragment {
                 obrisi_sliku();
             }
         });
-        ////za adresu dohvatiti
-/*
-        // Initialize Places.
-        Places.initialize(getContext(), "AIzaSyAyVddfVCAcVub30s1xsJLiaRCMx70EbtA");
-        // Initialize the AutocompleteSupportFragment.
-        autocompleteFragment = (AutocompleteSupportFragment)getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG,Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS));
-        //autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_button).setVisibility(View.GONE)
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setHint("Adresa");
-        //mice search icon
-        ImageView searchIcon = (ImageView)((LinearLayout)autocompleteFragment.getView()).getChildAt(0);
-        searchIcon.setVisibility(View.GONE);*/
 
-        //ako odabaremo adresu,spremi ju
-       /* autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(@NonNull Place place) {
-                autocompleteFragment.setText(place.getLatLng().toString());
-                adresa=place.getAddress();
-                //Log.d("pod adresa",adresa);
-            }
-            @Override
-            public void onError(@NonNull Status status) {
-                Toast.makeText(getActivity(),"Neuspjeli odabir adrese ", Toast.LENGTH_SHORT).show();
-            }
-        });*/
-        ///ako fragment je ucitan
-        //if(autocompleteFragment!=null){
             ucitajPodatke();
-        //}
     }
 
     private void obrisi_sliku() {
@@ -228,50 +197,42 @@ public class EditSkl extends Fragment {
 
     //pokrene se pri ucitavanju fragmenta za dohvacanje podataka
     private void ucitajPodatke(){
-        mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabaseRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    //Log.d("pod",postSnapshot.toString());
-                    if(postSnapshot.getKey().equals(id)){
-                        //Log.d("neuspjeh", String.valueOf(postSnapshot.hasChild("url")));
-                        //ako se jos nisu url,opis postavili
-                        if(postSnapshot.hasChild("url") & postSnapshot.hasChild("opis")){
-                            dohvaceno=postSnapshot.getValue(Root.class);
-                        }else if(postSnapshot.hasChild("url")) {
-                            dohvaceno=postSnapshot.getValue(Root.class);
-                        }else{
-                            dohvaceno=postSnapshot.getValue(Root.class);
-                        }
-                        if(postSnapshot.hasChild("url")){
-                            for(Map.Entry<String, String> entry :dohvaceno.getUrl().entrySet())
-                            {
-                                slike_ucitavanje.add(entry.getValue());
-                            }
-                        }
-                        naziv.setText(dohvaceno.getNaziv());
-                        if(dohvaceno.getAdresa()!=null){
-                           /* if(autocompleteFragment!=null){
-                                autocompleteFragment.setText(dohvaceno.getAdresa());
-                            }*/
-                            //adresa=dohvaceno.getAdresa();
-                            autoCompleteTextView.setText(dohvaceno.getAdresa());
-                        }
-                        if(!postSnapshot.hasChild("opis")){
-                            opis.setText(R.string.Opis);
-                        }else{
-                            opis.setText(dohvaceno.getOpis());
-                        }
+                //Log.d("Skoniste samo", dataSnapshot.toString());
+                if(dataSnapshot.hasChild("url") & dataSnapshot.hasChild("opis")){
+                    dohvaceno=dataSnapshot.getValue(Root.class);
+                }else if(dataSnapshot.hasChild("url")) {
+                    dohvaceno=dataSnapshot.getValue(Root.class);
+                }else{
+                    dohvaceno=dataSnapshot.getValue(Root.class);
+                }
+                if(dataSnapshot.hasChild("url")){
+                    //zamijenit listu s mapom, radi jednostavnosti
+                    for(Map.Entry<String, String> entry :dohvaceno.getUrl().entrySet())
+                    {
+                        slike_ucitavanje.add(entry.getValue());
                     }
                 }
+                naziv.setText(dohvaceno.getNaziv());
+                if(dohvaceno.getAdresa()!=null){
+                    autoCompleteTextView.setText(dohvaceno.getAdresa());
+                }
+                if(!dataSnapshot.hasChild("opis")){
+                    opis.setText(R.string.Opis);
+                }else{
+                    opis.setText(dohvaceno.getOpis());
+                }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getActivity(), "Skidanje nije uspjelo.", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(getActivity(), "Skidanje nije uspjelo", Toast.LENGTH_SHORT).show();
             }
         });
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -331,13 +292,7 @@ public class EditSkl extends Fragment {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Log.d("Ispisujem*: ",taskSnapshot.toString());
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressBar.setProgress(0);
-                            }
-                        }, 0);
+
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                         // ...
                          mUploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -427,7 +382,6 @@ public class EditSkl extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getActivity(),"Upload svih podataka je uspio ", Toast.LENGTH_LONG).show();
-                Log.d("Ispisuje*****","TU sam dosao");
                 mProgressBar.setVisibility(View.INVISIBLE);
 
             }
@@ -446,11 +400,10 @@ public class EditSkl extends Fragment {
                 .setAlbumSpanCount(2, 3)
                 .setButtonInAlbumActivity(false)
                 .setCamera(true)
-                .exceptGif(true)
                 .setReachLimitAutomaticClose(true)
                 .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_back_white))
-                //.setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
-                //.setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_ok))
+                .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
+                .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
                 .setAllViewTitle("All")
                 .setMenuAllDoneText("All Done")
                 .textOnNothingSelected("Odaberi jednu do najviše 8")
@@ -459,10 +412,8 @@ public class EditSkl extends Fragment {
     }
     //dohvaca alat i lanf od adrese
     private LatLng getLatLngFromAddress(String address){
-
         Geocoder geocoder=new Geocoder(getContext());
         List<Address> addressList;
-
         try {
             addressList = geocoder.getFromLocationName(address, 1);
             if(addressList!=null){
@@ -518,18 +469,20 @@ public class EditSkl extends Fragment {
                         //Log.d("put",slike_ucitavanje.toString());
 
                     }
-                    final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+
+                    adapter= new SliderAdapterExample(getActivity());
                     //ako skloniste nema slika prikazat ce samo odabrane trenutno,prije uploda
                     if(slike_ucitavanje.isEmpty()){
                         adapter.setCount(ImageList.size());
                         adapter.slike(ImageList);
-                        adapter.broj(ImageList.size());
 
                     }else{
                         adapter.setCount(slike_ucitavanje.size());
                         adapter.slike2(slike_ucitavanje);
-                        adapter.broj(slike_ucitavanje.size());
                     }
+                    Log.d("Slider_rez: ",slike_ucitavanje.toString());
+
+                    //dodati da prima Klasu sa svim podacima, umjesto da setamo s setcount i .slike2()
                     //postavljanje slidera
                     sliderView.setSliderAdapter(adapter);
                     sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!

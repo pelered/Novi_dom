@@ -31,7 +31,7 @@ import static android.graphics.Color.WHITE;
 
 public abstract class MySwipeHelper extends ItemTouchHelper.SimpleCallback {
 
-    int buttonWidth;
+    private int buttonWidth;
     private RecyclerView recyclerView;
     private List<MyButton> buttonList;
     private GestureDetector gestureDetector;
@@ -39,12 +39,8 @@ public abstract class MySwipeHelper extends ItemTouchHelper.SimpleCallback {
     private float swipeThreshold = 0.5f;
     private Map<Integer,List<MyButton>> buttonBuffer;
     private Queue<Integer> removerQueue;
-
-
-
     private GestureDetector.SimpleOnGestureListener gestureListener= new GestureDetector.SimpleOnGestureListener(){
 
-        //krivo nes
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             for (MyButton button:buttonList){
@@ -72,7 +68,6 @@ private View.OnTouchListener onTouchListener= new View.OnTouchListener() {
         if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP ||
         event.getAction() == MotionEvent.ACTION_MOVE)
         {
-
             if(rect.top < point.y && rect.bottom >point.y)
             {
                 gestureDetector.onTouchEvent(event);
@@ -145,7 +140,7 @@ private View.OnTouchListener onTouchListener= new View.OnTouchListener() {
             this.listener = listener;
             this.context = context;
             resources=context.getResources();
-            Log.d("KLIK3: ", String.valueOf(context));
+            //Log.d("KLIK3: ", String.valueOf(context));
 
         }
 
@@ -198,8 +193,6 @@ private View.OnTouchListener onTouchListener= new View.OnTouchListener() {
         return bitmap;
     }
 
-    //Override
-
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -220,11 +213,12 @@ private View.OnTouchListener onTouchListener= new View.OnTouchListener() {
             buttonList.clear();
         }
         buttonBuffer.clear();
+        assert buttonList != null;
         swipeThreshold = 0.5f*buttonList.size()+buttonWidth;
         recoverSwipedItem();
     }
 
-    public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
+    public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
         return swipeThreshold;
     }
 
@@ -257,6 +251,7 @@ private View.OnTouchListener onTouchListener= new View.OnTouchListener() {
                 }else {
                     buffer=buttonBuffer.get(pos);
                 }
+                assert buffer != null;
                 translationX=dX*buffer.size()*buttonWidth / itemView.getWidth();
                 drawButton(c,itemView,buffer,pos,translationX);
             }

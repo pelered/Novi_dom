@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
     private TextView log,ime,email;
     private SharedPreferences prefs;
-    //private ImageView slika;
     private CircleImageView slika;
 
     @Override
@@ -85,10 +84,10 @@ public class MainActivity extends AppCompatActivity
 
         View headerView = navigationView.getHeaderView(0);
 
-        log=(TextView) headerView.findViewById(R.id.log_click);
+        log=headerView.findViewById(R.id.log_click);
         log.setOnClickListener(this);
-        email=(TextView)headerView.findViewById(R.id.email);
-        ime=(TextView)headerView.findViewById(R.id.ime);
+        email=headerView.findViewById(R.id.email);
+        ime=headerView.findViewById(R.id.ime);
         slika=headerView.findViewById(R.id.imageViewSlika);
 
         prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
@@ -162,10 +161,10 @@ public class MainActivity extends AppCompatActivity
             ft.commit();
 
         } else if (id == R.id.nav_tools) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            /*FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, new EditZiv());
             ft.addToBackStack("tag_back4");
-            ft.commit();
+            ft.commit();*/
 
         } else if (id == R.id.nav_share) {
 

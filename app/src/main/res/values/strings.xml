@@ -23,9 +23,7 @@
     <string name="google_api">AIzaSyAyVddfVCAcVub30s1xsJLiaRCMx70EbtA</string>
     <string name="odaberi_slike">Odaberi slike</string>
     <string name="obrisi_slik">Obrisi sliku</string>
-    <string name="upload">Upload</string>
     <string name="email">Email</string>
-    <string name="opis">Opis</string>
     <string name="naziv_sklonista">Naziv sklonista</string>
     <string name="adresa">Adresa</string>
     <string name="naziv_skloni_ta">Naziv skloništa</string>
@@ -35,5 +33,27 @@
     <string name="poka_i_lozinku">Pokaži lozinku</string>
     <string name="potvrdi_lozinku">Potvrdi lozinku</string>
     <string name="registriraj">Registriraj</string>
+    <string name="opis">Opis</string>
+    <string name="oznaka">Oznaka</string>
+    <string name="ime">Ime</string>
+    <string name="upload">Upload</string>
+    <string name="spol">Spol:</string>
+    <string name="m">M</string>
+    <string name="Ž">Ž</string>
+    <string name="M" />
+    <string name="status">Status:</string>
+    <string name="neudomljen">Neudomljen</string>
+    <string name="udomljen">Udomljen</string>
+    <string name="pas">Pas</string>
+    <string name="macka">Macka</string>
+    <string name="pasmina">Pasmina</string>
+    <string name="godine">Godine</string>
+    <string name="god">god</string>
+    <string name="mjeseci">Mjeseci</string>
+    <string name="mj">mj</string>
+    <string name="te_ina">Težina</string>
+    <string name="kg">kg</string>
+    <string name="gram">gram</string>
+    <string name="g">g</string>
 
 </resources>

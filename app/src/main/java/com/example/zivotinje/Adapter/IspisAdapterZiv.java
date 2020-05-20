@@ -16,7 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.zivotinje.EditZiv;
+import com.example.zivotinje.PrikazZiv;
 import com.example.zivotinje.R;
 import com.example.zivotinje.Model.ZivUpload;
 
@@ -43,7 +43,8 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
             @Override
             public void onClick(View v) {
                 Toast.makeText(mContext, "This is item in position " + position, Toast.LENGTH_SHORT).show();
-                EditZiv fragment=new EditZiv();
+                //EditZiv fragment=new EditZiv();
+                PrikazZiv fragment=new PrikazZiv();
                 Bundle args = new Bundle();
                 args.putString("oznaka", uploadCurrent.getOznaka());
                 fragment.setArguments(args);
@@ -66,6 +67,7 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
     public int getItemCount() {
         return mUploads.size();
     }
+
     public class ImageViewHolder extends RecyclerView.ViewHolder {
         public TextView textViewName;
         public ImageView imageView;
