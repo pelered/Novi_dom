@@ -40,7 +40,7 @@
     <string name="spol">Spol:</string>
     <string name="m">M</string>
     <string name="Ž">Ž</string>
-    <string name="M" />
+    <string name="M">M</string>
     <string name="status">Status:</string>
     <string name="neudomljen">Neudomljen</string>
     <string name="udomljen">Udomljen</string>
@@ -55,5 +55,11 @@
     <string name="kg">kg</string>
     <string name="gram">gram</string>
     <string name="g">g</string>
+    <string name="log_in">Log in</string>
+    <string name="starost_do">Starost do:</string>
+    <string name="pretra_i">Pretraži</string>
+    <string name="oznaka_u_skloni_tu">Oznaka u skloništu</string>
+    <string name="te_ina_do">Težina do:</string>
+    <string name="ma_ka">Mačka</string>
 
 </resources>

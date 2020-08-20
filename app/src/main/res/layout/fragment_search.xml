@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Search">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foregroundGravity="center"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/pretra_i"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/idoznaka"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:inputType="text"
+            android:hint="@string/oznaka_u_skloni_tu"
+            android:textSize="18sp"
+            android:autofillHints="" />
+
+        <EditText
+            android:id="@+id/idskl"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="@string/naziv_skloni_ta"
+            android:autofillHints="" />
+
+        <EditText
+            android:id="@+id/idpasmina"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="center"
+            android:inputType="textPersonName"
+            android:hint="@string/pasmina"
+            android:autofillHints="" />
+
+        <EditText
+            android:id="@+id/idtezina"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="center"
+            android:inputType="numberDecimal|number"
+            android:hint="@string/te_ina_do"
+            android:autofillHints="" />
+
+        <EditText
+            android:id="@+id/idstarost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="center"
+            android:inputType="numberDecimal|number"
+            android:hint="@string/starost_do"
+            android:autofillHints="" />
+
+        <RadioGroup
+            android:id="@+id/vrsta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/idpas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pas" />
+
+            <RadioButton
+                android:id="@+id/idmacka"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ma_ka" />
+
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/idspol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/idM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/M" />
+
+            <RadioButton
+                android:id="@+id/idZ"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/Ž" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/idstatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/udomljen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/udomljen" />
+
+            <RadioButton
+                android:id="@+id/neudomljen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/neudomljen" />
+        </RadioGroup>
+
+
+        <ImageButton
+            android:id="@+id/idsearch"
+            android:layout_width="85dp"
+            android:layout_height="74dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_search_" />
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,25 +1,24 @@
 package com.example.zivotinje;
-
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
-import com.example.zivotinje.Adapter.MyAdapter;
-import com.example.zivotinje.Helper.MyButtonClickListener;
+import com.example.zivotinje.Adapter.ProfileMyAdapter;
 import com.example.zivotinje.Helper.MySwipeHelper;
 import com.example.zivotinje.Model.Fav;
 import com.example.zivotinje.Model.Item;
@@ -28,8 +27,6 @@ import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,13 +34,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
+public class ProfileActivity extends Fragment implements View.OnClickListener {
 
     private String username,email,photo;
     private String url;
@@ -53,18 +49,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private RecyclerView recyclerView;
-    private MyAdapter adapter;
+    private ProfileMyAdapter adapter;
     private LinearLayoutManager layoutManager;
     private String uid;
     private Fav fav1;
     private ArrayList <String> favo=new ArrayList<>();
-    ZivUpload ziv= new ZivUpload();
-    List<Item> itemList =new ArrayList<>();
+    private ZivUpload ziv= new ZivUpload();
+    private List<Item> itemList =new ArrayList<>();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_profile,container,false);
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
-        SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        SharedPreferences prefs = Objects.requireNonNull(getContext()).getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
         //prefs.getString("uid",null);
         //Log.d("OnCreate:",prefs.toString());
         //Log.d("OnCreate:1",prefs.getString("url",null));
@@ -72,19 +69,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         email=prefs.getString("email",null);
         url=prefs.getString("url",null);
         uid=prefs.getString("uid",null);
-        //trebam iz preff dobivat
-        /*email=getIntent().getStringExtra("email");
-        username=getIntent().getStringExtra("username");
-        if(getIntent().getStringExtra("url")!=null){
-            photo=getIntent().getStringExtra("url");
-            url=Uri.parse(photo);
-        }*/
 
-        u=findViewById(R.id.username);
-        e=findViewById(R.id.email);
-        logout=(Button) findViewById(R.id.logout);
-        vrati=(Button) findViewById(R.id.vrati);
-        i=findViewById(R.id.photo);
+        u=view.findViewById(R.id.username);
+        e=view.findViewById(R.id.email);
+        logout=view.findViewById(R.id.logout);
+        vrati=view.findViewById(R.id.vrati);
+        i=view.findViewById(R.id.photo);
         mAuth=FirebaseAuth.getInstance();
 
         logout.setOnClickListener(this);
@@ -101,23 +91,39 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 .requestEmail()
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(Objects.requireNonNull(getActivity()), gso);
 
 
         //swiper
-        recyclerView=findViewById(R.id.recycler_test);
+        recyclerView=view.findViewById(R.id.recycler_test);
         recyclerView.setHasFixedSize(true);
-        layoutManager=new LinearLayoutManager(this);
+        layoutManager=new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        MySwipeHelper swipeHelper = new MySwipeHelper(this,recyclerView,200) {
+        MySwipeHelper swipeHelper = new MySwipeHelper(getContext(),recyclerView,200) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MySwipeHelper.MyButton> buffer) {
-                buffer.add(new MyButton(ProfileActivity.this,"Delete",30,R.drawable.ic_delete_black, Color.parseColor("#FFFFFF"),
+                buffer.add(new MyButton(Objects.requireNonNull(getContext()),"Delete",30,R.drawable.ic_delete_black, Color.parseColor("#FFFFFF"),
                         pos -> {
-                            Toast.makeText(ProfileActivity.this,"Delete click",Toast.LENGTH_SHORT).show();
-
-                            Log.d("KliK: ", String.valueOf(pos));
+                            String key= null;
+                            //Log.d("delete:",fav1.toString());
+                            for(Map.Entry<String, String> entry :fav1.getFav().entrySet()){
+                                //Log.d("delete1:",entry.getValue());
+                                if(adapter.getItem(pos).getOznaka().equals(entry.getValue())){
+                                    //Log.d("delete2:",entry.getKey());
+                                    key = entry.getKey();
+                                    break; //breaking because its one to one map
+                                }
+                            }
+                            Toast.makeText(getContext(),"Delete click",Toast.LENGTH_SHORT).show();
+                            DatabaseReference ref= FirebaseDatabase.getInstance().getReference("Fav");
+                            //Log.d("delete3:",ref.toString());
+                            String finalKey = key;
+                            ref.child(uid).child("fav").child(key).removeValue((databaseError, databaseReference) -> {
+                                adapter.removeItem(pos);
+                                fav1.getFav().remove(finalKey);
+                            });
+                            //Log.d("KliK: ", adapter.getItem(pos).getOznaka().toString());
                         }));
             }
         };
@@ -132,7 +138,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                 fav1=dataSnapshot.getValue(Fav.class);
                 if(fav1!=null) {
                     for(Map.Entry<String, String> entry :fav1.getFav().entrySet()){
@@ -141,15 +146,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         reff.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                ziv=dataSnapshot.getValue(ZivUpload.class);
-                                Log.d("generateItem",ziv.toString());
-                                itemList.add(new Item(ziv.getNaziv(),ziv.getPasmina(),ziv.getUrl().get("0_key")));
-                                Log.d("generateItem1",itemList.toString());
-                                Log.d("generateItem2", String.valueOf(itemList.size()));
-                                Log.d("generateItem3", String.valueOf(fav1.getFav().size()));
-                                if(itemList.size()==fav1.getFav().size()){
-                                    adapter= new MyAdapter(getApplicationContext(),itemList);
-                                    recyclerView.setAdapter(adapter);
+                                ziv = dataSnapshot.getValue(ZivUpload.class);
+                                if (ziv != null) {
+                                    //Log.d("generateItem", ziv.toString());
+                                    itemList.add(new Item(ziv.getNaziv(), ziv.getPasmina(), ziv.getUrl().get("0_key"),ziv.getOznaka()));
+                                    //Log.d("generateItem1", itemList.toString());
+                                    //Log.d("generateItem2", String.valueOf(itemList.size()));
+                                    //Log.d("generateItem3", String.valueOf(fav1.getFav().size()));
+                                    if (itemList.size() == fav1.getFav().size()) {
+                                        adapter = new ProfileMyAdapter(getContext(), itemList);
+                                        recyclerView.setAdapter(adapter);
+                                    }
                                 }
                             }
                             @Override
@@ -171,22 +178,34 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         if(view.equals(logout)){
             mAuth.signOut();
-            mGoogleSignInClient.signOut().addOnCompleteListener(this,
+            mGoogleSignInClient.signOut().addOnCompleteListener(Objects.requireNonNull(getActivity()),
                     task -> {
-                        Intent intent=new Intent(ProfileActivity.this,MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        MapActivity fragment=new MapActivity();
+                        /*Bundle args = new Bundle();
+                        args.putString("oznaka", uploadCurrent.getId());
+                        fragment.setArguments(args);
+                        //FragmentTransaction ft=*/
+                        FragmentTransaction ft =(getActivity()).getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container, fragment);
+                        //ft.addToBackStack("tag_back1_profile");
+                        ft.commit();
+
+
                     });
             LoginManager.getInstance().logOut();
-            SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+            SharedPreferences prefs = Objects.requireNonNull(getContext()).getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
             //Log.d("dal izbrise","usao sam");
             editor.commit();
         }else if(view.equals(vrati)){
-            Intent intent=new Intent(ProfileActivity.this,MainActivity.class);
-            startActivity(intent);
-            finish();
+            //todo
+            MapActivity fragment=new MapActivity();
+            FragmentTransaction ft =(Objects.requireNonNull(getActivity())).getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, fragment);
+            //ft.addToBackStack("tag_back1_profile");
+            ft.commit();
+
         }
     }
 
@@ -194,10 +213,27 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onStart();
         FirebaseUser user=mAuth.getCurrentUser();
         if(user == null){
-            Intent intent=new Intent(this,Login.class);
-            startActivity(intent);
+            ProfileActivity fragment=new ProfileActivity();
+            FragmentTransaction ft =(Objects.requireNonNull(getActivity())).getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, fragment);
+            //ft.addToBackStack("tag_back1_profile");
+            ft.commit();
+
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 }

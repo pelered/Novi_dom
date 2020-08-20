@@ -17,7 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PrikazZiv"></activity>
+        <activity android:name=".SearchIspis" />
+        <activity android:name=".Search" />
+        <activity android:name=".PrikazZiv" />
         <activity android:name=".IspisZiv" />
         <activity android:name=".Ispis" />
         <activity android:name=".EditZiv" />

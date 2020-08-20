@@ -4,9 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import android.security.keystore.KeyPermanentlyInvalidatedException;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 
 import androidx.core.view.GravityCompat;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     private TextView log,ime,email;
     private SharedPreferences prefs;
     private CircleImageView slika;
+    DrawerLayout drawer;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -64,22 +68,22 @@ public class MainActivity extends AppCompatActivity
             @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {/* ... */}
         }).check();
         setContentView(R.layout.activity_main);
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+       /* DrawerLayout */drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
+        ;
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, new MapActivity());
-        ft.addToBackStack("tag_back");
+        //ft.addToBackStack("tag_back");
         ft.commit();
 
         View headerView = navigationView.getHeaderView(0);
@@ -128,9 +132,12 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, new Search());
+            ft.addToBackStack("tag_back_search");
+            ft.commit();
             return true;
         }
 
@@ -149,10 +156,10 @@ public class MainActivity extends AppCompatActivity
             ft.addToBackStack("tag_back2");
             ft.commit();        }
         else if (id == R.id.nav_gallery) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            /*FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, new EditSkl());
             ft.addToBackStack("tag_back3");
-            ft.commit();
+            ft.commit();*/
 
         } else if (id == R.id.nav_slideshow) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -179,17 +186,26 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if(log.getText().toString().equals("Log in")) {
-            Intent intent=new Intent(this,Login.class);
-            startActivity(intent);
+            Login fragment=new Login();
+            FragmentTransaction ft =(this).getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, fragment);
+            ft.addToBackStack("tag_back1_main");
+            ft.commit();
             if(prefs.contains("hasLogin")) {
                 log.setText("Log out");
             }else{
                 log.setText("Log in");
             }
+            drawer.closeDrawer(Gravity.LEFT);
+
         }else if(log.getText().toString().equals("Log out")){
-            Intent intent=new Intent(this,Login.class);
-            startActivity(intent);
+            ProfileActivity fragment=new ProfileActivity();
+            FragmentTransaction ft =(this).getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, fragment);
+            ft.addToBackStack("tag_back1_main");
+            ft.commit();
             log.setText("Log in");
+            drawer.closeDrawer(Gravity.LEFT);
 
 
         }

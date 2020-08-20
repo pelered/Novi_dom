@@ -16,25 +16,87 @@ public class ZivUpload {
     private Float godine;
     private String spol;
     private String status;
+    private String naz_skl;
+    private String email;
+    private String date;
+    private String last_date;
     public Map<String,String> url =new HashMap<>();
 
 
     public ZivUpload(){
 
     }
-    public ZivUpload(String naziv, String oznaka, String vrsta, String pasmina, String opis, Float tezina, Float godine, String id_skl, HashMap<String,String> url,String spol,String status)
-    {
-        this.spol=spol;
-        this.status=status;
-        this.url = url;
-        this.id_skl=id_skl;
+
+
+    public ZivUpload(String naziv, String oznaka, String vrsta, String pasmina, String opis, String id_skl, Float tezina, Float godine, String spol, String status, String naz_skl, String email, String date, String last_date, Map<String, String> url) {
         this.naziv = naziv;
-        this.oznaka=oznaka;
-        this.vrsta=vrsta;
-        this.opis=opis;
-        this.pasmina=pasmina;
-        this.tezina=tezina;
-        this.godine=godine;
+        this.oznaka = oznaka;
+        this.vrsta = vrsta;
+        this.opis = opis;
+        this.pasmina = pasmina;
+        this.id_skl = id_skl;
+        this.tezina = tezina;
+        this.godine = godine;
+        this.spol = spol;
+        this.status = status;
+        this.naz_skl = naz_skl;
+        this.email = email;
+        this.date = date;
+        this.last_date = last_date;
+        this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return "ZivUpload{" +
+                "naziv='" + naziv + '\'' +
+                ", oznaka='" + oznaka + '\'' +
+                ", vrsta='" + vrsta + '\'' +
+                ", opis='" + opis + '\'' +
+                ", pasmina='" + pasmina + '\'' +
+                ", id_skl='" + id_skl + '\'' +
+                ", tezina=" + tezina +
+                ", godine=" + godine +
+                ", spol='" + spol + '\'' +
+                ", status='" + status + '\'' +
+                ", naz_skl='" + naz_skl + '\'' +
+                ", email='" + email + '\'' +
+                ", date='" + date + '\'' +
+                ", last_date='" + last_date + '\'' +
+                ", url=" + url +
+                '}';
+    }
+
+    public String getLast_date() {
+        return last_date;
+    }
+
+    public void setLast_date(String last_date) {
+        this.last_date = last_date;
+    }
+
+    public String getNaz_skl() {
+        return naz_skl;
+    }
+
+    public void setNaz_skl(String naz_skl) {
+        this.naz_skl = naz_skl;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getSpol() {
@@ -124,16 +186,12 @@ public class ZivUpload {
     public void setStatus(String status) {
         this.status = status;
     }
-    @NonNull
-   @Override
-    public String toString(){
-        return "ClassPojo [naziv = "+naziv+", oznaka = "+oznaka+", vrsta = "+vrsta+", opis = "+opis+", url = "+url+", spol = "+spol+", pasmina = "+pasmina+", godine = "+godine+", tezina = "+tezina+", status = "+status+", id_skl = "+id_skl+"]";
-    }
     /*@Override
     public String toString() {
         return super.toString();
     }
 */
+
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("naziv", naziv);
@@ -146,6 +204,10 @@ public class ZivUpload {
         result.put("godine",godine);
         result.put("status",status);
         result.put("spol",spol);
+        result.put("naz_skl",naz_skl);
+        result.put("email",email);
+        result.put("date",date);
+        result.put("last_date",last_date);
         result.put("url", url);
         return result;
     }

@@ -50,7 +50,10 @@ import com.sangcomz.fishbun.define.Define;
 import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,13 +181,13 @@ public class EditZiv extends Fragment{
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 HashMap<String,String > privremeno = (HashMap<String, String>) dataSnapshot.getValue();
                 assert privremeno != null;
-                Log.d("ucitajPasmi(): ",privremeno.toString());
+                //Log.d("ucitajPasmi(): ",privremeno.toString());
 
                 for (Map.Entry<String, String> entry : privremeno.entrySet()) {
-                    Log.d("ucitajPasmi()2: ",entry.getValue());
+                    //Log.d("ucitajPasmi()2: ",entry.getValue());
 
                     pasmine.add(new PasminaItem(entry.getValue()));
-                    Log.d("ucitajPasmi()3: ",pasmine.toString());
+                    //Log.d("ucitajPasmi()3: ",pasmine.toString());
 
                 }
                 ispis_pasmina=new AutoCompletePasminaAdapter(Objects.requireNonNull(getContext()),pasmine);
@@ -213,19 +216,19 @@ public class EditZiv extends Fragment{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     //dodajemo sve vrste pasmina
-                    dohvaceno = dataSnapshot.getValue(ZivUpload.class);
-                    postavi_vrijednosti();
-                    if(dataSnapshot.hasChild("url")){
-                        //spremamo hash mapu
-                        //ovo radimo da mozemo prikazati slike lijepo,potreban samo url
-                        for(Map.Entry<String, String> entry :dohvaceno.getUrl().entrySet())
-                        {
-                            slike_ucitavanje.add(entry.getValue());
-                        }
-                    }else {
-                        //stvara se prazna lista,da ne dode do greske
-                        slike_ucitavanje.clear();
+                dohvaceno = dataSnapshot.getValue(ZivUpload.class);
+                postavi_vrijednosti();
+                if(dataSnapshot.hasChild("url")){
+                    //spremamo hash mapu
+                    //ovo radimo da mozemo prikazati slike lijepo,potreban samo url
+                    for(Map.Entry<String, String> entry :dohvaceno.getUrl().entrySet())
+                    {
+                        slike_ucitavanje.add(entry.getValue());
                     }
+                }else {
+                    //stvara se prazna lista,da ne dode do greske
+                    slike_ucitavanje.clear();
+                }
                 ucitaj_pasmine();
                 //popis svih pasmina koji se stavljaju u adapter za autofill
                 progressBar.setVisibility(View.INVISIBLE);
@@ -345,7 +348,7 @@ public class EditZiv extends Fragment{
                                     assert downloadUri != null;
                                     slike_iz_baze.put(ImageList_key.get(count).toString(),downloadUri.toString());
                                     count++;
-                                    Toast.makeText(getActivity(), "Upload.Dohvacen url", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), "Upload.Dohvacen url: "+count, Toast.LENGTH_LONG).show();
 
                                 } else {
                                     Toast.makeText(getActivity(), "Upload nije uspio", Toast.LENGTH_LONG).show();
@@ -378,8 +381,32 @@ public class EditZiv extends Fragment{
         id_vrste =ve.findViewById(vrsta.getCheckedRadioButtonId());
         id_status=ve.findViewById(status.getCheckedRadioButtonId());
         id_spol=ve.findViewById(spol.getCheckedRadioButtonId());
+        String created_at;
+        String last_updated;
+        if(dohvaceno==null){
+            Date date = new Date();
+            Date newDate = new Date(date.getTime() + (604800000L * 2) + (24 * 60 * 60));
+            SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy");
+            created_at = dt.format(newDate);
+            last_updated=dt.format(newDate);
+        }else{
+            Date date = new Date();
+            Date newDate = new Date(date.getTime() + (604800000L * 2) + (24 * 60 * 60));
+            SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy");
+            created_at=dohvaceno.getDate();
+            last_updated=dt.format(newDate);
+        }
+
         //pripremamo za upload
-        ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(), id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),Float.parseFloat(tezina.getText().toString()),Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),prefs.getString("uid",""),slike_map,id_spol.getText().toString(),id_status.getText().toString());
+        ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(),
+                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),prefs.getString("uid",""),Float.parseFloat(tezina.getText().toString()),
+                Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),id_spol.getText().toString(),id_status.getText().toString(),
+                prefs.getString("username",""),prefs.getString("email",""),created_at,last_updated,
+                slike_map);
+       /* ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(),
+                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),Float.parseFloat(tezina.getText().toString()),
+                Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),prefs.getString("uid",""),
+                slike_map,id_spol.getText().toString(),id_status.getText().toString());*/
         Map<String, Object> postValues2=upload2.toMap();
         Log.d("ucitajSlike():",pasmine.toString());
         for (int i=0; i<pasmine.size();i++){
@@ -535,6 +562,7 @@ public class EditZiv extends Fragment{
                             //targetList.clear();
                         }else{
                             inicijalizirajSlider(targetList);
+
                         }
 
                     }

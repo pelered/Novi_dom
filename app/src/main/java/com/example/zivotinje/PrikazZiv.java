@@ -101,26 +101,22 @@ public class PrikazZiv extends Fragment {
             //oznacimo da nam se svida, oznaka je na true;
             if(fav1==null){
                 favo=new ArrayList<>();
-                //HashMap<String,String> pr=new HashMap<>();
                 favo.add(odabrana_ziv.getOznaka());
-                //pr.put((0+"_k"),odabrana_ziv.getOznaka());
-                //Log.d("dodaj_fav0.0:",favo.toString());
-                //fav1=new Fav();
-                //Log.d("dodaj_fav0.1:",fav1.toString());
-                //fav1.setFav(pr);
-                //Log.d("dodaj_fav0.2:",fav1.toString());
-                //pr.clear();
-                //Log.d("dodaj_fav0.3:",fav1.toString());
+                fav1=new Fav();
             }else {
                 favo.add(odabrana_ziv.getOznaka());
-                //fav1.getFav().put(fav1.getFav().size() + "_k", odabrana_ziv.getOznaka());
-
+                fav1.getFav().clear();
             }
-            //Log.d("dodaj_fav0:",favo.toString());
-            fav1.getFav().clear();
-            for (int i=0;i<favo.size();i++){
-                fav1.getFav().put(i+"_k",favo.get(i));
 
+            //Log.d("dodaj_fav0:",favo.toString());
+            if(fav1!=null) {
+                for (int i = 0; i < favo.size(); i++) {
+                    fav1.getFav().put(i + "_k", favo.get(i));
+                }
+            }else{
+                HashMap<String,String> pr=new HashMap<>();
+                pr.put((0 + "_k"),favo.get(0));
+                fav1.setFav(pr);
             }
             //Log.d("dodaj_fav:",fav1.toString());
             Fav fav_up = new Fav(fav1.getFav());
@@ -183,7 +179,7 @@ public class PrikazZiv extends Fragment {
                                 favo.add(entry.getValue());
                             }
                             if (fav1.getFav().containsValue(odabrana_ziv.getOznaka())) {
-                                Log.d("dadaj:2", String.valueOf(fav1));
+                                //Log.d("dadaj:2", String.valueOf(fav1));
                                 favorite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
                                 oznacen_fav=true;
                             }

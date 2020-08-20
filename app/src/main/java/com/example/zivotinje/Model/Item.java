@@ -1,12 +1,21 @@
 package com.example.zivotinje.Model;
 
 public class Item {
-    private String name, price, image;
+    private String name, price, image,oznaka;
 
-    public Item(String name, String price, String image) {
+    public Item(String name, String price, String image,String oznaka) {
         this.name = name;
         this.price = price;
         this.image = image;
+        this.oznaka=oznaka;
+    }
+
+    public String getOznaka() {
+        return oznaka;
+    }
+
+    public void setOznaka(String oznaka) {
+        this.oznaka = oznaka;
     }
 
     public String getName() {
@@ -31,5 +40,15 @@ public class Item {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                ", image='" + image + '\'' +
+                ", oznaka='" + oznaka + '\'' +
+                '}';
     }
 }

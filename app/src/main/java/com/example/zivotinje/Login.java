@@ -1,15 +1,22 @@
 package com.example.zivotinje;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -29,10 +36,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,9 +49,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
+import java.util.Objects;
 
 
-public class Login extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class Login extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static final int RC_SIGN_IN = 1;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
@@ -61,15 +67,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     private DatabaseReference myRef ;
     private String naziv;
     private String profilePicUrl;
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_login,container,false);
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         mAuth = FirebaseAuth.getInstance();
         //za google
-        googlebtn=findViewById(R.id.googlebtn);
+        googlebtn=view.findViewById(R.id.googlebtn);
         googlebtn.setOnClickListener(this);
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -78,27 +84,29 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                 .build();
 
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(Objects.requireNonNull(getActivity()), gso);
         //za google
 
         //zasebno za skl
-        email=findViewById(R.id.email_log);
-        lozinka=findViewById(R.id.lozinka_log);
+        email=view.findViewById(R.id.email_log);
+        lozinka=view.findViewById(R.id.lozinka_log);
 
-        log_skl=findViewById(R.id.log_skl);
+        log_skl=view.findViewById(R.id.log_skl);
         log_skl.setOnClickListener(this);
 
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Sklonista");
 
-        checkbox =findViewById(R.id.checkbox);
+        checkbox =view.findViewById(R.id.checkbox);
         checkbox.setOnCheckedChangeListener(this);
 
         //facebook
         callbackManager = CallbackManager.Factory.create();
-        loginButton = findViewById(R.id.login_button);
+        loginButton = view.findViewById(R.id.login_button);
         loginButton.setPermissions("email", "public_profile");
+        loginButton.setFragment(this);
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d("Tag", "facebook:onSuccess:" + loginResult.toString());
@@ -114,7 +122,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                 Log.d("Tag", "facebook:onError", error);
             }
         });
-        reg_skl=findViewById(R.id.reg_skl);
+        reg_skl=view.findViewById(R.id.reg_skl);
         reg_skl.setOnClickListener(this);
     }
     //google
@@ -140,7 +148,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w("tag", "Google sign in failed", e);
-                Toast.makeText(this,"Nespjesan log in error: "+e,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),"Nespjesan log in error: "+e,Toast.LENGTH_SHORT).show();
             }
         }else{
             // Pass the activity result back to the Facebook SDK
@@ -161,25 +169,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
         Log.d("Tag", "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("Tag", "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("Tag", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(getApplicationContext(),"Autentikacija neuspjela",Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
+                .addOnCompleteListener(Objects.requireNonNull(getActivity()), task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("Tag", "signInWithCredential:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateUI(user);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("Tag", "signInWithCredential:failure", task.getException());
+                        Toast.makeText(getContext(),"Autentikacija neuspjela",Toast.LENGTH_SHORT).show();
+                        updateUI(null);
                     }
                 });
     }
     private void updateUI(FirebaseUser user) {
-        //Log.d("Probam :", String.valueOf(3));
+        Log.d("Probam3 :", String.valueOf(user));
         User user1;
     String username;
     if(user.getDisplayName()==null){
@@ -205,7 +210,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
      mDatabaseRef=FirebaseDatabase.getInstance().getReference("Kor").child(uid).updateChildren(postValues2);
      mDatabaseRef.addOnSuccessListener(aVoid -> {
          Log.d("Uspjel ", "upload");
-         SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+         SharedPreferences prefs = Objects.requireNonNull(getContext()).getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
          SharedPreferences.Editor editor = prefs.edit();
          editor.putString("email",email);
          editor.putString("username", username);
@@ -215,65 +220,60 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
          Log.d("updateUser()1",user1.toString());
          editor.apply();
          //image with glide
-         Intent intent=new Intent(this,ProfileActivity.class);
-         startActivity(intent);
-         finish();
-
-     })
-                 .addOnFailureListener(e -> Log.d("Uspjel ", "upload"));
-
-
+         FragmentTransaction ft = Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction();
+         ft.replace(R.id.fragment_container, new ProfileActivity());
+         //ft.addToBackStack("tag_back2");
+         ft.commit();
+     }).addOnFailureListener(e -> Log.d("NeUspjel ", "upload"));
     }
     @Override
     public void onClick(View view) {
         if(view.equals(googlebtn)){
             signIn();
         }else if(view.equals(reg_skl)){
-            Intent intent=new Intent(Login.this,RegistrationActivity.class);
+            Intent intent=new Intent(getActivity(),RegistrationActivity.class);
             startActivity(intent);
             //finish();
         }else if(view.equals(log_skl)){
             if(!(email.getText().toString().trim().equals("")) && !(lozinka.getText().toString().trim().equals(""))){
                 log();
             }else{
-                Toast.makeText(Login.this, "email ili lozinka prazni.",
+                Toast.makeText(getContext(), "email ili lozinka prazni.",
                         Toast.LENGTH_SHORT).show();
             }
         }
     }
     //facebook
-    //zbog virusa ne radi
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("TAG", "handleFacebookAccessToken:" + token);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("Tag", "signInWithCredential:success");
-                            //Log.d("Tagfacebook" +                                    "1", token.getUserId().toString());;
-                            //Log.d("Tagfacebook" +                                    "2", String.valueOf(task.getResult().getUser().getPhotoUrl()));
-                            //Log.d("Tagfacebook" +                                    "3", task.getResult().getAdditionalUserInfo().getProfile().toString());;
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            try {
-                                profilePicUrl="https://graph.facebook.com/"+token.getUserId()+"/picture?type=large";
-                                Log.d("Facebook:slika",profilePicUrl);
-                            }catch (Exception e)
-                            {
-                                Log.d("Facebook:error:catch",e.getMessage());
-                            }
-                            updateUI(user);
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("Tag", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(Login.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
+                .addOnCompleteListener(Objects.requireNonNull(getActivity()), task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("Tag", "signInWithCredential:success");
+                        //Log.d("Tagfacebook" +                                    "1", token.getUserId().toString());;
+                        //Log.d("Tagfacebook" +                                    "2", String.valueOf(task.getResult().getUser().getPhotoUrl()));
+                        //Log.d("Tagfacebook" +                                    "3", task.getResult().getAdditionalUserInfo().getProfile().toString());;
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        assert user != null;
+                        Log.d("Taguser", user.toString());
+                        try {
+                            profilePicUrl="https://graph.facebook.com/"+token.getUserId()+"/picture?type=large";
+                            Log.d("Facebook:slika",profilePicUrl);
+                        }catch (Exception e)
+                        {
+                            Log.d("Facebook:error:catch", Objects.requireNonNull(e.getMessage()));
                         }
+                        updateUI(user);
+
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("Tag", "signInWithCredential:failure", task.getException());
+                        Toast.makeText(getContext(), "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
+                        updateUI(null);
                     }
                 });
     }
@@ -289,24 +289,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
     }
     public void log(){
         mAuth.signInWithEmailAndPassword(email.getText().toString(), lozinka.getText().toString())
-                .addOnCompleteListener(this, task -> {
+                .addOnCompleteListener(Objects.requireNonNull(getActivity()), task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("log s emailom i pass", "signInWithEmail:success");
                         final FirebaseUser user = mAuth.getCurrentUser();
+                        assert user != null;
                         myRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                   @Override
                                   public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                       //dodala mozda maknem kasnije
                                       Root skl=dataSnapshot.getValue(Root.class);
                                       //Log.d("evoooo",dataSnapshot.toString());
+                                      assert skl != null;
                                       naziv=skl.getNaziv();
                                       updateUI(user);
                                       //Log.d("naziv",naziv);
                                   }
+
                                   @Override
                                   public void onCancelled(@NonNull DatabaseError databaseError) {
-                                      Toast.makeText(getApplicationContext(),"Otkazan log in error: "+databaseError,Toast.LENGTH_SHORT);
+                                      Toast.makeText(getContext(),"Otkazan log in error: "+databaseError,Toast.LENGTH_SHORT).show();
                                   }
                               }
                         );
@@ -314,9 +317,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Co
                         // If sign in fails, display a message to the user.
                         Log.w("log s emailom i pas", "signInWithEmail:failure", task.getException());
                         //Toast.makeText(Login.this, "Authentication failed. error: "+task.getException(), Toast.LENGTH_SHORT).show();
-                        Intent intent =new Intent(Login.this,Login.class);
-                        startActivity(intent);
-                        finish();
+                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container, new Login());
+                        //ft.addToBackStack("tag_back2");
+                        ft.commit();
                     }
                 });
     }

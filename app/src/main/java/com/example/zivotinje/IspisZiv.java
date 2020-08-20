@@ -105,6 +105,7 @@ public class IspisZiv extends Fragment {
                         Toast.makeText(getContext(),"Uspješno izbrisano",Toast.LENGTH_SHORT).show();
                         mUploads.remove(pos);
                         mAdapter.notifyItemRemoved(pos);
+
                     }).addOnFailureListener(e -> Toast.makeText(getContext(),"NeUspješno izbrisano",Toast.LENGTH_SHORT).show());
                 }
             }).addOnFailureListener(e -> {
