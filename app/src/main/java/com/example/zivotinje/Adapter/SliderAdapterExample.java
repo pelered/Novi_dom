@@ -78,32 +78,12 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
         this.pos2=pos2;
     }
     public void onBindViewHolder(SliderAdapterVH viewHolder, final int position) {
-        ArrayList<Uri> link;
         String link2= path2.get(position);
         Glide.with(viewHolder.itemView)
                 .load(link2)
                 .fitCenter()
                 .centerInside()
                 .into(viewHolder.imageViewBackground);
-        /*if(path==null){
-             link2=path2;
-            for (int i = 0; i < mCount; i++) {
-                Glide.with(viewHolder.itemView)
-                        .load(link2.get(position))
-                        .fitCenter()
-                        .centerInside()
-                        .into(viewHolder.imageViewBackground);
-            }
-        }else if(path2==null){
-            link=path;
-            for (int i = 0; i < pos2; i++) {
-                Glide.with(viewHolder.itemView)
-                        .load(link.get(position))
-                        .placeholder(R.mipmap.ic_paw)
-                        .fitCenter()
-                        .into(viewHolder.imageViewBackground);
-            }
-        }*/
         viewHolder.itemView.setOnClickListener(v -> Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show());
     }
     class SliderAdapterVH extends SliderViewAdapter.ViewHolder {

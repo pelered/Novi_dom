@@ -103,7 +103,7 @@ public class EditSkl extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mButtonChooseImage = view.findViewById(R.id.button_choose_image);
-        mButtonUpload = view.findViewById(R.id.button_upload);
+        mButtonUpload = view.findViewById(R.id.edit_skl_spremi);
         mTextViewShowUploads = view.findViewById(R.id.obrisi_sliku);
         mProgressBar = view.findViewById(R.id.progress_bar);
         naziv=view.findViewById(R.id.naziv_sk);

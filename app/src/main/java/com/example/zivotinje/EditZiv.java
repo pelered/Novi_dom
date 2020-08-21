@@ -51,11 +51,13 @@ import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import static android.app.Activity.RESULT_OK;
@@ -76,7 +78,7 @@ public class EditZiv extends Fragment{
     private View ve;
     private ArrayList<PasminaItem> pasmine;
     private HashMap<String,String> slike_map=new HashMap<>();
-    private ArrayList<String> slike_ucitavanje=new ArrayList<>();
+    private ArrayList<String> slike_ucitavanje_url =new ArrayList<>();
     private HashMap<String,Uri> ImageList = new HashMap<>();
     private int count=0;
     private SliderAdapterExample adapter;
@@ -108,7 +110,7 @@ public class EditZiv extends Fragment{
         tezina.setFilters( new InputFilter[]{ new MinMaxFilter( "0" , "100" )}) ;
         status=view.findViewById(R.id.status);
         sliderView =view.findViewById(R.id.imageSlider);
-        upload=view.findViewById(R.id.button_upload);
+        upload=view.findViewById(R.id.edit_ziv_spremi);
         odaberi_sliku=view.findViewById(R.id.button_choose_image);
         oznaka=view.findViewById(R.id.oznaka);
         progressBar=view.findViewById(R.id.progress_bar);
@@ -182,16 +184,15 @@ public class EditZiv extends Fragment{
                 HashMap<String,String > privremeno = (HashMap<String, String>) dataSnapshot.getValue();
                 assert privremeno != null;
                 //Log.d("ucitajPasmi(): ",privremeno.toString());
-
-                for (Map.Entry<String, String> entry : privremeno.entrySet()) {
-                    //Log.d("ucitajPasmi()2: ",entry.getValue());
-
-                    pasmine.add(new PasminaItem(entry.getValue()));
-                    //Log.d("ucitajPasmi()3: ",pasmine.toString());
-
+                if(privremeno!=null) {
+                    for (Map.Entry<String, String> entry : privremeno.entrySet()) {
+                        //Log.d("ucitajPasmi()2: ",entry.getValue());
+                        pasmine.add(new PasminaItem(entry.getValue()));
+                        //Log.d("ucitajPasmi()3: ",pasmine.toString());
+                    }
+                    ispis_pasmina = new AutoCompletePasminaAdapter(Objects.requireNonNull(getContext()), pasmine);
+                    pasmina.setAdapter(ispis_pasmina);
                 }
-                ispis_pasmina=new AutoCompletePasminaAdapter(Objects.requireNonNull(getContext()),pasmine);
-                pasmina.setAdapter(ispis_pasmina);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -223,11 +224,11 @@ public class EditZiv extends Fragment{
                     //ovo radimo da mozemo prikazati slike lijepo,potreban samo url
                     for(Map.Entry<String, String> entry :dohvaceno.getUrl().entrySet())
                     {
-                        slike_ucitavanje.add(entry.getValue());
+                        slike_ucitavanje_url.add(entry.getValue());
                     }
                 }else {
                     //stvara se prazna lista,da ne dode do greske
-                    slike_ucitavanje.clear();
+                    slike_ucitavanje_url.clear();
                 }
                 ucitaj_pasmine();
                 //popis svih pasmina koji se stavljaju u adapter za autofill
@@ -241,8 +242,8 @@ public class EditZiv extends Fragment{
 
         });
         new Handler().postDelayed(() -> {
-            if(!slike_ucitavanje.isEmpty()){
-                inicijalizirajSlider(slike_ucitavanje);
+            if(!slike_ucitavanje_url.isEmpty()){
+                inicijalizirajSlider(slike_ucitavanje_url);
             }
         }, 1000);
     }
@@ -253,40 +254,41 @@ public class EditZiv extends Fragment{
         ime.setText(dohvaceno.getNaziv());
         godine.setText(dohvaceno.getGodine().toString().split("\\.")[0]);
         mjesec.setText(dohvaceno.getGodine().toString().split("\\.")[1]);
-        tezina.setText(dohvaceno.getTezina().toString());
+        tezina.setText(dohvaceno.getTezina().toString().split("\\.")[0]);
+        gram.setText(dohvaceno.getTezina().toString().split("\\.")[1]);
         opis.setText(dohvaceno.getOpis());
         oznaka.setText(dohvaceno.getOznaka());
         pasmina.setText(dohvaceno.getPasmina());
-        if(dohvaceno.getSpol()!=null) {
-            if (dohvaceno.getSpol().equals("M")) {
-                RadioButton id = ve.findViewById(R.id.M);
-                id.setChecked(true);
-            } else if (dohvaceno.getSpol().equals("Ž")) {
-                RadioButton id = ve.findViewById(R.id.Z);
-                id.setChecked(true);
-            }
+
+        //todo provjeriti da ne izbaci ako ne postoji ziv
+        if (dohvaceno.getSpol().equals("M")) {
+            RadioButton id = ve.findViewById(R.id.M);
+            id.setChecked(true);
+        } else if (dohvaceno.getSpol().equals("Ž")) {
+            RadioButton id = ve.findViewById(R.id.Z);
+            id.setChecked(true);
         }
-        if(dohvaceno.getStatus()!=null) {
-            if (dohvaceno.getStatus().equals("Udomljen")) {
-                RadioButton id = ve.findViewById(R.id.Udomljen);
-                id.setChecked(true);
-            } else if (dohvaceno.getStatus().equals("Neudomljen")) {
-                RadioButton id = ve.findViewById(R.id.Neudomljen);
-                id.setChecked(true);
-            }
+
+        if (dohvaceno.getStatus().equals("Udomljen")) {
+            RadioButton id = ve.findViewById(R.id.Udomljen);
+            id.setChecked(true);
+        } else if (dohvaceno.getStatus().equals("Neudomljen")) {
+            RadioButton id = ve.findViewById(R.id.Neudomljen);
+            id.setChecked(true);
         }
-        if(dohvaceno.getVrsta()!=null) {
-            if (dohvaceno.getVrsta().equals("Pas")) {
-                RadioButton id = ve.findViewById(R.id.pas);
-                id.setChecked(true);
-            } else if (dohvaceno.getVrsta().equals("Macka")) {
-                RadioButton id = ve.findViewById(R.id.macka);
-                id.setChecked(true);
-            }
+
+        if (dohvaceno.getVrsta().equals("Pas")) {
+            RadioButton id = ve.findViewById(R.id.pas);
+            id.setChecked(true);
+        } else if (dohvaceno.getVrsta().equals("Macka")) {
+            RadioButton id = ve.findViewById(R.id.macka);
+            id.setChecked(true);
         }
+
     }
     //inicijalizacija slidera nakon sto se slike skinu,ako ih ima
     private void inicijalizirajSlider( ArrayList<String> slike_slider){
+        //TODO izmjeniti al kasnije
         adapter.setCount(slike_slider.size());
         adapter.slike2(slike_slider);
         sliderView.setSliderAdapter(adapter);
@@ -301,20 +303,20 @@ public class EditZiv extends Fragment{
     //uplodamo slike i dohvacamorl njihov
     private void uploadFile() {
         //dohvaca se trenutno prikazan popis slika
-        slike_ucitavanje=adapter.getList();
+        slike_ucitavanje_url =adapter.getList();
         //da spremimo u hasmapu s hashem vec ucitane slike
         HashMap<String,String> vec_ucitane=new HashMap<>();
         ImageList=new HashMap<>();
         HashMap<String,String> slike_iz_baze=new HashMap<>();
         List ImageList_key= new ArrayList();
         List vec_ucitane_key= new ArrayList();
-        if (!slike_ucitavanje.isEmpty()) {
-            for (int i = 0; i < slike_ucitavanje.size(); i++) {
-                if (slike_ucitavanje.get(i).contains("http")) {
-                    vec_ucitane.put((i + "_key"), slike_ucitavanje.get(i));
+        if (!slike_ucitavanje_url.isEmpty()) {
+            for (int i = 0; i < slike_ucitavanje_url.size(); i++) {
+                if (slike_ucitavanje_url.get(i).contains("http")) {
+                    vec_ucitane.put((i + "_key"), slike_ucitavanje_url.get(i));
                     vec_ucitane_key.add(Integer.toString(i));
                 } else {
-                    ImageList.put(Integer.toString(i), Uri.parse(slike_ucitavanje.get(i)));
+                    ImageList.put(Integer.toString(i), Uri.parse(slike_ucitavanje_url.get(i)));
                     ImageList_key.add(Integer.toString(i));
                 }
             }
@@ -324,11 +326,31 @@ public class EditZiv extends Fragment{
         if (!ImageList.isEmpty()) {
             count=0;
             for (int uploads = 0; uploads < ImageList.size(); uploads++) {
+                //zamjena nova
                 final Uri Image = ImageList.get(ImageList_key.get(uploads));
+                final StorageReference fileReference;
+                Boolean video;
+                if(Image.toString().contains("mp4")){
+                    video=true;
+                    fileReference= mStorageRef.child(System.currentTimeMillis()
+                            + "."+getFileExtension(new File(String.valueOf(Image))));
+                }else{
+                    video=false;
+                    fileReference = mStorageRef.child(System.currentTimeMillis()
+                            + "."+getFileExtension(Image));
+                }
+                if(video){
+                    mUploadTask = fileReference.putFile(Uri.fromFile(new File(String.valueOf(Image))));
+                }else{
+                    mUploadTask = fileReference.putFile(Image);
+                }
+
+                //
+               /* final Uri Image = ImageList.get(ImageList_key.get(uploads));
                 final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                         + "." + getFileExtension(Image));
                 assert Image != null;
-                mUploadTask = fileReference.putFile(Image);
+                mUploadTask = fileReference.putFile(Image);*/
                 // Register observers to listen for when the download is done or if it fails
                 mUploadTask.addOnFailureListener(exception -> Toast.makeText(getActivity(), "Upload nije uspio " + exception.toString(), Toast.LENGTH_LONG).show()) .addOnSuccessListener(taskSnapshot -> { ;
                         /*Task<Uri> urlTask =*/ mUploadTask.continueWithTask(task -> {
@@ -361,12 +383,26 @@ public class EditZiv extends Fragment{
                 }
             } else{
             //ako ne postoje odabrane slike iz galerije samo ponovo zapisujemo već skinute,tj uplodane slike
-                Toast.makeText(getActivity(), "No file selected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Nijedna nova slika nije odabrana", Toast.LENGTH_SHORT).show();
                 slike_map=new HashMap<>(vec_ucitane);
             }
         new Handler().postDelayed(() -> dodajSliku(vec_ucitane,slike_iz_baze), 10000);
     }
+    private static String getFileExtension(File file) {
+        String fileName = file.getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+            return fileName.substring(fileName.lastIndexOf(".")+1);
+        else return "";
+    }
+    //dohvacamo koja vrsta je slika
+    private String getFileExtension(Uri uri) {
+        Log.d("upload_get",uri.toString());
+        ContentResolver cR = requireActivity().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
 
+
+    }
     //slika se dodajeu bazu podataka , kao i podaci o zivotinji
     private void dodajSliku(HashMap<String, String> vec_ucitane, HashMap<String, String> imageList){
         slike_map=new HashMap<>();
@@ -384,29 +420,18 @@ public class EditZiv extends Fragment{
         String created_at;
         String last_updated;
         if(dohvaceno==null){
-            Date date = new Date();
-            Date newDate = new Date(date.getTime() + (604800000L * 2) + (24 * 60 * 60));
-            SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy");
-            created_at = dt.format(newDate);
-            last_updated=dt.format(newDate);
+            created_at = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         }else{
-            Date date = new Date();
-            Date newDate = new Date(date.getTime() + (604800000L * 2) + (24 * 60 * 60));
-            SimpleDateFormat dt = new SimpleDateFormat("MM-dd-yyyy");
             created_at=dohvaceno.getDate();
-            last_updated=dt.format(newDate);
         }
 
+        last_updated=new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         //pripremamo za upload
         ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(),
-                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),prefs.getString("uid",""),Float.parseFloat(tezina.getText().toString()),
+                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),prefs.getString("uid",""),Float.parseFloat(tezina.getText().toString()+"."+gram.getText().toString()),
                 Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),id_spol.getText().toString(),id_status.getText().toString(),
                 prefs.getString("username",""),prefs.getString("email",""),created_at,last_updated,
                 slike_map);
-       /* ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(),
-                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),Float.parseFloat(tezina.getText().toString()),
-                Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),prefs.getString("uid",""),
-                slike_map,id_spol.getText().toString(),id_status.getText().toString());*/
         Map<String, Object> postValues2=upload2.toMap();
         Log.d("ucitajSlike():",pasmine.toString());
         for (int i=0; i<pasmine.size();i++){
@@ -418,7 +443,7 @@ public class EditZiv extends Fragment{
                 Map<String,Object> postV=pasminaItem.toMap(pasmine.size());
                 database= FirebaseDatabase.getInstance();
                 mDatabaseRef = database.getReference("Pasmine");
-                mDatabaseRef.updateChildren(postV).addOnSuccessListener(aVoid -> Log.d("Uspjel ", "upload")).addOnFailureListener(e -> {
+                mDatabaseRef.updateChildren(postV).addOnSuccessListener(aVoid -> Log.d("Pasmine azurirane ", "upload")).addOnFailureListener(e -> {
                     Log.d("Error_pasmina: ", Objects.requireNonNull(e.getMessage()));
                 });
                 }
@@ -426,10 +451,12 @@ public class EditZiv extends Fragment{
 
         database= FirebaseDatabase.getInstance();
         mDatabaseRef = database.getReference("Ziv");
+        //provjeri da li ima slika za brisat
         if(!brisi_slike.isEmpty()) {
             for(int i=0;i<brisi_slike.size();i++) {
                 StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(brisi_slike.get(i));
                 int finalI = i;
+                //proba obrisat slike koje su u storagu
                 storageReference.delete().addOnSuccessListener(aVoid -> {
                     //Toast.makeText(getContext(), "Slika izbrisana", Toast.LENGTH_SHORT).show();
                     if((finalI+1)==brisi_slike.size()) {
@@ -437,6 +464,8 @@ public class EditZiv extends Fragment{
                         mDatabaseRef.child(oznaka.getText().toString()).updateChildren(postValues2).addOnSuccessListener(aVoidd -> {
                             Toast.makeText(getContext(), "Uplodano/Ažurirano", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
+                            brisi_slike.clear();
+                            //todo odvede te na prikaz ziv
                         }).addOnFailureListener(e -> {
                             Toast.makeText(getContext(), "Neuspjel pokušaj uplodanja/ažuriranja", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
@@ -456,16 +485,16 @@ public class EditZiv extends Fragment{
                 progressBar.setVisibility(View.INVISIBLE);
             });
         }
-        brisi_slike.clear();
+
         //resetira se jer smo uplodali slike
 
     }
     //dohvacamo koja vrsta je slika
-    private String getFileExtension(Uri uri) {
+   /* private String getFileExtension(Uri uri) {
         ContentResolver cR = Objects.requireNonNull(getActivity()).getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
-    }
+    }*/
     //za otvaranje galerije na klik gumba
     private void openFileChooser() {
         /*final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
@@ -548,7 +577,7 @@ public class EditZiv extends Fragment{
                         ArrayList<Uri> slike = new ArrayList<>(Objects.requireNonNull(imageData.getParcelableArrayListExtra(Define.INTENT_PATH)));
                         //ovdje spremamo sve trenutne slike koje imamo prikazane,nakon svakog odabira u galeriji se dodaju najnovije slike na vec postojece
                         for (int i = 0; i < slike.size(); i++) {
-                            slike_ucitavanje.add(slike.get(i).toString());
+                            slike_ucitavanje_url.add(slike.get(i).toString());
                         }
                         ArrayList<String> targetList = new ArrayList<>();
                         //radimo privremenu listu u koju spremamo slike kooje smo dobili iz galerije

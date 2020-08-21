@@ -74,7 +74,7 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/button_upload"
+                android:id="@+id/edit_skl_spremi"
                 android:layout_width="144dp"
                 android:layout_height="38dp"
                 android:layout_marginStart="264dp"
