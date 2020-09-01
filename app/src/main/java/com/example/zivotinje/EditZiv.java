@@ -5,7 +5,10 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,8 +32,12 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.features.ReturnMode;
+import com.esafirm.imagepicker.model.Image;
 import com.example.zivotinje.Adapter.AutoCompletePasminaAdapter;
-import com.example.zivotinje.Adapter.SliderAdapterExample;
+import com.example.zivotinje.Adapter.SliderAdapter;
 import com.example.zivotinje.Model.MinMaxFilter;
 import com.example.zivotinje.Model.PasminaItem;
 import com.example.zivotinje.Model.ZivUpload;
@@ -76,12 +83,12 @@ public class EditZiv extends Fragment{
     private StorageTask<com.google.firebase.storage.UploadTask.TaskSnapshot> mUploadTask;
     private SharedPreferences prefs;
     private View ve;
-    private ArrayList<PasminaItem> pasmine;
+    private ArrayList<PasminaItem> pasmine,sve_pasmine;
     private HashMap<String,String> slike_map=new HashMap<>();
     private ArrayList<String> slike_ucitavanje_url =new ArrayList<>();
     private HashMap<String,Uri> ImageList = new HashMap<>();
     private int count=0;
-    private SliderAdapterExample adapter;
+    private SliderAdapter adapter;
     private String id_skl,oznaka_ziv;
     private ZivUpload dohvaceno;
     private ProgressBar progressBar;
@@ -125,7 +132,7 @@ public class EditZiv extends Fragment{
         gram.setFilters( new InputFilter[]{ new MinMaxFilter( "0" , "1000" )}) ;
 
         ve=view;
-        adapter= new SliderAdapterExample(getActivity());
+        adapter= new SliderAdapter(getActivity());
 
         id_vrste = view.findViewById(vrsta.getCheckedRadioButtonId());
         id_spol=view.findViewById(spol.getCheckedRadioButtonId());
@@ -150,6 +157,10 @@ public class EditZiv extends Fragment{
         });
         odaberi_sliku.setOnClickListener(v -> openFileChooser());
         upload.setOnClickListener(v -> {
+
+
+            Log.d("Upload()", String.valueOf(mDatabaseRef.child(oznaka.getText().toString())));
+
             if (mUploadTask != null && mUploadTask.isInProgress()) {
                 Toast.makeText(getActivity(), "Upload in progress", Toast.LENGTH_SHORT).show();
             } else {
@@ -157,8 +168,23 @@ public class EditZiv extends Fragment{
                 if(TextUtils.isEmpty(ime.getText().toString()) ||TextUtils.isEmpty(gram.getText().toString()) || TextUtils.isEmpty(pasmina.getText().toString()) || TextUtils.isEmpty(godine.getText().toString()) || TextUtils.isEmpty(tezina.getText().toString()) || TextUtils.isEmpty(oznaka.getText().toString()) ){
                     Toast.makeText(getActivity(), "Jedino opis može ostat prazan", Toast.LENGTH_LONG).show();
                 }else {
-                    progressBar.setVisibility(View.VISIBLE);
-                    uploadFile();
+                    mDatabaseRef = database.getReference("Ziv").child(oznaka.getText().toString());
+                    mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.getValue() == null) {
+                                // The child doesn't exist
+                                uploadFile();
+                            }else{
+                                Toast.makeText(getActivity(), "Ljubimac s oznakom: "+oznaka.getText().toString()+" već postoji", Toast.LENGTH_LONG).show();
+
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
+                    });
+
                 }
             }
         });
@@ -182,14 +208,21 @@ public class EditZiv extends Fragment{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 HashMap<String,String > privremeno = (HashMap<String, String>) dataSnapshot.getValue();
+                //Log.d("ucitaj_pasmine()",dataSnapshot.getValue().toString());
+               // Log.d("ucitaj_pasmine()2",privremeno.toString());
+
                 assert privremeno != null;
                 //Log.d("ucitajPasmi(): ",privremeno.toString());
                 if(privremeno!=null) {
                     for (Map.Entry<String, String> entry : privremeno.entrySet()) {
-                        //Log.d("ucitajPasmi()2: ",entry.getValue());
+                        //Log.d("ucitajPasmi()3: ",entry.getValue());
                         pasmine.add(new PasminaItem(entry.getValue()));
-                        //Log.d("ucitajPasmi()3: ",pasmine.toString());
+
                     }
+
+
+                    sve_pasmine=new ArrayList<>(pasmine);
+                    //Log.d("ucitajPasmi()4: ",sve_pasmine.toString()+","+sve_pasmine.size());
                     ispis_pasmina = new AutoCompletePasminaAdapter(Objects.requireNonNull(getContext()), pasmine);
                     pasmina.setAdapter(ispis_pasmina);
                 }
@@ -211,7 +244,6 @@ public class EditZiv extends Fragment{
     }
     //pokrene se pri ucitavanju fragmenta za dohvacanje podataka
     private void ucitajPodatke(){
-        //Todo dodati child(oznaka_ziv)
         mDatabaseRef.child(oznaka_ziv).addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("ResourceType")
             @Override
@@ -289,8 +321,10 @@ public class EditZiv extends Fragment{
     //inicijalizacija slidera nakon sto se slike skinu,ako ih ima
     private void inicijalizirajSlider( ArrayList<String> slike_slider){
         //TODO izmjeniti al kasnije
+        adapter= new SliderAdapter(getActivity());
         adapter.setCount(slike_slider.size());
         adapter.slike2(slike_slider);
+
         sliderView.setSliderAdapter(adapter);
         sliderView.setIndicatorAnimation(IndicatorAnimations.SLIDE); //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
         sliderView.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
@@ -302,8 +336,14 @@ public class EditZiv extends Fragment{
     }
     //uplodamo slike i dohvacamorl njihov
     private void uploadFile() {
+        Log.d("ucitajPasmi()5: ",pasmine.toString()+","+pasmine.size());
         //dohvaca se trenutno prikazan popis slika
-        slike_ucitavanje_url =adapter.getList();
+        if (adapter!=null){
+        slike_ucitavanje_url =adapter.getList();}
+        //Log.d("uploadFile()2",slike_ucitavanje_url.toString());
+        slike_ucitavanje_url=new ArrayList<>();
+
+
         //da spremimo u hasmapu s hashem vec ucitane slike
         HashMap<String,String> vec_ucitane=new HashMap<>();
         ImageList=new HashMap<>();
@@ -321,7 +361,6 @@ public class EditZiv extends Fragment{
                 }
             }
         }
-        //TODO prvo provjeri dal upisana oznaka vec postoji
         //provjeravamo dal postoje odabrane slike iz galerije
         if (!ImageList.isEmpty()) {
             count=0;
@@ -371,6 +410,15 @@ public class EditZiv extends Fragment{
                                     slike_iz_baze.put(ImageList_key.get(count).toString(),downloadUri.toString());
                                     count++;
                                     Toast.makeText(getActivity(), "Upload.Dohvacen url: "+count, Toast.LENGTH_LONG).show();
+                                    final int K=0;
+                                    if(ImageList.size()==count){
+                                       // Log.d("ucitajPasmi()6: ",pasmine.toString()+","+pasmine.size());
+                                        dodajSliku(vec_ucitane,slike_iz_baze);
+                                        Log.d("uploadFile()",slike_iz_baze.toString());
+
+                                    }
+
+
 
                                 } else {
                                     Toast.makeText(getActivity(), "Upload nije uspio", Toast.LENGTH_LONG).show();
@@ -385,8 +433,10 @@ public class EditZiv extends Fragment{
             //ako ne postoje odabrane slike iz galerije samo ponovo zapisujemo već skinute,tj uplodane slike
                 Toast.makeText(getActivity(), "Nijedna nova slika nije odabrana", Toast.LENGTH_SHORT).show();
                 slike_map=new HashMap<>(vec_ucitane);
+                dodajSliku(vec_ucitane,slike_iz_baze);
+
             }
-        new Handler().postDelayed(() -> dodajSliku(vec_ucitane,slike_iz_baze), 10000);
+        //new Handler().postDelayed(() -> dodajSliku(vec_ucitane,slike_iz_baze), 10000);
     }
     private static String getFileExtension(File file) {
         String fileName = file.getName();
@@ -406,6 +456,9 @@ public class EditZiv extends Fragment{
     //slika se dodajeu bazu podataka , kao i podaci o zivotinji
     private void dodajSliku(HashMap<String, String> vec_ucitane, HashMap<String, String> imageList){
         slike_map=new HashMap<>();
+        //Log.d("ucitajPasmi()7: ",sve_pasmine.toString()+","+sve_pasmine.size());
+        //Log.d("uploadFile()2",vec_ucitane.toString());
+        //Log.d("uploadFile()3",imageList.toString());
         for(int i=0; i<(vec_ucitane.size()+imageList.size());i++){
             if(vec_ucitane.containsKey((i+"_key"))){
                 slike_map.put((i+"_key"),vec_ucitane.get(i+"_key"));
@@ -433,12 +486,12 @@ public class EditZiv extends Fragment{
                 prefs.getString("username",""),prefs.getString("email",""),created_at,last_updated,
                 slike_map);
         Map<String, Object> postValues2=upload2.toMap();
-        Log.d("ucitajSlike():",pasmine.toString());
-        for (int i=0; i<pasmine.size();i++){
-            String s=pasmine.get(i).getPasminaName();
-            Log.d("ucitajSlike()1."+i,s);
+        //Log.d("ucitajSlike():",sve_pasmine.toString());
+        for (int i=0; i<sve_pasmine.size();i++){
+            String s=sve_pasmine.get(i).getPasminaName();
+            //Log.d("ucitajSlike()1."+i,s);
             if(!s.equals(pasmina.getText().toString())){
-                Log.d("ucitajSlike()2."+i,s);
+                //Log.d("ucitajSlike()2."+i,s);
                 PasminaItem pasminaItem=new PasminaItem(pasmina.getText().toString());
                 Map<String,Object> postV=pasminaItem.toMap(pasmine.size());
                 database= FirebaseDatabase.getInstance();
@@ -465,7 +518,15 @@ public class EditZiv extends Fragment{
                             Toast.makeText(getContext(), "Uplodano/Ažurirano", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
                             brisi_slike.clear();
-                            //todo odvede te na prikaz ziv
+                            PrikazZiv fragment =new PrikazZiv();
+                            Bundle args = new Bundle();
+                            args.putString("oznaka", upload2.getOznaka());
+                            fragment.setArguments(args);
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+
+                            ft.replace(R.id.fragment_container, fragment);
+                            //ft.addToBackStack("tag_back2");
+                            ft.commit();
                         }).addOnFailureListener(e -> {
                             Toast.makeText(getContext(), "Neuspjel pokušaj uplodanja/ažuriranja", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
@@ -479,6 +540,15 @@ public class EditZiv extends Fragment{
         }else{
             mDatabaseRef.child(oznaka.getText().toString()).updateChildren(postValues2).addOnSuccessListener(aVoidd -> {
                 Toast.makeText(getContext(), "Uplodano/Ažurirano", Toast.LENGTH_SHORT).show();
+                PrikazZiv fragment =new PrikazZiv();
+                Bundle args = new Bundle();
+                args.putString("oznaka", upload2.getOznaka());
+                fragment.setArguments(args);
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+
+                ft.replace(R.id.fragment_container, fragment);
+                //ft.addToBackStack("tag_back2");
+                ft.commit();
                 progressBar.setVisibility(View.INVISIBLE);
             }).addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Neuspjel pokušaj uplodanja/ažuriranja", Toast.LENGTH_SHORT).show();
@@ -497,71 +567,54 @@ public class EditZiv extends Fragment{
     }*/
     //za otvaranje galerije na klik gumba
     private void openFileChooser() {
-        /*final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
         View mView = getLayoutInflater().inflate(R.layout.custom_dialog,null);
         Button btn_video = (Button)mView.findViewById(R.id.video);
         Button btn_slike = (Button)mView.findViewById(R.id.slike);
         alert.setView(mView);
         final AlertDialog alertDialog = alert.create();
         alertDialog.setCanceledOnTouchOutside(false);
-        btn_video.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-               //Jednog dana za video
-                Toast.makeText(getActivity(),"Jos nije implementirano",Toast.LENGTH_SHORT).show();
-            }
+        btn_video.setOnClickListener(v -> {
+            ImagePicker.create(EditZiv.this)
+                    .returnMode(ReturnMode.GALLERY_ONLY) // set whether pick and / or camera action should return immediate result or not.
+                    .folderMode(true) // folder mode (false by default)
+                    .toolbarFolderTitle("Folder") // folder selection title
+                    .toolbarImageTitle("Tap to select") // image selection title
+                    .toolbarArrowColor(Color.BLACK) // Toolbar 'up' arrow color
+                    .includeVideo(true) // Show video on image picker
+                    .onlyVideo(true) // include video (false by default)
+                    .single() // single mode
+                    .limit(10) // max images can be selected (99 by default)
+                    .showCamera(false) // show camera or not (true by default)
+                    .enableLog(false) // disabling log
+                    .start(); // start image picker activity with request code
+            alertDialog.dismiss();
         });
-        btn_slike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                FishBun.with(EditZiv.this)
-                        .setImageAdapter(new GlideAdapter())
-                        .setMaxCount(10)
-                        .setMinCount(1)
-                        .setPickerSpanCount(5)
-                        .setActionBarColor(Color.parseColor("#466deb"), Color.parseColor("#466deb"), false)
-                        .setActionBarTitleColor(Color.parseColor("#ffffff"))
-                        .setAlbumSpanCount(2, 3)
-                        .setButtonInAlbumActivity(false)
-                        .setCamera(true)
-                        .setReachLimitAutomaticClose(true)
-                        .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_back_white))
-                        .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
-                        .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
-                        .setAllViewTitle("All")
-                        .setMenuAllDoneText("All Done")
-                        .setActionBarTitle("Odaberi slike")
-                        .textOnNothingSelected("Please select 1 or more!")
-                        .textOnImagesSelectionLimitReached("Limit Reached!")
-                        .setSelectCircleStrokeColor(Color.BLACK)
-                        .startAlbum();
-            }
+        btn_slike.setOnClickListener(v -> {
+            FishBun.with(EditZiv.this)
+                    .setImageAdapter(new GlideAdapter())
+                    .setMaxCount(10)
+                    .setMinCount(1)
+                    .setPickerSpanCount(5)
+                    .setActionBarColor(Color.parseColor("#466deb"), Color.parseColor("#466deb"), false)
+                    .setActionBarTitleColor(Color.parseColor("#ffffff"))
+                    .setAlbumSpanCount(2, 3)
+                    .setButtonInAlbumActivity(false)
+                    .setCamera(true)
+                    .setReachLimitAutomaticClose(true)
+                    .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_custom_back_white))
+                    .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
+                    .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
+                    .setAllViewTitle("All")
+                    .setMenuAllDoneText("All Done")
+                    .setActionBarTitle("Odaberi slike")
+                    .textOnNothingSelected("Please select 1 or more!")
+                    .textOnImagesSelectionLimitReached("Limit Reached!")
+                    .setSelectCircleStrokeColor(Color.BLACK)
+                    .startAlbum();
+            alertDialog.dismiss();
         });
-        alertDialog.show();*/
-        //ne radi  u alert dialogu,zbog with(this)
-        FishBun.with(this)
-                .setImageAdapter(new GlideAdapter())
-                .setMaxCount(10)
-                .setMinCount(1)
-                .setPickerSpanCount(5)
-                .setActionBarColor(Color.parseColor("#466deb"), Color.parseColor("#466deb"), false)
-                .setActionBarTitleColor(Color.parseColor("#ffffff"))
-                .setAlbumSpanCount(2, 3)
-                .setButtonInAlbumActivity(false)
-                .setCamera(true)
-                .setReachLimitAutomaticClose(true)
-                .setHomeAsUpIndicatorDrawable(ContextCompat.getDrawable(Objects.requireNonNull(getActivity()), R.drawable.ic_custom_back_white))
-                .setDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
-                .setAllDoneButtonDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_check))
-                .setAllViewTitle("All")
-                .setMenuAllDoneText("All Done")
-                .setActionBarTitle("Odaberi slike")
-                .textOnNothingSelected("Please select 1 or more!")
-                .textOnImagesSelectionLimitReached("Limit Reached!")
-                .setSelectCircleStrokeColor(Color.BLACK)
-                .startAlbum();
+        alertDialog.show();
 
     }
     //pokrene se kad dode neki rezultat npr od galerije
@@ -589,6 +642,9 @@ public class EditZiv extends Fragment{
                             //adapter.addItem(targetList, sliderView.getCurrentPagePosition());
                             //adapter.notifyDataSetChanged();
                             //targetList.clear();
+                            adapter.addItem(targetList, sliderView.getCurrentPagePosition());
+                            adapter.notifyDataSetChanged();
+                            targetList.clear();
                         }else{
                             inicijalizirajSlider(targetList);
 
@@ -596,6 +652,38 @@ public class EditZiv extends Fragment{
 
                     }
                 }
-        }
+                break;
+
+
+             case 553:
+                 if(imageData!=null) {
+                     // Get a list of picked images
+                     List<Image> images = ImagePicker.getImages(imageData);
+                     // or get a single image only
+                     Image image = ImagePicker.getFirstImageOrNull(imageData);
+                     Log.d("onAcitivityResult:Video", image.getPath());
+                /*for (int i = 0; i < slike.size(); i++) {
+                    slike_ucitavanje.add(slike.get(i).toString());
+                }*/
+                     slike_ucitavanje_url.add(image.toString());
+                     ArrayList<String> targetList = new ArrayList<>();
+                     targetList.add(image.getPath());
+                     //radimo privremenu listu u koju spremamo slike kooje smo dobili iz galerije
+                     //slike.forEach(uri -> targetList.add(uri.toString()));
+                     //dodajemo novo odabrane slike u adapter na mjesto na kojem je sliderview bio
+                     //kada se odabralo Odaberi slike
+                     if (sliderView.getSliderAdapter() != null) {
+                         // Log.d("result():", String.valueOf(sliderView.getCurrentPagePosition()));
+                         adapter.addItem(targetList, sliderView.getCurrentPagePosition());
+                         adapter.notifyDataSetChanged();
+                         targetList.clear();
+                     } else {
+                         inicijalizirajSlider(targetList);
+                     }
+                 }
+                 break;
+         }
+
+
     }
 }

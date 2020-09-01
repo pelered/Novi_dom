@@ -1,93 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegistrationActivity">
+    android:orientation="vertical"
+    tools:context=".RegistrationActivity"
+    android:layout_gravity="center"
+    android:gravity="center">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <EditText
+        android:id="@+id/naziv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="top|center"
-        android:orientation="vertical"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:autofillHints=""
+        android:gravity="center"
+        android:hint="@string/naziv_skloni_ta"
+        android:inputType="text"
+        android:paddingBottom="20dp" />
 
-        <EditText
-            android:id="@+id/naziv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:gravity="center"
-            android:hint="@string/naziv_skloni_ta"
-            android:inputType="text"
-            android:paddingBottom="20dp" />
+    <AutoCompleteTextView
+        android:id="@+id/autocomplete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="@string/adresa"
+        android:paddingBottom="10dp" />
 
-        <AutoCompleteTextView
-            android:id="@+id/autocomplete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="@string/adresa"
-            android:paddingBottom="10dp" />
+    <EditText
+        android:id="@+id/email_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/email_skloni_ta"
+        android:inputType="textEmailAddress"
+        android:paddingBottom="20dp" />
 
-        <EditText
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/email_skloni_ta"
-            android:inputType="textEmailAddress"
-            android:paddingBottom="20dp" />
+    <EditText
+        android:id="@+id/broj_tel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="@string/broj_telefona"
+        android:inputType="number" />
 
-        <EditText
-            android:id="@+id/lozinka"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/lozinka_min_6_znakova"
-            android:inputType="textPassword"
-            android:paddingBottom="20dp" />
+    <EditText
+        android:id="@+id/lozinka"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/lozinka_min_6_znakova"
+        android:inputType="textPassword"
+        android:paddingBottom="20dp" />
 
-        <EditText
-            android:id="@+id/potvrdi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/potvrdi_lozinku"
-            android:inputType="textPassword"
-            android:paddingBottom="20dp" />
-    </LinearLayout>
+    <EditText
+        android:id="@+id/potvrdi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/potvrdi_lozinku"
+        android:inputType="textPassword"
+        android:paddingBottom="20dp" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="320dp"
         android:text="@string/registriraj"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkbox"
-        app:layout_constraintVertical_bias="1.0" />
-
+        />
 
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="388dp"
         android:text="@string/poka_i_lozinku"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.131"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

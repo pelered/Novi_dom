@@ -17,6 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ResetPasword"></activity>
+
+        <service android:name=".Service.MyService" />
+
         <activity android:name=".SearchIspis" />
         <activity android:name=".Search" />
         <activity android:name=".PrikazZiv" />
@@ -24,7 +28,7 @@
         <activity android:name=".Ispis" />
         <activity android:name=".EditZiv" />
         <activity android:name=".PrikazSkl" />
-        <activity android:name=".Adapter.SliderAdapterExample" />
+        <activity android:name=".Adapter.SliderAdapter" />
         <activity android:name=".EditSkl" />
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".ProfileActivity" />
@@ -40,7 +44,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MapActivity"
+            android:name=".MapFragment"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

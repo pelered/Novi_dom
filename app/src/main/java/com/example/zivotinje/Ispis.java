@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.zivotinje.Adapter.IspisAdapter;
-import com.example.zivotinje.Model.Root;
+import com.example.zivotinje.Model.Skl;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +26,7 @@ public class Ispis extends Fragment {
     private RecyclerView mRecyclerView;
     private IspisAdapter mAdapter;
     private ProgressBar mProgressCircle;
-    private List<Root> mUploads;
+    private List<Skl> mUploads;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_ispis,container,false);
@@ -46,7 +46,7 @@ public class Ispis extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Root upload = postSnapshot.getValue(Root.class);
+                    Skl upload = postSnapshot.getValue(Skl.class);
                     assert upload != null;
                     mUploads.add(upload);
                 }

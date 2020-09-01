@@ -16,10 +16,10 @@
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:foregroundGravity="center"
             android:gravity="center"
-            android:layout_gravity="center"
             android:text="@string/pretra_i"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -30,35 +30,35 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:autofillHints=""
             android:gravity="center"
-            android:inputType="text"
             android:hint="@string/oznaka_u_skloni_tu"
-            android:textSize="18sp"
-            android:autofillHints="" />
+            android:inputType="text"
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/idskl"
-            android:gravity="center"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
+            android:autofillHints=""
             android:ems="10"
-            android:inputType="textPersonName"
+            android:gravity="center"
             android:hint="@string/naziv_skloni_ta"
-            android:autofillHints="" />
+            android:inputType="textPersonName" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/idpasmina"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:autofillHints=""
             android:ems="10"
             android:gravity="center"
-            android:inputType="textPersonName"
             android:hint="@string/pasmina"
-            android:autofillHints="" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/idtezina"
@@ -66,11 +66,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:autofillHints=""
             android:ems="10"
             android:gravity="center"
-            android:inputType="numberDecimal|number"
             android:hint="@string/te_ina_do"
-            android:autofillHints="" />
+            android:inputType="numberDecimal|number" />
 
         <EditText
             android:id="@+id/idstarost"
@@ -78,11 +78,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:autofillHints=""
             android:ems="10"
             android:gravity="center"
-            android:inputType="numberDecimal|number"
             android:hint="@string/starost_do"
-            android:autofillHints="" />
+            android:inputType="numberDecimal|number" />
 
         <RadioGroup
             android:id="@+id/vrsta"
@@ -152,14 +152,30 @@
         </RadioGroup>
 
 
-        <ImageButton
-            android:id="@+id/idsearch"
-            android:layout_width="85dp"
-            android:layout_height="74dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/transparent"
-            android:src="@drawable/ic_search_" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/refresh_s"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:src="@drawable/ic_refresh"
+                android:textSize="15sp"
+                android:tint="#090909" />
+
+            <ImageButton
+                android:id="@+id/idsearch"
+                android:layout_width="85dp"
+                android:layout_height="74dp"
+                android:layout_gravity="center"
+                android:background="@color/transparent"
+                android:src="@drawable/ic_search_" />
+        </LinearLayout>
 
     </LinearLayout>
 </RelativeLayout>

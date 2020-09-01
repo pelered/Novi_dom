@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +63,16 @@ public class IspisZiv extends Fragment {
 
         ucitaj_podatke();
 
+        SharedPreferences prefs =getContext().getSharedPreferences("shared_pref_name", getContext().MODE_PRIVATE);
+
+        Log.d("IspisZiv:", String.valueOf(prefs.getBoolean("skl",false)));
+        if(prefs.getBoolean("skl",false)){
+            postavi_swiper();
+        }
+
+    }
+
+    private void postavi_swiper() {
         /*MySwipeHelper swipeHelper =*/ new MySwipeHelper(getContext(),mRecyclerView,200) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MySwipeHelper.MyButton> buffer) {
@@ -96,6 +108,7 @@ public class IspisZiv extends Fragment {
             }
         };
     }
+
     private void obrisi_ziv(int pos) {
         for(int i =0; i<mUploads.get(pos).getUrl().size();i++){
             int finalI = i;

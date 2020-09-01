@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="10dp"
+    android:layout_marginBottom="0dp"
+    android:clipToPadding="false"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:scaleType="fitXY"
+            android:id="@+id/image_view_upload"
+            android:layout_width="126dp"
+            android:layout_height="98dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginRight="5dp"
+            android:cropToPadding="false" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:id="@+id/textView_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stanje"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/card_grad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Grad"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

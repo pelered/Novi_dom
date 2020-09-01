@@ -1,42 +1,46 @@
 package com.example.zivotinje.Model;
 
-import android.net.Uri;
-
 import com.google.firebase.database.Exclude;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Root
+public class Skl
 {
     private String adresa;
-
     private String naziv;
-
     private String id;
-
     private String email;
-
-    private Map<String,String> url;
-
+    private Map<String,String> url=new HashMap<>();
     private String opis;
-    private ArrayList<Uri> url1;
+    private String broj;
 
-    public Root(String uid, String mnaziv, String madresa) {
+    public Skl(String uid, String mnaziv,String email, String madresa, String broj) {
         this.id=uid;
         this.naziv=mnaziv;
         this.adresa=madresa;
-
+        this.email=email;
+        this.broj = broj;
     }
-    public Root(String uid, String mnaziv, String madresa,ArrayList<Uri> url1) {
+    public Skl(String uid, String mnaziv,String email, String madresa, String broj,String opis,Map<String,String> url) {
         this.id=uid;
         this.naziv=mnaziv;
         this.adresa=madresa;
-        this.url1=url1;
-
+        this.email=email;
+        this.broj = broj;
+        this.opis=opis;
+        this.url=url;
     }
-    public Root(){}
+
+    public Skl(){}
+
+    public String getBroj() {
+        return broj;
+    }
+
+    public void setBroj(String broj) {
+        this.broj = broj;
+    }
 
     public String getAdresa ()
     {
@@ -96,48 +100,14 @@ public class Root
         this.opis = opis;
     }
 
-    public ArrayList<Uri> getUrl1() {
-        return url1;
-    }
-
-    public void setUrl1(ArrayList<Uri> url1) {
-        this.url1 = url1;
-    }
 
     @Override
     public String toString()
     {
-        return "ClassPojo [adresa = "+adresa+", naziv = "+naziv+", id = "+id+", email = "+email+", url = "+url+", opis = "+opis+"]";
+        return "ClassPojo [adresa = "+adresa+", naziv = "+naziv+", id = "+id+", email = "+email+", broj ="+broj+",url = "+url+", opis = "+opis+"]";
     }
 
-    ///proba
-    /*
-    public Root(String name, String id, String adresa, String email, String opis, HashMap<String, String> slike_map)
-    {
-        this.email=email;
-        this.url=slike_map;
-        this.naziv=name;
-        this.id=id;
-        this.adresa=adresa;
-        this.opis=opis;
-    }
-    public Root(String name, String id, String adresa,String email, String opis)
-    {
-        this.email=email;
-        this.naziv=name;
-        this.id=id;
-        this.adresa=adresa;
-        this.opis=opis;
-    }
-    public Root(String name, String id, String adresa,String email )
-    {
-        this.email=email;
-        this.naziv=name;
-        this.id=id;
-        this.adresa=adresa;
-    }
-*/
-    //proba
+
     //za upload na bazu podataka
     @Exclude
     public Map<String, Object> toMap() {
@@ -146,6 +116,7 @@ public class Root
         result.put("id",id);
         result.put("adresa",adresa);
         result.put("email",email);
+        result.put("broj",broj);
         result.put("opis",opis);
         result.put("url",url);
         return result;

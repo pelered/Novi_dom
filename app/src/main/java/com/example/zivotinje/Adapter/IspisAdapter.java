@@ -14,16 +14,16 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.zivotinje.Model.Skl;
 import com.example.zivotinje.PrikazSkl;
 import com.example.zivotinje.R;
-import com.example.zivotinje.Model.Root;
 
 import java.util.List;
 
 public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHolder> {
     private Context mContext;
-    private List<Root> mUploads;
-    public IspisAdapter(Context context, List<Root> uploads) {
+    private List<Skl> mUploads;
+    public IspisAdapter(Context context, List<Skl> uploads) {
         mContext = context;
         mUploads = uploads;
     }
@@ -37,7 +37,7 @@ public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
-        final Root uploadCurrent = mUploads.get(position);
+        final Skl uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getNaziv());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

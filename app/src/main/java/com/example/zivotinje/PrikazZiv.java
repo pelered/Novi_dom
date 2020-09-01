@@ -2,13 +2,14 @@ package com.example.zivotinje;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,27 +19,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.zivotinje.Adapter.SliderAdapterExample;
+import com.example.zivotinje.Adapter.SliderAdapter;
 import com.example.zivotinje.Model.Fav;
-import com.example.zivotinje.Model.Root;
 import com.example.zivotinje.Model.ZivUpload;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.smarteist.autoimageslider.IndicatorAnimations;
-import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PrikazZiv extends Fragment {
@@ -48,7 +42,7 @@ public class PrikazZiv extends Fragment {
     private DatabaseReference mDatabaseRef;
     private SliderView sliderView1;
     private ZivUpload odabrana_ziv;
-    private TextView ime,opis,oznaka,kg,starost,status,vrsta,pasmina,spol;
+    private TextView ime,opis,oznaka,kg,starost,status,vrsta,pasmina,spol,created,last_updated;
     private ImageView email;
     private ArrayList<String> slike= new ArrayList<>();
     private ImageView favorite;
@@ -65,12 +59,12 @@ public class PrikazZiv extends Fragment {
         if (getArguments()==null){
             Toast.makeText(getContext(),"Nisi smio ovo uspjet,javi mi kako",Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(getContext(),"Oznaka: "+getArguments().getString("oznaka"),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(),"Oznaka: "+getArguments().getString("oznaka"),Toast.LENGTH_SHORT).show();
             oznaka_ziv= getArguments().getString("oznaka");
         }
         database=FirebaseDatabase.getInstance();
         mDatabaseRef=database.getReference("Ziv");
-        ime=view.findViewById(R.id.ime);
+        ime=view.findViewById(R.id.ime_nav);
         opis=view.findViewById(R.id.opis);
         oznaka=view.findViewById(R.id.oznaka);
         kg=view.findViewById(R.id.tezina);
@@ -78,11 +72,13 @@ public class PrikazZiv extends Fragment {
         status=view.findViewById(R.id.status);
         vrsta=view.findViewById(R.id.vrsta);
         pasmina=view.findViewById(R.id.pasmina);
-        email=view.findViewById(R.id.email);
+        email=view.findViewById(R.id.email_nav);
         spol=view.findViewById(R.id.spol);
         sliderView1=view.findViewById(R.id.imageSlider);
         favorite=view.findViewById(R.id.favorite);
         favorite.setVisibility(View.INVISIBLE);
+        last_updated=view.findViewById(R.id.last_updated);
+        created=view.findViewById(R.id.created);
         favo=new ArrayList<>();
         SharedPreferences prefs = getActivity().getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
         if(prefs.getString("uid",null)!=null) {
@@ -161,36 +157,37 @@ public class PrikazZiv extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 odabrana_ziv = dataSnapshot.getValue(ZivUpload.class);
-                Log.d("dadaj:0", dataSnapshot.getValue().toString());
+                //todo dodat da ako ne nade ziv da odvede na home page
+                //Log.d("dadaj:0", dataSnapshot.getValue().toString());
                 if (dataSnapshot.hasChild("url")) {
                     for (Map.Entry<String, String> entry : odabrana_ziv.getUrl().entrySet()) {
                         slike.add(entry.getValue());
                     }
                 }
-                DatabaseReference ref= FirebaseDatabase.getInstance().getReference("Fav").child(uid);
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        fav1=dataSnapshot.getValue(Fav.class);
-
-                        if(fav1!=null) {
-                            for(Map.Entry<String, String> entry :fav1.getFav().entrySet()){
-                                favo.add(entry.getValue());
-                            }
-                            if (fav1.getFav().containsValue(odabrana_ziv.getOznaka())) {
-                                //Log.d("dadaj:2", String.valueOf(fav1));
-                                favorite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
-                                oznacen_fav=true;
+                if (uid != null) {
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Fav").child(uid);
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            fav1 = dataSnapshot.getValue(Fav.class);
+                            if (fav1 != null) {
+                                for (Map.Entry<String, String> entry : fav1.getFav().entrySet()) {
+                                    favo.add(entry.getValue());
+                                }
+                                if (fav1.getFav().containsValue(odabrana_ziv.getOznaka())) {
+                                    //Log.d("dadaj:2", String.valueOf(fav1));
+                                    favorite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+                                    oznacen_fav = true;
+                                }
                             }
                         }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.d("onCancelled:fav: ",databaseError.getMessage());
-                    }
-                });
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.d("onCancelled:fav: ", databaseError.getMessage());
+                        }
+                    });
+                }
                 postavi_podatke();
             }
             @Override
@@ -212,12 +209,61 @@ public class PrikazZiv extends Fragment {
         vrsta.setText(odabrana_ziv.getVrsta());
         opis.setText(odabrana_ziv.getOpis());
         starost.setText(odabrana_ziv.getGodine().toString()+" god");
+        created.setText("Dodan: " +odabrana_ziv.getDate());
+        last_updated.setText("Ažuriran: " +odabrana_ziv.getLast_date());
         inicijalizirajSlider();
+        email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getEmail();
+            }
+        });
 
     }
 
+    private void getEmail() {
+        //String email1;
+        mDatabaseRef=database.getReference("Sklonista");
+        mDatabaseRef.child(odabrana_ziv.getId_skl()).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("IntentReset")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Toast.makeText(getActivity(), dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+                sendEmail(dataSnapshot.getValue().toString());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getActivity(), "Greska s dohvacanjem emaila.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+    @SuppressLint("IntentReset")
+    private void sendEmail(String e) {
+        Log.i("Send email", "");
+        // String[] TO = {""};
+        // String[] CC = {""};
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+        Log.d("saljem",e);
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{e});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Upit vezan za ljubimca s oznakom "+odabrana_ziv.getOznaka()+" u skloništu.");
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            //finish();
+            Log.d("Finished sending emai.", "");
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(getActivity(), "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void inicijalizirajSlider() {
-        final SliderAdapterExample adapter= new SliderAdapterExample(getActivity());
+        final SliderAdapter adapter= new SliderAdapter(getActivity());
         adapter.setCount(slike.size());
         adapter.slike2(slike);
         sliderView1.setSliderAdapter(adapter);
@@ -230,20 +276,7 @@ public class PrikazZiv extends Fragment {
         sliderView1.setOnIndicatorClickListener(position -> sliderView1.setCurrentPagePosition(position));
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
 }
 
 

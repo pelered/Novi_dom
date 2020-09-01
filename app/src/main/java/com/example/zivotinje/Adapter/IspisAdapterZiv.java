@@ -32,6 +32,7 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
 
     @NonNull
     public IspisAdapterZiv.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //todo promjenit layout za zivotinje bas
         View v = LayoutInflater.from(mContext).inflate(R.layout.card_view_skl, parent, false);
         return new IspisAdapterZiv.ImageViewHolder(v);
     }

@@ -1,18 +1,27 @@
 package com.example.zivotinje;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -22,7 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.zivotinje.Adapter.PlaceAutoSuggestAdapter;
-import com.example.zivotinje.Model.Root;
+import com.example.zivotinje.Model.Skl;
 import com.google.android.gms.maps.model.LatLng;
 
 
@@ -32,26 +41,31 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.List;
 
-public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class RegistrationActivity extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private String TAG = "Tag";
 
     private Button gumb;
     private TextView naziv;
     private AppCompatCheckBox checkbox;
-    private EditText email,lozinka,potvrda;
+    private EditText email,lozinka,potvrda,broj;
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
     private AutoCompleteTextView autoCompleteTextView;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_registration, container, false);
+    }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration);
 
-        autoCompleteTextView=findViewById(R.id.autocomplete);
-        autoCompleteTextView.setAdapter(new PlaceAutoSuggestAdapter(RegistrationActivity.this,android.R.layout.simple_list_item_1));
-        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+        autoCompleteTextView=view.findViewById(R.id.autocomplete);
+        autoCompleteTextView.setAdapter(new PlaceAutoSuggestAdapter(getActivity(),android.R.layout.simple_list_item_1));
+        autoCompleteTextView.setOnItemClickListener((parent, vieww, position, id) -> {
             Log.d("Address : ",autoCompleteTextView.getText().toString());
             LatLng latLng=getLatLngFromAddress(autoCompleteTextView.getText().toString());
             if(latLng!=null) {
@@ -76,16 +90,17 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         });
 
 
-        gumb=findViewById(R.id.button2);
+        gumb=view.findViewById(R.id.button2);
         gumb.setOnClickListener(this);
 
 
         //
-        email=findViewById(R.id.email);
-        lozinka=findViewById(R.id.lozinka);
-        potvrda=findViewById(R.id.potvrdi);
-        checkbox = findViewById(R.id.checkbox);
-        naziv=findViewById(R.id.naziv);
+        email=view.findViewById(R.id.email_nav);
+        lozinka=view.findViewById(R.id.lozinka);
+        potvrda=view.findViewById(R.id.potvrdi);
+        checkbox = view.findViewById(R.id.checkbox);
+        naziv=view.findViewById(R.id.naziv);
+        broj=view.findViewById(R.id.broj_tel);
 
         checkbox.setOnCheckedChangeListener(this);
 
@@ -94,30 +109,33 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     }
     @Override
     public void onClick(View view) {
-        if(provjeri()){
+        if(provjeri() && prazno()){
             //Log.d("Naziv",skriven.getText().toString());
             try{
                 mAuth.createUserWithEmailAndPassword(email.getText().toString(), lozinka.getText().toString())
-                        .addOnCompleteListener(this, task -> {
+                        .addOnCompleteListener(getActivity(), task -> {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "createUserWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 assert user != null;
                                 updateUI(user);
-                                Root skl=new Root(user.getUid(),naziv.getText().toString(),autoCompleteTextView.getText().toString());
+                                Skl skl=new Skl(user.getUid(),naziv.getText().toString(),email.getText().toString(),autoCompleteTextView.getText().toString(), broj.getText().toString());
+                                database= FirebaseDatabase.getInstance();
                                 myRef = database.getReference("Sklonista");
                                 myRef.child(user.getUid()).setValue(skl);
+
 
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(RegistrationActivity.this, "Authentication failed.",
+                                Toast.makeText(getActivity(), "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
                                 //updateUI(null);
-                                Intent intent=new Intent(RegistrationActivity.this,RegistrationActivity.class);
-                                startActivity(intent);
-                                finish();
+                                FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+                                ft.replace(R.id.fragment_container, new RegistrationActivity());
+                                ft.addToBackStack("tag_reg");
+                                ft.commit();
 
                             }
                         });
@@ -128,7 +146,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     }
     private LatLng getLatLngFromAddress(String address){
 
-        Geocoder geocoder=new Geocoder(RegistrationActivity.this);
+        Geocoder geocoder=new Geocoder(getActivity());
         List<Address> addressList;
 
         try {
@@ -149,7 +167,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     }
 
     private Address getAddressFromLatLng(LatLng latLng){
-        Geocoder geocoder=new Geocoder(RegistrationActivity.this);
+        Geocoder geocoder=new Geocoder(getActivity());
         List<Address> addresses;
         try {
             addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 5);
@@ -178,9 +196,16 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             potvrda.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
         }
     }
+    private boolean prazno(){
+        if (TextUtils.isEmpty(email.getText().toString()) || TextUtils.isEmpty(broj.getText().toString()) || TextUtils.isEmpty(autoCompleteTextView.getText().toString()) || TextUtils.isEmpty(lozinka.getText().toString()) || TextUtils.isEmpty(naziv.getText().toString())){
+            Toast.makeText(getActivity(),"Sva polja moraju biti popunjena",Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
     public boolean provjeri(){
-        if(!(lozinka.getText().toString().equals(potvrda.getText().toString()))){
-            Toast.makeText(RegistrationActivity.this,"Lozinke nisu iste",Toast.LENGTH_LONG).show();
+        if(!(lozinka.getText().toString().trim().equals(potvrda.getText().toString().trim()))){
+            Toast.makeText(getActivity(),"Lozinke nisu iste",Toast.LENGTH_LONG).show();
             return false;
         }else{
             return true;
@@ -195,19 +220,21 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         }
         String email=user.getEmail();
         String uid=user.getUid();
-        SharedPreferences prefs = getSharedPreferences("shared_pref_name", MODE_PRIVATE);
+        SharedPreferences prefs = requireContext().getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("email",email);
         editor.putString("username", username);
         editor.putString("uid",uid);
+        editor.putString("add",autoCompleteTextView.getText().toString());
+        editor.putString("broj",broj.getText().toString());
         editor.putBoolean("hasLogin",true);
+        editor.putBoolean("skl",true);
         editor.apply();
+        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, new ProfileActivity());
+        ft.addToBackStack("tag_reg");
+        ft.commit();
         //image with glide
-        Intent intent=new Intent(this,ProfileActivity.class);
-        intent.putExtra("username",username);
-        intent.putExtra("email",email);
-        intent.putExtra("uid",uid);
-        startActivity(intent);
-        finish();
+
     }
 }

@@ -59,6 +59,7 @@
         android:layout_marginTop="258dp"
         android:layout_marginRight="103dp"
         android:text="Skloništa"
+        android:gravity="center"
         android:textSize="30sp"
         android:textStyle="italic">
 
@@ -126,6 +127,19 @@
         android:layout_marginRight="148dp"
         android:layout_marginBottom="265dp"
         android:text="Pokaži lozinku" />
+
+    <TextView
+        android:id="@+id/lozinka_reset"
+        android:layout_width="177dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="105dp"
+        android:layout_marginTop="536dp"
+        android:layout_marginEnd="129dp"
+        android:gravity="center"
+        android:text="Zaboravili ste lozinku" />
 
 
 </RelativeLayout>

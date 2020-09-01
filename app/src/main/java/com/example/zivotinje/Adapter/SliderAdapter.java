@@ -6,8 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -18,13 +19,12 @@ import com.smarteist.autoimageslider.SliderViewAdapter;
 
 import java.util.ArrayList;
 
-public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample.SliderAdapterVH> {
+public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapterVH> {
     private Context context;
     private int mCount;
-    private int pos2;
     private ArrayList<String> path2;
     private ArrayList<Uri> path;
-    public SliderAdapterExample(FragmentActivity context) {
+    public SliderAdapter(FragmentActivity context) {
 
         this.context = context;
     }
@@ -54,11 +54,9 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
     }
     public void addItem(ArrayList<String> list,int position) {
         this.path2.removeAll(list);
-        this.path2.addAll(position,list);
+        this.path2.addAll(position+1,list);
         setCount(path2.size());
         notifyDataSetChanged();
-
-
     }
     public ArrayList<String> getList(){
         return path2;
@@ -67,33 +65,49 @@ public class SliderAdapterExample extends SliderViewAdapter<SliderAdapterExample
         return path2.get(position);
     }
     //ovo je slike uzete s mobitela
-    public void slike(ArrayList<Uri> path){
+    /*public void slike(ArrayList<Uri> path){
         this.path=path;
-    }
+    }*/
     public void slike2(ArrayList<String> slike2) {
         this.path2=slike2;
     }
-    //velicina polja slika
-    public void broj(int pos2){
-        this.pos2=pos2;
-    }
+
     public void onBindViewHolder(SliderAdapterVH viewHolder, final int position) {
         String link2= path2.get(position);
-        Glide.with(viewHolder.itemView)
-                .load(link2)
-                .fitCenter()
-                .centerInside()
-                .into(viewHolder.imageViewBackground);
-        viewHolder.itemView.setOnClickListener(v -> Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show());
+        if(link2.contains("mp4")) {
+            viewHolder.imageViewBackground.setVisibility(View.INVISIBLE);
+            viewHolder.videoViewBackground.setVisibility(View.VISIBLE);
+
+            viewHolder.videoViewBackground.setVideoPath(link2);
+            //viewHolder.videoViewBackground.seekTo(1);
+            viewHolder.controller.show();
+        }else{
+            viewHolder.controller.hide();
+            viewHolder.videoViewBackground.stopPlayback();
+            viewHolder.videoViewBackground.setVisibility(View.INVISIBLE);
+            viewHolder.imageViewBackground.setVisibility(View.VISIBLE);
+            Glide.with(viewHolder.itemView)
+                    .load(link2)
+                    .fitCenter()
+                    .centerInside()
+                    .into(viewHolder.imageViewBackground);
+        }
+        //viewHolder.itemView.setOnClickListener(v -> Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show());
     }
     class SliderAdapterVH extends SliderViewAdapter.ViewHolder {
         View itemView;
         ImageView imageViewBackground;
         TextView textViewDescription;
+        VideoView videoViewBackground;
+        MediaController controller;
         public SliderAdapterVH(View itemView) {
             super(itemView);
             imageViewBackground = itemView.findViewById(R.id.iv_auto_image_slider);
             textViewDescription = itemView.findViewById(R.id.tv_auto_image_slider);
+            videoViewBackground=itemView.findViewById(R.id.iv_auto_video_slider);
+            controller=new MediaController(context);
+            videoViewBackground.setMediaController(controller);
+
             this.itemView = itemView;
         }
     }

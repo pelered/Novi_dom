@@ -8,78 +8,76 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.cardview.widget.CardView
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="297dp"
-            android:layout_margin="5dp"
-            app:cardCornerRadius="2dp">
+            android:layout_height="wrap_content">
 
-
-            <com.smarteist.autoimageslider.SliderView
-                android:id="@+id/imageSlider"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="297dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="0dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginEnd="0dp"
-                android:layout_marginRight="0dp"
-                app:sliderAnimationDuration="600"
-                app:sliderAutoCycleDirection="back_and_forth"
-                app:sliderAutoCycleEnabled="true"
-
-                app:sliderIndicatorAnimationDuration="600"
-                app:sliderIndicatorGravity="center_horizontal|bottom"
-                app:sliderIndicatorMargin="15dp"
-                app:sliderIndicatorOrientation="horizontal"
-                app:sliderIndicatorPadding="3dp"
-                app:sliderIndicatorRadius="2dp"
-                app:sliderIndicatorSelectedColor="#5A5A5A"
-                app:sliderIndicatorUnselectedColor="#FFF"
-                app:sliderScrollTimeInSec="1"
-                app:sliderStartAutoCycle="true">
+                android:layout_margin="5dp"
+                app:cardCornerRadius="2dp">
 
 
-                <Button
-                    android:id="@+id/button_choose_image"
-                    android:layout_width="170dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="115dp"
-                    android:layout_marginTop="107dp"
-                    android:layout_marginEnd="126dp"
-                    android:background="@android:color/transparent"
-                    android:text="@string/odaberi_slike" />
+                <com.smarteist.autoimageslider.SliderView
+                    android:id="@+id/imageSlider"
+                    android:layout_width="match_parent"
+                    android:layout_height="297dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginRight="0dp"
+                    app:sliderAnimationDuration="600"
+                    app:sliderAutoCycleDirection="back_and_forth"
+                    app:sliderAutoCycleEnabled="true"
 
-                <TextView
-                    android:id="@+id/obrisi_sliku"
-                    android:layout_width="118dp"
-                    android:layout_height="52dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center"
-                    android:text="@string/obrisi_slik"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
-
-            </com.smarteist.autoimageslider.SliderView>
-        </androidx.cardview.widget.CardView>
+                    app:sliderIndicatorAnimationDuration="600"
+                    app:sliderIndicatorGravity="center_horizontal|bottom"
+                    app:sliderIndicatorMargin="15dp"
+                    app:sliderIndicatorOrientation="horizontal"
+                    app:sliderIndicatorPadding="3dp"
+                    app:sliderIndicatorRadius="2dp"
+                    app:sliderIndicatorSelectedColor="#5A5A5A"
+                    app:sliderIndicatorUnselectedColor="#FFF"
+                    app:sliderScrollTimeInSec="1"
+                    app:sliderStartAutoCycle="true">
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+                    <Button
+                        android:id="@+id/button_choose_image"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="115dp"
+                        android:layout_marginTop="107dp"
+                        android:layout_marginEnd="126dp"
+                        android:background="@android:color/transparent"
+                        android:text="@string/odaberi_slike" />
+
+                    <TextView
+                        android:id="@+id/obrisi_sliku"
+                        android:layout_width="118dp"
+                        android:layout_height="52dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:text="@string/obrisi_slik"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+
+                </com.smarteist.autoimageslider.SliderView>
+            </androidx.cardview.widget.CardView>
+
+
 
             <Button
                 android:id="@+id/edit_skl_spremi"
                 android:layout_width="144dp"
                 android:layout_height="38dp"
-                android:layout_marginStart="264dp"
-                android:layout_marginTop="300dp"
-                android:layout_marginEnd="3dp"
+
                 android:text="@string/upload" />
 
             <EditText
@@ -106,12 +104,20 @@
                 android:hint="@string/email"
                 android:inputType="textEmailAddress" />
 
+            <EditText
+                android:id="@+id/broj_tel_edit"
+                android:layout_width="match_parent"
+                android:layout_height="37dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:hint="@string/broj_telefona" />
+
             <AutoCompleteTextView
                 android:id="@+id/autocomplete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/adresa"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:hint="@string/adresa" />
 
             <EditText
 
@@ -125,51 +131,21 @@
                 android:hint="@string/opis"
                 android:inputType="textMultiLine"
                 android:scrollbars="vertical" />
-        </LinearLayout>
 
+
+        </LinearLayout>
         <ProgressBar
             android:id="@+id/progress_bar"
-            android:layout_width="71dp"
-            android:layout_height="wrap_content"
+            android:layout_width="122dp"
+            android:layout_height="76dp"
+
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginStart="150dp"
+            android:layout_marginStart="144dp"
             android:layout_marginTop="200dp"
-            android:layout_marginEnd="150dp"
-             />
+            android:layout_marginEnd="145dp" />
 
-
-        <!--
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="383dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginRight="0dp"
-            android:background="@null"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <fragment
-                android:id="@+id/autocomplete_fragment"
-                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null"
-                />
-        </androidx.cardview.widget.CardView>
--->
 
     </RelativeLayout>
-
 </ScrollView>
