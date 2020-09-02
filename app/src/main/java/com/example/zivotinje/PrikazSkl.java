@@ -44,7 +44,7 @@ public class PrikazSkl extends Fragment implements Serializable {
     private SliderAdapter adapter;
 
     private ArrayList<String> slike2=new ArrayList<>();
-    private ImageView salji,edit,zovi;
+    private ImageView edit;
     private String value;
     private Skl odabrano_skl;
     private Button ispis_ziv,dodaj;
@@ -69,9 +69,7 @@ public class PrikazSkl extends Fragment implements Serializable {
         dodaj=view.findViewById(R.id.dodaj);
         broj=view.findViewById(R.id.broj_tel_pri);
         //Bundle bundle = this.getArguments();
-        salji=view.findViewById(R.id.salji);
         edit=view.findViewById(R.id.edit_mode);
-        zovi=view.findViewById(R.id.zovi_skl);
         ispis_ziv=view.findViewById(R.id.ispis_zv);
         SharedPreferences prefs =getContext().getSharedPreferences("shared_pref_name", getContext().MODE_PRIVATE);
 
@@ -91,7 +89,6 @@ public class PrikazSkl extends Fragment implements Serializable {
         EditZiv fragment2 =new EditZiv();
         FragmentManager fragmentManager = getFragmentManager();
         Bundle args = new Bundle();
-        //Todo mozda promijeniti da id gleda iz sharedpref,jer ponekad je prespor pa izbaci iz app
         args.putString("id_skl_prikaz", odabrano_skl.getId());
         fragment2.setArguments(args);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -106,6 +103,8 @@ public class PrikazSkl extends Fragment implements Serializable {
             FragmentManager fragmentManager = getFragmentManager();
             Bundle args = new Bundle();
             args.putString("id_skl", odabrano_skl.getId());
+            args.putString("id_skl", odabrano_skl.getId());
+
             fragment2.setArguments(args);
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, fragment2);
@@ -181,9 +180,9 @@ public class PrikazSkl extends Fragment implements Serializable {
                     }
                 });
                 //@Override
-                salji.setOnClickListener(v -> sendEmail());
+                email1.setOnClickListener(v -> sendEmail());
                 edit.setOnClickListener(v -> edit());
-                zovi.setOnClickListener(v -> zovi());
+                broj.setOnClickListener(v -> zovi());
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {

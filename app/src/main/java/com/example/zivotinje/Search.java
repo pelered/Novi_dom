@@ -3,9 +3,11 @@ package com.example.zivotinje;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +32,12 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Search extends Fragment {
-    private AutoCompleteTextView idpasmina;
-    private AutoCompletePasminaAdapter ispis_pasmina;
+    private AutoCompleteTextView idpasmina,id_sklonista;
+    private AutoCompletePasminaAdapter ispis_pasmina,ispis_skl;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseRef;
-    private ArrayList<PasminaItem> pasmine,sve_pasmine;
-    private EditText idskl,idtezina,idstarost,idoznaka;
+    private ArrayList<PasminaItem> pasmine,sklonista;
+    private EditText idtezina,idstarost,idoznaka;
     private RadioGroup vrsta, spol, status;
     private RadioButton idvrsta,idspol,idstatus;
     private ImageButton search,refresh;
@@ -46,7 +48,7 @@ public class Search extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        idskl=view.findViewById(R.id.idskl);
+        id_sklonista=view.findViewById(R.id.idskl);
         idpasmina=view.findViewById(R.id.idpasmina);
         idoznaka=view.findViewById(R.id.idoznaka);
         idtezina=view.findViewById(R.id.idtezina);
@@ -57,8 +59,9 @@ public class Search extends Fragment {
         search=view.findViewById(R.id.idsearch);
         refresh=view.findViewById(R.id.refresh_s);
         ucitaj_pasmine();
+        ucitaj_skl();
         refresh.setOnClickListener(v -> {
-            idskl.getText().clear();
+            id_sklonista.getText().clear();
             idpasmina.getText().clear();
             idtezina.getText().clear();
             idstarost.getText().clear();
@@ -74,44 +77,81 @@ public class Search extends Fragment {
             if(vrsta.getCheckedRadioButtonId()!=-1){
                 idvrsta =view.findViewById(vrsta.getCheckedRadioButtonId());
                 args.putString("vrsta", idvrsta.getText().toString());
+                //Log.d("Search():",idvrsta.getText().toString());
             }
             if(status.getCheckedRadioButtonId()!=-1){
                 idstatus=view.findViewById(status.getCheckedRadioButtonId());
                 args.putString("status",  idstatus.getText().toString());
+                //Log.d("Search()2:",idstatus.getText().toString());
+
             }
             if(spol.getCheckedRadioButtonId()!=-1){
                 idspol=view.findViewById(spol.getCheckedRadioButtonId());
                 args.putString("spol", idspol.getText().toString());
+                //Log.d("Search()3:",idspol.getText().toString());
+
             }
-            if (!TextUtils.isEmpty(idoznaka.getText().toString())){
-                args.putString("grad",idoznaka.getText().toString());
-            }
-            if (!TextUtils.isEmpty(idpasmina.getText().toString())){
-                args.putString("zup",idpasmina.getText().toString() );
-            }
+
             if (!TextUtils.isEmpty(idstarost.getText().toString())){
                 args.putFloat("starost", Float.parseFloat(String.valueOf(idstarost.getText())));
-            }
-            if (!TextUtils.isEmpty(idtezina.getText().toString())){
-                args.putFloat("tezina", Float.parseFloat(idtezina.getText().toString()));
-            }
+                //Log.d("Search()4:",idstarost.getText().toString());
 
+            }
+          if (!TextUtils.isEmpty(idpasmina.getText().toString())){
+                args.putString("pasmina", idpasmina.getText().toString());
+              //Log.d("Search()5:",idpasmina.getText().toString());
+               }
+
+            if(!id_sklonista.getText().toString().equals("")){
+                args.putString("skl", id_sklonista.getText().toString());
+                //Log.d("Search()6:",idskl.getText().toString());
+
+            }
             if(!idtezina.getText().toString().equals("")){
-                args.putFloat("tezina", Float.parseFloat(idtezina.getText().toString()));
+                args.putFloat("tezina", Float.parseFloat(String.valueOf(idtezina.getText())));
+               // Log.d("Search()7:",idstarost.getText().toString());
+
             }
-            if(!idstarost.getText().toString().equals("")){
-                args.putFloat("starost", Float.parseFloat(String.valueOf(idstarost.getText())));
+            if (!TextUtils.isEmpty(idoznaka.getText().toString())){
+                args.putString("pasmina", idoznaka.getText().toString());
+                //Log.d("Search()8:",idoznaka.getText().toString());
             }
 
-            Toast.makeText(getActivity(),"",Toast.LENGTH_SHORT).show();
-            /*
+
             fragment.setArguments(args);
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, fragment);
             ft.addToBackStack("tag_search");
-            ft.commit();*/
+            ft.commit();
         });
     }
+
+    private void ucitaj_skl() {
+        sklonista=new ArrayList<>();
+        database= FirebaseDatabase.getInstance();
+        mDatabaseRef = database.getReference("Sklonista");
+        mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//
+                    Log.d("ucitaj_skl()0",postSnapshot.child("naziv").getValue().toString());
+                    sklonista.add(new PasminaItem(postSnapshot.child("naziv").getValue().toString()));
+
+                }
+                ispis_skl = new AutoCompletePasminaAdapter(Objects.requireNonNull(getContext()), sklonista);
+                id_sklonista.setAdapter(ispis_skl);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void ucitaj_pasmine() {
         pasmine=new ArrayList<>();
         database= FirebaseDatabase.getInstance();
@@ -123,9 +163,10 @@ public class Search extends Fragment {
                   assert privremeno != null;
                 if(privremeno!=null) {
                     for (Map.Entry<String, String> entry : privremeno.entrySet()) {
+                        Log.d("ucitaj_pasmine()",entry.getValue());
                         pasmine.add(new PasminaItem(entry.getValue()));
+                        Log.d("ucitaj_pasmine()2",pasmine.toString());
                     }
-                    sve_pasmine=new ArrayList<>(pasmine);
                     ispis_pasmina = new AutoCompletePasminaAdapter(Objects.requireNonNull(getContext()), pasmine);
                     idpasmina.setAdapter(ispis_pasmina);
                 }

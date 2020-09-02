@@ -1,5 +1,6 @@
 package com.example.zivotinje.Tab;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -68,31 +69,43 @@ public class FavFragment extends Fragment {
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MySwipeHelper.MyButton> buffer) {
                 buffer.add(new MyButton(requireContext(),"Delete",30,R.drawable.ic_delete_black, Color.parseColor("#FFFFFF"),
                         pos -> {
-                            String key= null;
-                            //Log.d("delete:",fav1.toString());
-                            for(Map.Entry<String, String> entry :fav1.getFav().entrySet()){
-                                //Log.d("delete1:",entry.getValue());
-                                if(adapter.getItem(pos).getOznaka().equals(entry.getValue())){
-                                    //Log.d("delete2:",entry.getKey());
-                                    key = entry.getKey();
-                                    break; //breaking because its one to one map
-                                }
-                            }
-                            Toast.makeText(getContext(),"Delete",Toast.LENGTH_SHORT).show();
-                            DatabaseReference ref= FirebaseDatabase.getInstance().getReference("Fav");
-                            //Log.d("delete3:",ref.toString());
-                            String finalKey = key;
-                            ref.child(uid).child("fav").child(key).removeValue((databaseError, databaseReference) -> {
-                                adapter.removeItem(pos);
-                                fav1.getFav().remove(finalKey);
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("Obavijest o brisanju praćenog ljubimca");
+                            builder.setMessage("Želite prestati pratiti ovog ljubimca");
+                            builder.setCancelable(false);
+                            builder.setPositiveButton("Da", (dialog, which) -> {
+                                Toast.makeText(getContext(), "Ljubimac će biti izbrisan", Toast.LENGTH_SHORT).show();
+                                birisi_pracenu_ziv(pos);
                             });
-                            //Log.d("KliK: ", adapter.getItem(pos).getOznaka().toString());
+                            builder.setNegativeButton("Ne", (dialog, which) -> Toast.makeText(getContext(), "Promijeniti oznaku", Toast.LENGTH_SHORT).show());
+                            builder.show();
+
                         }));
             }
         };
         generateItem();
 
 
+    }
+    private void birisi_pracenu_ziv(int pos){
+        String key= null;
+        //Log.d("delete:",fav1.toString());
+        for(Map.Entry<String, String> entry :fav1.getFav().entrySet()){
+            //Log.d("delete1:",entry.getValue());
+            if(adapter.getItem(pos).getOznaka().equals(entry.getValue())){
+                //Log.d("delete2:",entry.getKey());
+                key = entry.getKey();
+                break; //breaking because its one to one map
+            }
+        }
+        Toast.makeText(getContext(),"Delete",Toast.LENGTH_SHORT).show();
+        DatabaseReference ref= FirebaseDatabase.getInstance().getReference("Fav");
+        //Log.d("delete3:",ref.toString());
+        String finalKey = key;
+        ref.child(uid).child("fav").child(key).removeValue((databaseError, databaseReference) -> {
+            adapter.removeItem(pos);
+            fav1.getFav().remove(finalKey);
+        });
     }
     private void generateItem() {
         DatabaseReference ref= FirebaseDatabase.getInstance().getReference("Fav").child(uid);

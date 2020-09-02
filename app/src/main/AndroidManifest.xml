@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.zivotinje">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -18,14 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ResetPasword"></activity>
-
-        <service android:name=".Service.MyService" />
-
+        <service android:name=".Service.Service" />
         <activity android:name=".SearchIspis" />
         <activity android:name=".Search" />
         <activity android:name=".PrikazZiv" />
         <activity android:name=".IspisZiv" />
-        <activity android:name=".Ispis" />
+        <activity android:name=".IspisSkl" />
         <activity android:name=".EditZiv" />
         <activity android:name=".PrikazSkl" />
         <activity android:name=".Adapter.SliderAdapter" />

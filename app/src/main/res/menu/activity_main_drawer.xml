@@ -18,6 +18,11 @@
             android:id="@+id/nav_popis_skl"
             android:icon="@drawable/ic_baseline_list_24"
             android:title="Ispis skloništa" />
+        <item
+            android:id="@+id/nav_dodaj_ziv"
+            android:icon="@drawable/ic_add_"
+            android:title="Dodaj novog ljubimca"
+            android:visible="false"/>
     </group>
 
 

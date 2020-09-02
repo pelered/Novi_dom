@@ -37,13 +37,15 @@
             android:orientation="vertical">
 
             <EditText
+                android:drawableLeft="@drawable/ic_profile"
+                android:drawablePadding="4dp"
                 android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:focusable="false"
-                android:hint="Ime i prezime"
+                android:hint="@string/ime_i_prezime"
                 android:inputType="textPersonName"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -58,8 +60,10 @@
                     android:layout_height="wrap_content"
                     android:focusable="false"
                     android:hint="@string/email"
+                    android:drawablePadding="4dp"
+                    android:drawableLeft="@drawable/ic_envelope"
                     android:inputType="textEmailAddress"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -85,7 +89,7 @@
                 android:layout_width="25dp"
                 android:layout_height="26dp"
                 android:layout_gravity="top|end"
-                android:background="@drawable/buttona"
+                android:background="@color/transparent"
                 android:gravity="top|end"
                 android:src="@drawable/ic_mode_edit"
                 android:textSize="15sp"
@@ -97,9 +101,12 @@
                 android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Ažuriraj"
+                style="?attr/materialButtonOutlinedStyle"
+
+                android:text="@string/a_uriraj"
                 android:textSize="10sp"
-                android:textStyle="normal" />
+                android:textStyle="normal"
+                tools:ignore="SmallSp" />
 
         </LinearLayout>
 

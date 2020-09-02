@@ -42,6 +42,7 @@ public class IspisZiv extends Fragment {
     private ProgressBar mProgressCircle;
     private List<ZivUpload> mUploads;
     private DatabaseReference mDatabaseRef;
+    private boolean vlasnik=false;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_ispis, container, false);
@@ -65,8 +66,8 @@ public class IspisZiv extends Fragment {
 
         SharedPreferences prefs =getContext().getSharedPreferences("shared_pref_name", getContext().MODE_PRIVATE);
 
-        Log.d("IspisZiv:", String.valueOf(prefs.getBoolean("skl",false)));
-        if(prefs.getBoolean("skl",false)){
+        //Log.d("IspisZiv:", String.valueOf(prefs.getBoolean("skl",false)));
+        if(prefs.getBoolean("skl",false)&&(prefs.getString("uid","").equals(id_skl))){
             postavi_swiper();
         }
 
@@ -78,17 +79,17 @@ public class IspisZiv extends Fragment {
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MySwipeHelper.MyButton> buffer) {
                 buffer.add(new MyButton(Objects.requireNonNull(getContext()),"Izbriši",30,R.drawable.ic_delete_black, Color.parseColor("#FFFFFF"),
                         pos -> {
-                            Toast.makeText(getActivity(),"Delete click",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getActivity(),"Delete click",Toast.LENGTH_SHORT).show();
                             Log.d("KliK: ", String.valueOf(pos));
                             final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("Potvrda za brisanje");
                             builder.setMessage("Sigurno želite obrisati?");
                             builder.setCancelable(false);
-                            builder.setPositiveButton("Yes", (dialog, which) -> {
-                                Toast.makeText(getContext(), "You've choosen to delete all records", Toast.LENGTH_SHORT).show();
+                            builder.setPositiveButton("Da", (dialog, which) -> {
+                                Toast.makeText(getContext(), "Podaci će se izbrisati", Toast.LENGTH_SHORT).show();
                                 obrisi_ziv(pos);
                             });
-                            builder.setNegativeButton("No", (dialog, which) -> Toast.makeText(getContext(), "Neće se obrisati", Toast.LENGTH_SHORT).show());
+                            builder.setNegativeButton("Ne", (dialog, which) -> Toast.makeText(getContext(), "Neće se obrisati", Toast.LENGTH_SHORT).show());
                             builder.show();
 
                         }));

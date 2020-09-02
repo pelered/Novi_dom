@@ -34,7 +34,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.zivotinje.Adapter.ViewPagerAdapter;
 import com.example.zivotinje.Model.User;
-import com.example.zivotinje.Service.MyService;
+import com.example.zivotinje.Service.Service;
 import com.example.zivotinje.Tab.FavFragment;
 import com.facebook.login.LoginFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -88,7 +88,7 @@ public class ProfileActivity extends Fragment implements View.OnClickListener {
 
 
     Intent mTimerServiceIntent;
-    private MyService mService;
+    private Service mService;
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_profile,container,false);
     }
@@ -109,7 +109,7 @@ public class ProfileActivity extends Fragment implements View.OnClickListener {
         aSwitch=view.findViewById(R.id.prati_not);
         ///
         System.out.println("****** [MainActivity] onCreate: initializing service intent...");
-        mService = new MyService();
+        mService = new Service();
         mTimerServiceIntent = new Intent(getActivity(), mService.getClass());
         if(getArguments()==null){
             //ne dolazimo s stranice zivotinje, ali smo registrirani,prikazi nam nas profil
@@ -391,7 +391,7 @@ public class ProfileActivity extends Fragment implements View.OnClickListener {
             editor.putString("url",url);
             editor.putBoolean("hasLogin",true);
             editor.apply();
-
+//todo ako je skl dodaj skl-true,dodaj i da sprema i u skl
             NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
             View headerView = navigationView.getHeaderView(0);
             ime_nav=headerView.findViewById(R.id.ime_nav);
@@ -448,5 +448,12 @@ public class ProfileActivity extends Fragment implements View.OnClickListener {
                 }
             }
         }
+    }
+    @Override
+    public void onDestroy() {
+        getActivity().stopService(mTimerServiceIntent);
+        Log.i("MAINACT", "onDestroy!");
+        super.onDestroy();
+
     }
 }

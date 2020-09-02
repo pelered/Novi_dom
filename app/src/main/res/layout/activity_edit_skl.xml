@@ -48,22 +48,31 @@
 
 
                     <Button
+                        android:textColor="#000000"
+
                         android:id="@+id/button_choose_image"
+                        style="?attr/materialButtonOutlinedStyle"
                         android:layout_width="170dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="37dp"
                         android:layout_marginStart="115dp"
                         android:layout_marginTop="107dp"
                         android:layout_marginEnd="126dp"
+                        android:textStyle="bold"
+
                         android:background="@android:color/transparent"
                         android:text="@string/odaberi_slike" />
 
                     <TextView
+                        android:textColor="#000000"
+
                         android:id="@+id/obrisi_sliku"
-                        android:layout_width="118dp"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
                         android:layout_height="52dp"
                         android:background="@android:color/transparent"
                         android:gravity="center"
                         android:text="@string/obrisi_slik"
+
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:visibility="visible" />
@@ -77,47 +86,94 @@
                 android:id="@+id/edit_skl_spremi"
                 android:layout_width="144dp"
                 android:layout_height="38dp"
+                style="?attr/materialButtonOutlinedStyle"
 
-                android:text="@string/upload" />
+                android:text="@string/spremi" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/naziv_sklonista"
+                app:endIconMode="clear_text"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <EditText
                 android:id="@+id/naziv_sk"
-                android:layout_width="match_parent"
+                android:layout_width="308dp"
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:background="@null"
                 android:gravity="center"
-                android:hint="@string/naziv_sklonista"
                 android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/email"
+                app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/ic_envelope"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <EditText
                 android:id="@+id/email_skl"
-                android:layout_width="match_parent"
+                android:layout_width="308dp"
                 android:layout_height="36dp"
 
-
-                android:layout_marginTop="-5dp"
-
+android:paddingTop="10dp"
+android:paddingBottom="10dp"
                 android:autofillHints=""
                 android:background="@null"
                 android:gravity="center"
-                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/broj_telefona"
+                app:startIconDrawable="@drawable/ic_phone"
+                app:endIconMode="clear_text"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <EditText
                 android:id="@+id/broj_tel_edit"
-                android:layout_width="match_parent"
-                android:layout_height="37dp"
-                android:gravity="center"
-                android:inputType="number"
-                android:hint="@string/broj_telefona" />
-
-            <AutoCompleteTextView
-                android:id="@+id/autocomplete"
-                android:layout_width="match_parent"
+                android:layout_width="308dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:hint="@string/adresa" />
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:inputType="number" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/adresa"
+                app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/ic_baseline_location_on"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+               <com.google.android.material.textview.MaterialAutoCompleteTextView
+
+                android:id="@+id/autocomplete"
+                android:layout_width="308dp"
+                   android:paddingTop="10dp"
+                   android:paddingBottom="10dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/opis"
+                app:endIconMode="clear_text"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <EditText
 
@@ -128,11 +184,10 @@
                 android:autofillHints=""
                 android:background="@null"
                 android:gravity="center"
-                android:hint="@string/opis"
                 android:inputType="textMultiLine"
                 android:scrollbars="vertical" />
 
-
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
         <ProgressBar
             android:id="@+id/progress_bar"

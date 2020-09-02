@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.zivotinje.Model.ZivUpload;
+import com.example.zivotinje.PrikazZiv;
 import com.example.zivotinje.R;
 
 
@@ -49,8 +50,11 @@ public class ProfileMyAdapter extends RecyclerView.Adapter<ProfileMyAdapter.MyVi
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         //Log.d("ProfileMy:",itemList.toString());
-        holder.status_ziv.setText("Status: "+itemList.get(position).getStatus());
-        holder.ime_ziv.setText("Ime: "+itemList.get(position).getNaziv());
+        holder.status_ziv.setText(itemList.get(position).getStatus());
+        holder.ime_ziv.setText(itemList.get(position).getNaziv());
+        holder.skl.setText(itemList.get(position).getNaz_skl());
+        holder.izmjena.setText(itemList.get(position).getLast_date());
+
         //holder.grad.setText("Grad: " +itemList.get(position).getGrad());
         if(itemList.get(position).getUrl()!=null){
             Glide.with(context)
@@ -63,14 +67,14 @@ public class ProfileMyAdapter extends RecyclerView.Adapter<ProfileMyAdapter.MyVi
 
         holder.itemView.setOnClickListener(v ->{
             final int random = new Random().nextInt(100);
-           /* PrikazZivFragment fragment=new PrikazZivFragment();
+           PrikazZiv fragment=new PrikazZiv();
             Bundle args = new Bundle();
-            args.putString("oznaka", itemList.get(position).getKey());
+            args.putString("oznaka", itemList.get(position).getOznaka());
             fragment.setArguments(args);
             FragmentTransaction ft =((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.nav_host_fragment, fragment);
+            ft.replace(R.id.fragment_container, fragment);
             ft.addToBackStack("tag_profil_ispis"+random);
-            ft.commit();*/
+            ft.commit();
             //Toast.makeText(context, "This is item in position " + position, Toast.LENGTH_SHORT).show();
         });
     }
@@ -80,11 +84,14 @@ public class ProfileMyAdapter extends RecyclerView.Adapter<ProfileMyAdapter.MyVi
         return itemList.size();
     }
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView ime_ziv, status_ziv;
+        TextView ime_ziv, status_ziv,skl,izmjena;
         ImageView slika_ziv;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            izmjena= itemView.findViewById(R.id.izmjena);
+            skl= itemView.findViewById(R.id.card_grad);
+
             slika_ziv =itemView.findViewById(R.id.image_view_upload);
             ime_ziv =itemView.findViewById(R.id.textView_name);
             status_ziv =itemView.findViewById(R.id.card_grad);

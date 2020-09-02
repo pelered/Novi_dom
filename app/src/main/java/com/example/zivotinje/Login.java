@@ -200,6 +200,8 @@ public class Login extends Fragment implements View.OnClickListener, CompoundBut
             MenuItem item ;
             item =menu.findItem(R.id.nav_profil);
             item.setVisible(true);
+            item =menu.findItem(R.id.nav_dodaj_ziv);
+            item.setVisible(true);
 
             //image with glide
 
@@ -312,8 +314,12 @@ public class Login extends Fragment implements View.OnClickListener, CompoundBut
         if(view.equals(googlebtn)){
             signIn();
         }else if(view.equals(reg_skl)){
-            Intent intent=new Intent(getActivity(),RegistrationActivity.class);
-            startActivity(intent);
+            RegistrationActivity fragment2 = new RegistrationActivity();
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, fragment2);
+            fragmentTransaction.addToBackStack("tag_login");
+            fragmentTransaction.commit();
             //finish();
         }else if(view.equals(log_skl)){
             if(!(email.getText().toString().trim().equals("")) && !(lozinka.getText().toString().trim().equals(""))){

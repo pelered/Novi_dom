@@ -39,6 +39,7 @@ public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHol
     public void onBindViewHolder(@NonNull final ImageViewHolder holder, final int position) {
         final Skl uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getNaziv());
+        holder.add.setText(uploadCurrent.getAdresa());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,11 +70,12 @@ public class IspisAdapter extends RecyclerView.Adapter<IspisAdapter.ImageViewHol
         return mUploads.size();
     }
     public class ImageViewHolder extends RecyclerView.ViewHolder {
-        public TextView textViewName;
+        public TextView textViewName,add;
         public ImageView imageView;
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.textView_name);
+            add= itemView.findViewById(R.id.card_add);
             imageView = itemView.findViewById(R.id.image_view_upload);
         }
     }

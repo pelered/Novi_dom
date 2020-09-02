@@ -24,7 +24,6 @@
     <string name="google_api">AIzaSyAyVddfVCAcVub30s1xsJLiaRCMx70EbtA</string>
     <string name="odaberi_slike">Odaberi slike</string>
     <string name="obrisi_slik">Obrisi sliku</string>
-    <string name="email">Email</string>
     <string name="naziv_sklonista">Naziv sklonista</string>
     <string name="adresa">Adresa</string>
     <string name="naziv_skloni_ta">Naziv skloništa</string>
@@ -52,17 +51,30 @@
     <string name="god">god</string>
     <string name="mjeseci">Mjeseci</string>
     <string name="mj">mj</string>
-    <string name="te_ina">Težina</string>
+    <string name="te_ina">Težina(kg)</string>
     <string name="kg">kg</string>
     <string name="gram">gram</string>
     <string name="g">g</string>
     <string name="log_in">Log in</string>
-    <string name="starost_do">Starost do:</string>
+    <string name="starost_do">Starost(god) do:</string>
     <string name="pretra_i">Pretraži</string>
     <string name="oznaka_u_skloni_tu">Oznaka u skloništu</string>
-    <string name="te_ina_do">Težina do:</string>
+    <string name="te_ina_do">Težina(kg) do:</string>
     <string name="ma_ka">Macka</string>
     <string name="resetiraj_lozinku">Resetiraj lozinku</string>
     <string name="broj_telefona">Broj telefona</string>
+    <string name="registracija_skloni_ta">Registracija skloništa</string>
+    <string name="korisnik">Korisnik</string>
+    <string name="email">Email</string>
+    <string name="ukratko_o_skloni_tu">Ukratko o skloništu</string>
+    <string name="ne_to_o_nama">Nešto o nama:</string>
+    <string name="spremi">Spremi</string>
+    <string name="a_uriraj">Ažuriraj</string>
+    <string name="ime_i_prezime">Ime i prezime</string>
+    <string name="video">Video</string>
+    <string name="slike">Slike</string>
+    <string name="skloni_te">Sklonište</string>
+    <string name="izmjena">Izmjena</string>
+    <string name="status_">Status</string>
 
 </resources>

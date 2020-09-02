@@ -20,6 +20,8 @@ import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
@@ -35,23 +37,24 @@ import com.example.zivotinje.Model.Skl;
 import com.google.android.gms.maps.model.LatLng;
 
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.List;
 
-public class RegistrationActivity extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class RegistrationActivity extends Fragment implements View.OnClickListener {
     private String TAG = "Tag";
 
     private Button gumb;
     private TextView naziv;
-    private AppCompatCheckBox checkbox;
     private EditText email,lozinka,potvrda,broj;
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
     private AutoCompleteTextView autoCompleteTextView;
+    private View v;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,7 +65,7 @@ public class RegistrationActivity extends Fragment implements View.OnClickListen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        v=view;
         autoCompleteTextView=view.findViewById(R.id.autocomplete);
         autoCompleteTextView.setAdapter(new PlaceAutoSuggestAdapter(getActivity(),android.R.layout.simple_list_item_1));
         autoCompleteTextView.setOnItemClickListener((parent, vieww, position, id) -> {
@@ -98,11 +101,9 @@ public class RegistrationActivity extends Fragment implements View.OnClickListen
         email=view.findViewById(R.id.email_nav);
         lozinka=view.findViewById(R.id.lozinka);
         potvrda=view.findViewById(R.id.potvrdi);
-        checkbox = view.findViewById(R.id.checkbox);
         naziv=view.findViewById(R.id.naziv);
         broj=view.findViewById(R.id.broj_tel);
 
-        checkbox.setOnCheckedChangeListener(this);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -184,18 +185,7 @@ public class RegistrationActivity extends Fragment implements View.OnClickListen
         }
 
     }
-    @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-        if (isChecked) {
-            // show password
-            lozinka.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-            potvrda.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-        } else {
-            // hide password
-            lozinka.setTransformationMethod(PasswordTransformationMethod.getInstance());
-            potvrda.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-        }
-    }
+
     private boolean prazno(){
         if (TextUtils.isEmpty(email.getText().toString()) || TextUtils.isEmpty(broj.getText().toString()) || TextUtils.isEmpty(autoCompleteTextView.getText().toString()) || TextUtils.isEmpty(lozinka.getText().toString()) || TextUtils.isEmpty(naziv.getText().toString())){
             Toast.makeText(getActivity(),"Sva polja moraju biti popunjena",Toast.LENGTH_LONG).show();
@@ -229,6 +219,13 @@ public class RegistrationActivity extends Fragment implements View.OnClickListen
         editor.putString("broj",broj.getText().toString());
         editor.putBoolean("hasLogin",true);
         editor.putBoolean("skl",true);
+        NavigationView navigationView = v.findViewById(R.id.nav_view);
+
+        Menu menu=navigationView.getMenu();
+        MenuItem item ;
+        item =menu.findItem(R.id.nav_dodaj_ziv);
+        item.setVisible(true);
+
         editor.apply();
         FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, new ProfileActivity());

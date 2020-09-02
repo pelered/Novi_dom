@@ -2,24 +2,32 @@ package com.example.zivotinje;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.zivotinje.Adapter.SliderAdapter;
+import com.example.zivotinje.Helper.OnSwipeListener;
 import com.example.zivotinje.Model.Fav;
 import com.example.zivotinje.Model.ZivUpload;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrikazZiv extends Fragment {
+public class PrikazZiv extends Fragment{
 
     private String oznaka_ziv;
     private FirebaseDatabase database;
@@ -48,13 +56,15 @@ public class PrikazZiv extends Fragment {
     private ImageView favorite;
     private boolean oznacen_fav=false;
     private String uid;
-    ArrayList<String> favo;
-    Fav fav1;
+    private  ArrayList<String> favo;
+    private Fav fav1;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_prikaz_ziv, container, false);
     }
+    @SuppressLint("ClickableViewAccessibility")
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (getArguments()==null){
             Toast.makeText(getContext(),"Nisi smio ovo uspjet,javi mi kako",Toast.LENGTH_SHORT).show();
@@ -80,6 +90,8 @@ public class PrikazZiv extends Fragment {
         last_updated=view.findViewById(R.id.last_updated);
         created=view.findViewById(R.id.created);
         favo=new ArrayList<>();
+
+
         SharedPreferences prefs = getActivity().getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
         if(prefs.getString("uid",null)!=null) {
             uid=prefs.getString("uid",null);
@@ -157,7 +169,6 @@ public class PrikazZiv extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 odabrana_ziv = dataSnapshot.getValue(ZivUpload.class);
-                //todo dodat da ako ne nade ziv da odvede na home page
                 //Log.d("dadaj:0", dataSnapshot.getValue().toString());
                 if (dataSnapshot.hasChild("url")) {
                     for (Map.Entry<String, String> entry : odabrana_ziv.getUrl().entrySet()) {
@@ -203,14 +214,14 @@ public class PrikazZiv extends Fragment {
         ime.setText(odabrana_ziv.getNaziv());
         oznaka.setText(odabrana_ziv.getOznaka());
         pasmina.setText(odabrana_ziv.getPasmina());
-        kg.setText(odabrana_ziv.getTezina().doubleValue()+" kg");
+        kg.setText(odabrana_ziv.getTezina().toString()+" kg");
         status.setText(odabrana_ziv.getStatus());
         spol.setText(odabrana_ziv.getSpol());
         vrsta.setText(odabrana_ziv.getVrsta());
         opis.setText(odabrana_ziv.getOpis());
         starost.setText(odabrana_ziv.getGodine().toString()+" god");
-        created.setText("Dodan: " +odabrana_ziv.getDate());
-        last_updated.setText("Ažuriran: " +odabrana_ziv.getLast_date());
+        created.setText(odabrana_ziv.getDate());
+        last_updated.setText(odabrana_ziv.getLast_date());
         inicijalizirajSlider();
         email.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -274,8 +285,8 @@ public class PrikazZiv extends Fragment {
         sliderView1.setIndicatorUnselectedColor(Color.GRAY);
         sliderView1.setScrollTimeInSec(15);
         sliderView1.setOnIndicatorClickListener(position -> sliderView1.setCurrentPagePosition(position));
-    }
 
+    }
 
 }
 

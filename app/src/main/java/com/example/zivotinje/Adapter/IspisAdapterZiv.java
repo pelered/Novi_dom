@@ -33,13 +33,16 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
     @NonNull
     public IspisAdapterZiv.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //todo promjenit layout za zivotinje bas
-        View v = LayoutInflater.from(mContext).inflate(R.layout.card_view_skl, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.card_view_ziv, parent, false);
         return new IspisAdapterZiv.ImageViewHolder(v);
     }
 
     public void onBindViewHolder(@NonNull final IspisAdapterZiv.ImageViewHolder holder, final int position) {
         final ZivUpload uploadCurrent = mUploads.get(position);
         holder.textViewName.setText(uploadCurrent.getNaziv());
+        holder.skl.setText(uploadCurrent.getNaz_skl());
+        holder.status.setText(uploadCurrent.getStatus());
+        holder.izmjena.setText(uploadCurrent.getLast_date());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,7 +58,7 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
                 ft.commit();
             }
         });
-        Log.d("Pisem",uploadCurrent.getUrl().toString());
+        //Log.d("Pisem",uploadCurrent.getUrl().toString());
         if(uploadCurrent.getUrl()!=null){
             Glide.with(mContext)
                     .load(uploadCurrent.getUrl().get("0_key"))
@@ -70,10 +73,13 @@ public class IspisAdapterZiv extends RecyclerView.Adapter<IspisAdapterZiv.ImageV
     }
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
-        public TextView textViewName;
+        public TextView textViewName,skl,status,izmjena;
         public ImageView imageView;
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);
+            skl= itemView.findViewById(R.id.card_grad);
+            status= itemView.findViewById(R.id.status);
+            izmjena= itemView.findViewById(R.id.izmjena);
             textViewName = itemView.findViewById(R.id.textView_name);
             imageView = itemView.findViewById(R.id.image_view_upload);
         }

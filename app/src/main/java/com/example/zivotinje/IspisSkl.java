@@ -5,6 +5,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,12 +24,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Ispis extends Fragment {
+public class IspisSkl extends Fragment {
     private RecyclerView mRecyclerView;
     private IspisAdapter mAdapter;
     private ProgressBar mProgressCircle;
-    private List<Skl> mUploads;
+    private List<com.example.zivotinje.Model.Skl> mUploads;
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_ispis,container,false);
@@ -39,6 +43,14 @@ public class Ispis extends Fragment {
         mUploads = new ArrayList<>();
 
         mProgressCircle.setVisibility(View.VISIBLE);
+        if(getArguments().getString("skl_ispis")!=null){
+            ucitaj();
+        }
+
+
+
+    }
+    private void ucitaj(){
 
         DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference("Sklonista");
         //Log.d("Usao",mDatabaseRef.toString());
@@ -60,7 +72,6 @@ public class Ispis extends Fragment {
                 mProgressCircle.setVisibility(View.INVISIBLE);
             }
         });
-
     }
     }
 

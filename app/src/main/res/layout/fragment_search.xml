@@ -13,6 +13,9 @@
         tools:ignore="UselessParent">
 
         <TextView
+            android:paddingTop="20dp"
+            android:textColor="#020101"
+android:paddingBottom="20dp"
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,67 +26,126 @@
             android:text="@string/pretra_i"
             android:textSize="24sp"
             android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/idoznaka"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:hint="@string/oznaka_u_skloni_tu"
+            app:endIconMode="clear_text"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/idoznaka"
+            android:layout_width="308dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:autofillHints=""
             android:gravity="center"
-            android:hint="@string/oznaka_u_skloni_tu"
             android:inputType="text"
             android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/idskl"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_weight="1"
+
+            app:endIconMode="clear_text"
+            android:hint="@string/naziv_skloni_ta"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textview.MaterialAutoCompleteTextView
+            android:id="@+id/idskl"
+            android:layout_width="308dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:autofillHints=""
-            android:ems="10"
             android:gravity="center"
-            android:hint="@string/naziv_skloni_ta"
+            android:paddingTop="20dp"
+            android:textSize="18sp"
+android:paddingBottom="20dp"
             android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_weight="1"
+
+            app:endIconMode="clear_text"
+            android:hint="@string/pasmina"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <AutoCompleteTextView
             android:id="@+id/idpasmina"
-            android:layout_width="wrap_content"
+            android:layout_width="308dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:autofillHints=""
             android:ems="10"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:textSize="18sp"
             android:gravity="center"
-            android:hint="@string/pasmina"
             android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/idtezina"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:autofillHints=""
-            android:ems="10"
             android:gravity="center"
+            app:endIconMode="clear_text"
             android:hint="@string/te_ina_do"
-            android:inputType="numberDecimal|number" />
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <EditText
-            android:id="@+id/idstarost"
-            android:layout_width="wrap_content"
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/idtezina"
+            android:layout_width="308dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:autofillHints=""
             android:ems="10"
+            android:textSize="18sp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
             android:gravity="center"
-            android:hint="@string/starost_do"
             android:inputType="numberDecimal|number" />
+        </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            app:endIconMode="clear_text"
+            android:hint="@string/starost_do"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/idstarost"
+                android:layout_width="308dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:ems="10"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:inputType="numberDecimal|number"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp" />
+        </com.google.android.material.textfield.TextInputLayout>
         <RadioGroup
             android:id="@+id/vrsta"
             android:layout_width="wrap_content"
@@ -170,8 +232,8 @@
 
             <ImageButton
                 android:id="@+id/idsearch"
-                android:layout_width="85dp"
-                android:layout_height="74dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@color/transparent"
                 android:src="@drawable/ic_search_" />

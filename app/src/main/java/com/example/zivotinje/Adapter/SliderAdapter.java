@@ -2,6 +2,8 @@ package com.example.zivotinje.Adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 
+import com.example.zivotinje.Helper.OnSwipeListener;
 import com.example.zivotinje.R;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
@@ -23,7 +26,7 @@ public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapter
     private Context context;
     private int mCount;
     private ArrayList<String> path2;
-    private ArrayList<Uri> path;
+
     public SliderAdapter(FragmentActivity context) {
 
         this.context = context;
@@ -40,6 +43,7 @@ public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapter
     @Override
     public SliderAdapterVH onCreateViewHolder(ViewGroup parent) {
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_slider_adapter_example, null);
+
         return new SliderAdapterVH(inflate);
     }
     public void deleteItem(int position) {
@@ -109,6 +113,7 @@ public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapter
             videoViewBackground.setMediaController(controller);
 
             this.itemView = itemView;
+
         }
     }
 }

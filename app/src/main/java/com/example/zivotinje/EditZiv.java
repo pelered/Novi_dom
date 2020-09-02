@@ -159,7 +159,6 @@ public class EditZiv extends Fragment{
         upload.setOnClickListener(v -> {
 
 
-            Log.d("Upload()", String.valueOf(mDatabaseRef.child(oznaka.getText().toString())));
 
             if (mUploadTask != null && mUploadTask.isInProgress()) {
                 Toast.makeText(getActivity(), "Upload in progress", Toast.LENGTH_SHORT).show();
@@ -172,13 +171,23 @@ public class EditZiv extends Fragment{
                     mDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.getValue() == null) {
-                                // The child doesn't exist
-                                uploadFile();
+                            if(dataSnapshot.getValue()!=null){
+                                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("Obavijest o poklapanju oznaka");
+                                builder.setMessage("Ljubimac s tom oznakom već postoji. Želite li svejedno dodati/ažurirati?");
+                                builder.setCancelable(false);
+                                builder.setPositiveButton("Da", (dialog, which) -> {
+                                    Toast.makeText(getContext(), "Ljubimac će biti prepisan/ažuriran", Toast.LENGTH_SHORT).show();
+                                    uploadFile();
+                                    progressBar.setVisibility(View.VISIBLE);
+                                });
+                                builder.setNegativeButton("Ne", (dialog, which) -> Toast.makeText(getContext(), "Promijeniti oznaku", Toast.LENGTH_SHORT).show());
+                                builder.show();
                             }else{
-                                Toast.makeText(getActivity(), "Ljubimac s oznakom: "+oznaka.getText().toString()+" već postoji", Toast.LENGTH_LONG).show();
-
+                                progressBar.setVisibility(View.VISIBLE);
+                                uploadFile();
                             }
+
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -190,10 +199,13 @@ public class EditZiv extends Fragment{
         });
         pasmine=new ArrayList<>();
         //ucita podatke samo ako dode s ulogiranog sklonista,inace ne nego imamo prazna stranicu za popunit
-        if(TextUtils.isEmpty(getArguments().getString("id_skl_prikaz"))){
+        if(getArguments().getString("id_skl_prikaz")!=null){
             database= FirebaseDatabase.getInstance();
             mDatabaseRef = database.getReference("Ziv");
             ucitajPodatke();
+        }else if(getArguments().getString("ziv_dodaj")!=null){
+            ucitaj_pasmine();
+
         }else{
             ucitaj_pasmine();
 
@@ -292,7 +304,6 @@ public class EditZiv extends Fragment{
         oznaka.setText(dohvaceno.getOznaka());
         pasmina.setText(dohvaceno.getPasmina());
 
-        //todo provjeriti da ne izbaci ako ne postoji ziv
         if (dohvaceno.getSpol().equals("M")) {
             RadioButton id = ve.findViewById(R.id.M);
             id.setChecked(true);
@@ -336,12 +347,12 @@ public class EditZiv extends Fragment{
     }
     //uplodamo slike i dohvacamorl njihov
     private void uploadFile() {
-        Log.d("ucitajPasmi()5: ",pasmine.toString()+","+pasmine.size());
         //dohvaca se trenutno prikazan popis slika
         if (adapter!=null){
-        slike_ucitavanje_url =adapter.getList();}
-        //Log.d("uploadFile()2",slike_ucitavanje_url.toString());
-        slike_ucitavanje_url=new ArrayList<>();
+        slike_ucitavanje_url =adapter.getList();
+        }else{
+            slike_ucitavanje_url=new ArrayList<>();
+        }
 
 
         //da spremimo u hasmapu s hashem vec ucitane slike
@@ -409,12 +420,12 @@ public class EditZiv extends Fragment{
                                     assert downloadUri != null;
                                     slike_iz_baze.put(ImageList_key.get(count).toString(),downloadUri.toString());
                                     count++;
-                                    Toast.makeText(getActivity(), "Upload.Dohvacen url: "+count, Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(getActivity(), "Upload.Dohvacen url: "+count, Toast.LENGTH_LONG).show();
                                     final int K=0;
                                     if(ImageList.size()==count){
                                        // Log.d("ucitajPasmi()6: ",pasmine.toString()+","+pasmine.size());
                                         dodajSliku(vec_ucitane,slike_iz_baze);
-                                        Log.d("uploadFile()",slike_iz_baze.toString());
+                                        //Log.d("uploadFile()",slike_iz_baze.toString());
 
                                     }
 
@@ -480,20 +491,21 @@ public class EditZiv extends Fragment{
 
         last_updated=new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         //pripremamo za upload
+        String tez=tezina.getText().toString()+"."+gram.getText().toString();
         ZivUpload upload2 = new ZivUpload(ime.getText().toString(),oznaka.getText().toString(),
-                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),prefs.getString("uid",""),Float.parseFloat(tezina.getText().toString()+"."+gram.getText().toString()),
+                id_vrste.getText().toString(),pasmina.getText().toString(),opis.getText().toString(),prefs.getString("uid",""),Float.parseFloat(tez),
                 Float.parseFloat(godine.getText().toString()+"."+mjesec.getText().toString()),id_spol.getText().toString(),id_status.getText().toString(),
                 prefs.getString("username",""),prefs.getString("email",""),created_at,last_updated,
                 slike_map);
         Map<String, Object> postValues2=upload2.toMap();
-        //Log.d("ucitajSlike():",sve_pasmine.toString());
+        Log.d("ucitajSlike():",upload2.toString());
         for (int i=0; i<sve_pasmine.size();i++){
             String s=sve_pasmine.get(i).getPasminaName();
             //Log.d("ucitajSlike()1."+i,s);
             if(!s.equals(pasmina.getText().toString())){
                 //Log.d("ucitajSlike()2."+i,s);
                 PasminaItem pasminaItem=new PasminaItem(pasmina.getText().toString());
-                Map<String,Object> postV=pasminaItem.toMap(pasmine.size());
+                Map<String,Object> postV=pasminaItem.toMap(sve_pasmine.size());
                 database= FirebaseDatabase.getInstance();
                 mDatabaseRef = database.getReference("Pasmine");
                 mDatabaseRef.updateChildren(postV).addOnSuccessListener(aVoid -> Log.d("Pasmine azurirane ", "upload")).addOnFailureListener(e -> {
@@ -513,7 +525,7 @@ public class EditZiv extends Fragment{
                 storageReference.delete().addOnSuccessListener(aVoid -> {
                     //Toast.makeText(getContext(), "Slika izbrisana", Toast.LENGTH_SHORT).show();
                     if((finalI+1)==brisi_slike.size()) {
-                        Log.d("dodajSliku_count:", String.valueOf(finalI));
+                        //Log.d("dodajSliku_count:", String.valueOf(finalI));
                         mDatabaseRef.child(oznaka.getText().toString()).updateChildren(postValues2).addOnSuccessListener(aVoidd -> {
                             Toast.makeText(getContext(), "Uplodano/Ažurirano", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
@@ -556,15 +568,9 @@ public class EditZiv extends Fragment{
             });
         }
 
-        //resetira se jer smo uplodali slike
 
     }
-    //dohvacamo koja vrsta je slika
-   /* private String getFileExtension(Uri uri) {
-        ContentResolver cR = Objects.requireNonNull(getActivity()).getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(cR.getType(uri));
-    }*/
+
     //za otvaranje galerije na klik gumba
     private void openFileChooser() {
         final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
@@ -638,10 +644,6 @@ public class EditZiv extends Fragment{
                         //dodajemo novo odabrane slike u adapter na mjesto na kojem je sliderview bio
                         //kada se odabralo Odaberi slike
                         if (sliderView.getSliderAdapter()!=null){
-                           // Log.d("result():", String.valueOf(sliderView.getCurrentPagePosition()));
-                            //adapter.addItem(targetList, sliderView.getCurrentPagePosition());
-                            //adapter.notifyDataSetChanged();
-                            //targetList.clear();
                             adapter.addItem(targetList, sliderView.getCurrentPagePosition());
                             adapter.notifyDataSetChanged();
                             targetList.clear();

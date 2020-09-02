@@ -8,20 +8,29 @@
     tools:context=".ResetPasword"
     android:layout_gravity="center"
     android:gravity="center">
-
-    <EditText
-        android:id="@+id/etPasswordEmail"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="textEmailAddress"
         android:hint="@string/email"
-        android:layout_gravity="center"/>
+
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+    <EditText
+            android:id="@+id/etPasswordEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="center"
+            android:inputType="textEmailAddress"
+            android:layout_gravity="center"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <Button
         android:id="@+id/btnPasswordReset"        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        style="?attr/materialButtonOutlinedStyle"
+
         android:text="@string/resetiraj_lozinku" />
 </LinearLayout>
