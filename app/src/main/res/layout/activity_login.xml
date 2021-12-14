@@ -7,16 +7,19 @@
     tools:context=".Login">
 
     <TextView
-        android:layout_width="224dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="108dp"
-        android:layout_marginTop="41dp"
-        android:layout_marginRight="80dp"
-        android:text="Korisnici"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="89dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="99dp"
+        android:gravity="center"
+        android:text="@string/korisnik"
+        android:textColor="#020101"
         android:textSize="30sp"
+
         android:textStyle="italic">
 
     </TextView>
@@ -25,14 +28,13 @@
         android:id="@+id/googlebtn"
         android:layout_width="210dp"
         android:layout_height="43dp"
-
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="false"
-        android:layout_marginLeft="108dp"
+        android:layout_marginStart="108dp"
         android:layout_marginTop="110dp"
-        android:layout_marginRight="93dp">
+        android:layout_marginEnd="93dp">
 
     </com.google.android.gms.common.SignInButton>
 
@@ -40,60 +42,83 @@
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="37dp"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="103dp"
+        android:layout_marginStart="103dp"
         android:layout_marginTop="170dp"
-        android:layout_marginRight="92dp"
+        android:layout_marginEnd="92dp"
         android:layout_marginBottom="30dp" />
 
     <TextView
         android:layout_width="217dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="91dp"
-        android:layout_marginTop="258dp"
-        android:layout_marginRight="103dp"
-        android:text="Skloništa"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="224dp"
+        android:layout_marginEnd="105dp"
+        android:gravity="center"
+        android:text="@string/skloni_te"
+        android:textColor="#020101"
         android:textSize="30sp"
         android:textStyle="italic">
 
     </TextView>
 
-    <EditText
-        android:id="@+id/email_log"
-        android:layout_width="256dp"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="63dp"
-        android:layout_marginTop="321dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="69dp"
+        android:layout_marginTop="287dp"
         android:hint="Email"
-        android:inputType="textEmailAddress" />
+        app:endIconMode="clear_text">
 
-    <EditText
-        android:id="@+id/lozinka_log"
-        android:layout_width="253dp"
+        <EditText
+            android:id="@+id/email_log"
+            android:layout_width="256dp"
+            android:layout_height="wrap_content"
+
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="64dp"
-        android:layout_marginTop="384dp"
-        android:hint="Lozinka"
-        android:inputType="textPassword" />
+        android:layout_gravity="center"
+        android:layout_marginLeft="70dp"
+        android:layout_marginTop="358dp"
+        android:gravity="center"
+        android:hint="@string/lozinka_min_6_znakova"
+        app:endIconMode="password_toggle">
+
+        <EditText
+            android:id="@+id/lozinka_log"
+            android:layout_width="253dp"
+            android:layout_height="wrap_content"
+
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/log_skl"
-        android:layout_width="78dp"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="150dp"
-        android:layout_marginTop="465dp"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="468dp"
+
         android:text="Log in">
 
     </Button>
@@ -104,8 +129,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="153dp"
-        android:layout_marginTop="508dp"
+        android:layout_marginLeft="145dp"
+        android:layout_marginTop="516dp"
         android:text="Registriraj se">
 
     </TextView>
@@ -125,7 +150,21 @@
         android:layout_marginEnd="148dp"
         android:layout_marginRight="148dp"
         android:layout_marginBottom="265dp"
-        android:text="Pokaži lozinku" />
+        android:text="Pokaži lozinku"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/lozinka_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="430dp"
+        android:layout_marginEnd="100dp"
+        android:gravity="center"
+        android:text="Zaboravili ste lozinku" />
 
 
 </RelativeLayout>

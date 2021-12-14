@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PrikazSkl">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="297dp"
+            android:layout_margin="5dp"
+            app:cardCornerRadius="2dp">
+
+            <com.smarteist.autoimageslider.SliderView
+                android:id="@+id/imageSlider2"
+                android:layout_width="match_parent"
+                android:layout_height="297dp"
+
+
+                app:sliderAnimationDuration="600"
+                app:sliderAutoCycleDirection="back_and_forth"
+                app:sliderAutoCycleEnabled="true"
+                app:sliderIndicatorAnimationDuration="600"
+                app:sliderIndicatorGravity="center_horizontal|bottom"
+                app:sliderIndicatorMargin="15dp"
+                app:sliderIndicatorOrientation="horizontal"
+                app:sliderIndicatorPadding="3dp"
+                app:sliderIndicatorRadius="2dp"
+                app:sliderIndicatorSelectedColor="#5A5A5A"
+                app:sliderIndicatorUnselectedColor="#FFF"
+                app:sliderScrollTimeInSec="1"
+                app:sliderStartAutoCycle="true">
+
+            </com.smarteist.autoimageslider.SliderView>
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/edit_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+
+
+            android:layout_gravity="right"
+            android:src="@drawable/ic_mode_edit"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/naziv_skl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+android:textSize="24sp"
+            android:textColor="#000000"
+
+            android:background="@null"
+            android:gravity="center"
+            android:text="Naziv sklonista" />
+
+        <TextView
+            android:id="@+id/adresa_skl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:gravity="center"
+android:textSize="18sp"
+            android:drawableLeft="@drawable/ic_baseline_location_on"
+            android:drawablePadding="4dp"
+            android:paddingTop="10dp"
+            android:text="Adresa"
+            android:textColor="#21212B" />
+
+        <TextView
+            android:id="@+id/email_sk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#21212B"
+            android:textSize="20sp"
+            android:drawableLeft="@drawable/ic_envelope"
+            android:drawablePadding="4dp"
+            android:paddingTop="10dp"
+
+            android:layout_gravity="center"
+            android:background="@null"
+            android:gravity="center"
+            android:text="@string/email" />
+
+        <TextView
+            android:id="@+id/broj_tel_pri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#21212B"
+            android:textSize="20sp"
+            android:drawableLeft="@drawable/ic_phone"
+            android:drawablePadding="4dp"
+            android:paddingTop="10dp"
+            android:clickable="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/broj_telefona" />
+
+        <TextView
+
+            android:id="@+id/opis_skl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:textColor="#21212B"
+            android:textSize="20sp"
+            android:paddingTop="15sp"
+            android:gravity="center"
+            android:hint="@string/ne_to_o_nama"
+            android:inputType="textMultiLine"
+            tools:ignore="TextViewEdits" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/ispis_zv"
+                    android:layout_width="174dp"
+                    android:layout_height="wrap_content"
+                    style="?attr/materialButtonOutlinedStyle"
+
+                    android:text="Ispis ljubimaca" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/dodaj"
+                    android:layout_width="56dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+
+
+                    android:background="@drawable/ic_add_"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>

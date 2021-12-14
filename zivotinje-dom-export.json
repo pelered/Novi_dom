@@ -1,0 +1,26 @@
+{
+  "Sklonista" : {
+    "2r0DDq2A3daINzoerlZ2IV8i8nu2" : {
+      "-Lo7HqHkaJl7qWLtlq0V" : {
+        "imageUrl1" : "com.google.android.gms.tasks.zzu@765cbf6"
+      },
+      "-Lo7HqK2p5c53xcG2HP4" : {
+        "imageUrl1" : "com.google.android.gms.tasks.zzu@b4663ce"
+      },
+      "adresa" : "Ul. Antuna Gustava Matoša 46",
+      "id" : "2r0DDq2A3daINzoerlZ2IV8i8nu2",
+      "naziv" : "Skloniste Karlovac"
+    },
+    "HsV0xW5q8cet15SWnjXHfp5pgrQ2" : {
+      "-Lo7HL78Q6W89VPnYg5B" : {
+        "imageUrl1" : "com.google.android.gms.tasks.zzu@74685b4"
+      },
+      "-Lo7HLDrpgCv6LukTNJ-" : {
+        "imageUrl1" : "com.google.android.gms.tasks.zzu@410d74c"
+      },
+      "adresa" : "Ul. Nikole Tomašića 5",
+      "id" : "HsV0xW5q8cet15SWnjXHfp5pgrQ2",
+      "naziv" : "Skloniste Zagreb"
+    }
+  }
+}

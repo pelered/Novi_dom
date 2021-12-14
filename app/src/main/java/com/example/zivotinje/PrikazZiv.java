@@ -1,164 +1,294 @@
 package com.example.zivotinje;
 
-import android.content.ClipData;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.daimajia.slider.library.Animations.DescriptionAnimation;
-import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.BaseSliderView;
-import com.daimajia.slider.library.SliderTypes.TextSliderView;
-import com.daimajia.slider.library.Tricks.ViewPagerEx;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.zivotinje.Adapter.SliderAdapter;
+import com.example.zivotinje.Helper.OnSwipeListener;
+import com.example.zivotinje.Model.Fav;
+import com.example.zivotinje.Model.ZivUpload;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.smarteist.autoimageslider.IndicatorAnimations;
+import com.smarteist.autoimageslider.SliderAnimations;
+import com.smarteist.autoimageslider.SliderView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
-import static android.app.Activity.RESULT_OK;
+public class PrikazZiv extends Fragment{
 
-public class PrikazZiv extends Fragment implements ViewPagerEx.OnPageChangeListener,BaseSliderView.OnSliderClickListener {
-    int PICK_IMAGE_MULTIPLE = 5;
-    String imageEncoded;
-    List<String> imagesEncodedList;
+    private String oznaka_ziv;
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabaseRef;
+    private SliderView sliderView1;
+    private ZivUpload odabrana_ziv;
+    private TextView ime,opis,oznaka,kg,starost,status,vrsta,pasmina,spol,created,last_updated;
+    private ImageView email;
+    private ArrayList<String> slike= new ArrayList<>();
+    private ImageView favorite;
+    private boolean oznacen_fav=false;
+    private String uid;
+    private  ArrayList<String> favo;
+    private Fav fav1;
 
-    SliderLayout sliderLayout;
-    HashMap<String,String> Hash_file_maps ;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_prikaz_ziv, container, false);
     }
-
+    @SuppressLint("ClickableViewAccessibility")
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-
-        Hash_file_maps = new HashMap<String, String>();
-
-        sliderLayout = (SliderLayout)view.findViewById(R.id.slider);
-
-        Hash_file_maps.put("Android CupCake", "http://androidblog.esy.es/images/cupcake-1.png");
-        Hash_file_maps.put("Android Donut", "http://androidblog.esy.es/images/donut-2.png");
-        Hash_file_maps.put("Android Eclair", "http://androidblog.esy.es/images/eclair-3.png");
-        Hash_file_maps.put("Android Froyo", "http://androidblog.esy.es/images/froyo-4.png");
-        Hash_file_maps.put("Android GingerBread", "http://androidblog.esy.es/images/gingerbread-5.png");
-
-        for(String name : Hash_file_maps.keySet()){
-
-            TextSliderView textSliderView = new TextSliderView(getActivity());
-            textSliderView
-                    .description(name)
-                    .image(Hash_file_maps.get(name))
-                    .setScaleType(BaseSliderView.ScaleType.Fit)
-                    .setOnSliderClickListener(this);
-            textSliderView.bundle(new Bundle());
-            textSliderView.getBundle()
-                    .putString("extra",name);
-            sliderLayout.addSlider(textSliderView);
+        if (getArguments()==null){
+            Toast.makeText(getContext(),"Nisi smio ovo uspjet,javi mi kako",Toast.LENGTH_SHORT).show();
+        }else{
+            //Toast.makeText(getContext(),"Oznaka: "+getArguments().getString("oznaka"),Toast.LENGTH_SHORT).show();
+            oznaka_ziv= getArguments().getString("oznaka");
         }
-        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Accordion);
-        sliderLayout.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-        sliderLayout.setCustomAnimation(new DescriptionAnimation());
-        sliderLayout.setDuration(3000);
-        sliderLayout.addOnPageChangeListener(this);
+        database=FirebaseDatabase.getInstance();
+        mDatabaseRef=database.getReference("Ziv");
+        ime=view.findViewById(R.id.ime_nav);
+        opis=view.findViewById(R.id.opis);
+        oznaka=view.findViewById(R.id.oznaka);
+        kg=view.findViewById(R.id.tezina);
+        starost=view.findViewById(R.id.starost);
+        status=view.findViewById(R.id.status);
+        vrsta=view.findViewById(R.id.vrsta);
+        pasmina=view.findViewById(R.id.pasmina);
+        email=view.findViewById(R.id.email_nav);
+        spol=view.findViewById(R.id.spol);
+        sliderView1=view.findViewById(R.id.imageSlider);
+        favorite=view.findViewById(R.id.favorite);
+        favorite.setVisibility(View.INVISIBLE);
+        last_updated=view.findViewById(R.id.last_updated);
+        created=view.findViewById(R.id.created);
+        favo=new ArrayList<>();
 
 
+        SharedPreferences prefs = getActivity().getSharedPreferences("shared_pref_name", Context.MODE_PRIVATE);
+        if(prefs.getString("uid",null)!=null) {
+            uid=prefs.getString("uid",null);
+            favorite.setVisibility(View.VISIBLE);
+            favorite.setOnClickListener(v -> {
+                dodaj_favorita();
+            });
+        }
+        ucitaj_podatke();
     }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            // When an Image is picked
-            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
-                    && null != data) {
-                // Get the Image from data
 
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                imagesEncodedList = new ArrayList<String>();
-                if(data.getData()!=null){
+    private void dodaj_favorita() {
+        DatabaseReference ref= FirebaseDatabase.getInstance().getReference("Fav").child(uid);
+        if(!oznacen_fav) {
+            //oznacimo da nam se svida, oznaka je na true;
+            if(fav1==null){
+                favo=new ArrayList<>();
+                favo.add(odabrana_ziv.getOznaka());
+                fav1=new Fav();
+            }else {
+                favo.add(odabrana_ziv.getOznaka());
+                fav1.getFav().clear();
+            }
 
-                    Uri mImageUri=data.getData();
+            //Log.d("dodaj_fav0:",favo.toString());
+            if(fav1!=null) {
+                for (int i = 0; i < favo.size(); i++) {
+                    fav1.getFav().put(i + "_k", favo.get(i));
+                }
+            }else{
+                HashMap<String,String> pr=new HashMap<>();
+                pr.put((0 + "_k"),favo.get(0));
+                fav1.setFav(pr);
+            }
+            //Log.d("dodaj_fav:",fav1.toString());
+            Fav fav_up = new Fav(fav1.getFav());
+            //Log.d("dodaj_fav:1",fav_up.toString());
+            Map<String, Object> postValues2=fav_up.toMap();
+            //Log.d("dodaj_fav:2",postValues2.toString());
+            ref.updateChildren(postValues2).addOnSuccessListener(aVoid -> {
+                favorite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+                oznacen_fav=true;
+            }).addOnFailureListener(e -> {
+                fav1.getFav().remove(fav1.getFav().size()+"_k",odabrana_ziv.getOznaka());
+                favo.remove(odabrana_ziv.getOznaka());
+                Toast.makeText(getActivity(),"Neuspjelo dodavanje",Toast.LENGTH_SHORT);
+            });
 
-                    // Get the cursor
-                    Cursor cursor = getActivity().getContentResolver().query(mImageUri,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
+        }else{
+            //oznacimo da nam se ne sviđa,oznaka false
+            String key= null;
+            //String value="somename";
+            for(Map.Entry<String, String> entry :fav1.getFav().entrySet()){
+                if(odabrana_ziv.getOznaka().equals(entry.getValue())){
+                    key = entry.getKey();
+                    break; //breaking because its one to one map
+                }
+            }
+            //Log.d("dodaj_fav5.5", String.valueOf(ref.child("fav").child(key)));
+            ref.child("fav").child(key).removeValue((databaseError, databaseReference) -> {
+                favo.remove(odabrana_ziv.getOznaka());
+                for (int i=0;i<favo.size();i++){
+                    fav1.getFav().put(i+"_k",favo.get(i));
+                }
+               // Log.d("dodaj_fav:6",fav1.toString());
+                favorite.setBackgroundResource(R.drawable.ic_favorite_border_yellow);
+                oznacen_fav=false;
+            });
 
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageEncoded  = cursor.getString(columnIndex);
-                    cursor.close();
+        }
+    }
 
-                } else {
-                    if (data.getClipData() != null) {
-                        ClipData mClipData = data.getClipData();
-                        ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
-                        for (int i = 0; i < mClipData.getItemCount(); i++) {
-
-                            ClipData.Item item = mClipData.getItemAt(i);
-                            Uri uri = item.getUri();
-                            mArrayUri.add(uri);
-                            // Get the cursor
-
-                            Cursor cursor = getActivity().getContentResolver().query(uri, filePathColumn, null, null, null);
-                            // Move to first row
-                            cursor.moveToFirst();
-
-                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                            imageEncoded  = cursor.getString(columnIndex);
-                            imagesEncodedList.add(imageEncoded);
-                            cursor.close();
-
-                        }
-                        Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
+    private void ucitaj_podatke() {
+        mDatabaseRef.child(oznaka_ziv).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                odabrana_ziv = dataSnapshot.getValue(ZivUpload.class);
+                //Log.d("dadaj:0", dataSnapshot.getValue().toString());
+                if (dataSnapshot.hasChild("url")) {
+                    for (Map.Entry<String, String> entry : odabrana_ziv.getUrl().entrySet()) {
+                        slike.add(entry.getValue());
                     }
                 }
-            } else {
-                Toast.makeText(getActivity(), "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
+                if (uid != null) {
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Fav").child(uid);
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            fav1 = dataSnapshot.getValue(Fav.class);
+                            if (fav1 != null) {
+                                for (Map.Entry<String, String> entry : fav1.getFav().entrySet()) {
+                                    favo.add(entry.getValue());
+                                }
+                                if (fav1.getFav().containsValue(odabrana_ziv.getOznaka())) {
+                                    //Log.d("dadaj:2", String.valueOf(fav1));
+                                    favorite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+                                    oznacen_fav = true;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.d("onCancelled:fav: ", databaseError.getMessage());
+                        }
+                    });
+                }
+                postavi_podatke();
             }
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("onCancelled:ziv: ",databaseError.getMessage());
+                Toast.makeText(getActivity(),databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void postavi_podatke() {
+        ime.setText(odabrana_ziv.getNaziv());
+        oznaka.setText(odabrana_ziv.getOznaka());
+        pasmina.setText(odabrana_ziv.getPasmina());
+        kg.setText(odabrana_ziv.getTezina().toString()+" kg");
+        status.setText(odabrana_ziv.getStatus());
+        spol.setText(odabrana_ziv.getSpol());
+        vrsta.setText(odabrana_ziv.getVrsta());
+        opis.setText(odabrana_ziv.getOpis());
+        starost.setText(odabrana_ziv.getGodine().toString()+" god");
+        created.setText(odabrana_ziv.getDate());
+        last_updated.setText(odabrana_ziv.getLast_date());
+        inicijalizirajSlider();
+        email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getEmail();
+            }
+        });
+
+    }
+
+    private void getEmail() {
+        //String email1;
+        mDatabaseRef=database.getReference("Sklonista");
+        mDatabaseRef.child(odabrana_ziv.getId_skl()).child("email").addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("IntentReset")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Toast.makeText(getActivity(), dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+                sendEmail(dataSnapshot.getValue().toString());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getActivity(), "Greska s dohvacanjem emaila.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+    @SuppressLint("IntentReset")
+    private void sendEmail(String e) {
+        Log.i("Send email", "");
+        // String[] TO = {""};
+        // String[] CC = {""};
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setType("text/plain");
+        Log.d("saljem",e);
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{e});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Upit vezan za ljubimca s oznakom "+odabrana_ziv.getOznaka()+" u skloništu.");
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            //finish();
+            Log.d("Finished sending emai.", "");
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(getActivity(), "There is no email client installed.", Toast.LENGTH_SHORT).show();
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-    @Override
-    public void onStop() {
-
-        sliderLayout.stopAutoCycle();
-
-        super.onStop();
     }
 
-    @Override
-    public void onSliderClick(BaseSliderView slider) {
-        Toast.makeText(getActivity(),slider.getBundle().get("extra") + "",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    private void inicijalizirajSlider() {
+        final SliderAdapter adapter= new SliderAdapter(getActivity());
+        adapter.setCount(slike.size());
+        adapter.slike2(slike);
+        sliderView1.setSliderAdapter(adapter);
+        sliderView1.setIndicatorAnimation(IndicatorAnimations.SLIDE);
+        sliderView1.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION);
+        sliderView1.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+        sliderView1.setIndicatorSelectedColor(Color.WHITE);
+        sliderView1.setIndicatorUnselectedColor(Color.GRAY);
+        sliderView1.setScrollTimeInSec(15);
+        sliderView1.setOnIndicatorClickListener(position -> sliderView1.setCurrentPagePosition(position));
 
     }
 
-    @Override
-    public void onPageSelected(int position) {
-        Log.d("Slider Demo", "Page Changed: " + position);
-
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
-    }
 }
+
+
+
